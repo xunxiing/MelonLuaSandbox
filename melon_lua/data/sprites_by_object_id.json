@@ -1,0 +1,2747 @@
+{
+  "stats": {
+    "reliable": 19,
+    "aigcsave_icon": 396,
+    "atlas_match": 5,
+    "plastic": 36
+  },
+  "count": 456,
+  "sprites": [
+    {
+      "objectId": 0,
+      "gameObjectName": "",
+      "spritePath": "sprites_pack/images/0000_obj_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 1,
+      "gameObjectName": "Propeller",
+      "spritePath": "sprites_pack/images/0001_Propeller.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 2,
+      "gameObjectName": "Apple",
+      "spritePath": "sprites_pack/images/0002_Apple.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 3,
+      "gameObjectName": "Armchair",
+      "spritePath": "sprites_pack/images/0003_Armchair.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 4,
+      "gameObjectName": "Armor",
+      "spritePath": "sprites_pack/images/0004_Armor.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 5,
+      "gameObjectName": "Arrow",
+      "spritePath": "sprites_pack/images/0005_Arrow_atlas.png",
+      "source": "manifest_exact"
+    },
+    {
+      "objectId": 6,
+      "gameObjectName": "ArrowH",
+      "spritePath": "sprites_pack/images/0006_ArrowH_atlas.png",
+      "source": "manifest_fuzzy"
+    },
+    {
+      "objectId": 7,
+      "gameObjectName": "AutoPistol",
+      "spritePath": "sprites_pack/images/0007_AutoPistol.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 8,
+      "gameObjectName": "AutoRifle",
+      "spritePath": "sprites_pack/images/0008_AutoRifle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 9,
+      "gameObjectName": "Ax",
+      "spritePath": "sprites_pack/images/0009_Ax.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 10,
+      "gameObjectName": "Wing",
+      "spritePath": "sprites_pack/images/0010_Wing.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 11,
+      "gameObjectName": "AxeHammer",
+      "spritePath": "sprites_pack/images/0011_AxeHammer.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 12,
+      "gameObjectName": "AxeHev",
+      "spritePath": "sprites_pack/images/0012_AxeHev.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 13,
+      "gameObjectName": "Ranger",
+      "spritePath": "sprites_pack/images/0013_Ranger.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 14,
+      "gameObjectName": "Balk",
+      "spritePath": "sprites_pack/images/0014_Balk.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 15,
+      "gameObjectName": "BalkShort",
+      "spritePath": "sprites_pack/images/0015_BalkShort.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 16,
+      "gameObjectName": "Balloon",
+      "spritePath": "sprites_pack/images/0016_Balloon_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 17,
+      "gameObjectName": "Bandage",
+      "spritePath": "sprites_pack/images/0017_Bandage.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 18,
+      "gameObjectName": "Bat",
+      "spritePath": "sprites_pack/images/0018_Bat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 19,
+      "gameObjectName": "Beard",
+      "spritePath": "sprites_pack/images/0019_Beard.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 20,
+      "gameObjectName": "Boots",
+      "spritePath": "sprites_pack/images/0020_Boots.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 21,
+      "gameObjectName": "Bottle",
+      "spritePath": "sprites_pack/images/0021_Bottle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 22,
+      "gameObjectName": "Bowl",
+      "spritePath": "sprites_pack/images/0022_Bowl.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 23,
+      "gameObjectName": "Box",
+      "spritePath": "sprites_pack/images/0023_Box.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 24,
+      "gameObjectName": "Brick",
+      "spritePath": "sprites_pack/images/0024_Brick.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 25,
+      "gameObjectName": "BrickWall",
+      "spritePath": "sprites_pack/images/0025_BrickWall.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 26,
+      "gameObjectName": "NuclearBomb",
+      "spritePath": "sprites_pack/images/0026_NuclearBomb.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 27,
+      "gameObjectName": "Bulgeon",
+      "spritePath": "sprites_pack/images/0027_Bulgeon.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 28,
+      "gameObjectName": "BulletproofVestHeavy",
+      "spritePath": "sprites_pack/images/0028_BulletproofVestHeavy.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 29,
+      "gameObjectName": "BulletproofVestLight",
+      "spritePath": "sprites_pack/images/0029_BulletproofVestLight.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 30,
+      "gameObjectName": "BulletproofVestMedium",
+      "spritePath": "sprites_pack/images/0030_BulletproofVestMedium.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 31,
+      "gameObjectName": "Business suit",
+      "spritePath": "sprites_pack/images/0031_Business suit.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 32,
+      "gameObjectName": "C4",
+      "spritePath": "sprites_pack/images/0032_C4.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 33,
+      "gameObjectName": "Lever",
+      "spritePath": "sprites_pack/images/0033_Lever.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 34,
+      "gameObjectName": "Cap",
+      "spritePath": "sprites_pack/images/0034_Cap.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 35,
+      "gameObjectName": "Chair",
+      "spritePath": "sprites_pack/images/0035_Chair.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 36,
+      "gameObjectName": "Christmas hat",
+      "spritePath": "sprites_pack/images/0036_Christmas hat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 37,
+      "gameObjectName": "Club",
+      "spritePath": "sprites_pack/images/0037_Club.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 38,
+      "gameObjectName": "Corn",
+      "spritePath": "sprites_pack/images/0038_Corn.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 39,
+      "gameObjectName": "Crossbow",
+      "spritePath": "sprites_pack/images/0039_Crossbow.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 40,
+      "gameObjectName": "Cup",
+      "spritePath": "sprites_pack/images/0040_Cup.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 41,
+      "gameObjectName": "DirectBomb",
+      "spritePath": "sprites_pack/images/0041_DirectBomb.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 42,
+      "gameObjectName": "Desintegrator",
+      "spritePath": "sprites_pack/images/0042_Desintegrator.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 43,
+      "gameObjectName": "Dress",
+      "spritePath": "sprites_pack/images/0043_Dress.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 44,
+      "gameObjectName": "Revolver",
+      "spritePath": "sprites_pack/images/0044_Revolver.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 45,
+      "gameObjectName": "CircularSaw",
+      "spritePath": "sprites_pack/images/0045_CircularSaw.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 46,
+      "gameObjectName": "Extinguisher",
+      "spritePath": "sprites_pack/images/0046_Extinguisher.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 47,
+      "gameObjectName": "FlameThrower",
+      "spritePath": "sprites_pack/images/0047_FlameThrower.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 48,
+      "gameObjectName": "FlashGranade",
+      "spritePath": "sprites_pack/images/0048_FlashGranade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 49,
+      "gameObjectName": "FragGranade",
+      "spritePath": "sprites_pack/images/0049_FragGranade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 50,
+      "gameObjectName": "Glass",
+      "spritePath": "sprites_pack/images/0050_Glass.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 51,
+      "gameObjectName": "RocketLauncher",
+      "spritePath": "sprites_pack/images/0051_RocketLauncher.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 52,
+      "gameObjectName": "GranadeLauncher",
+      "spritePath": "sprites_pack/images/0052_GranadeLauncher.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 53,
+      "gameObjectName": "ButtonF",
+      "spritePath": "sprites_pack/images/0053_ButtonF.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 54,
+      "gameObjectName": "HammerHev",
+      "spritePath": "sprites_pack/images/0054_HammerHev.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 55,
+      "gameObjectName": "Hard hat",
+      "spritePath": "sprites_pack/images/0055_Hard hat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 56,
+      "gameObjectName": "Hat",
+      "spritePath": "sprites_pack/images/0056_Hat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 57,
+      "gameObjectName": "HeartMonitor",
+      "spritePath": "sprites_pack/images/0057_HeartMonitor.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 58,
+      "gameObjectName": "Helmet Medieval 1",
+      "spritePath": "sprites_pack/images/0058_Helmet Medieval 1.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 59,
+      "gameObjectName": "Helmet Medieval 2",
+      "spritePath": "sprites_pack/images/0059_Helmet Medieval 2.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 60,
+      "gameObjectName": "Helmet Medieval 3",
+      "spritePath": "sprites_pack/images/0060_Helmet Medieval 3.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 61,
+      "gameObjectName": "Helmet",
+      "spritePath": "sprites_pack/images/0061_Helmet.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 62,
+      "gameObjectName": "Human",
+      "spritePath": "sprites_pack/images/0062_Human.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 63,
+      "gameObjectName": "HumanA",
+      "spritePath": "sprites_pack/images/0063_HumanA.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 64,
+      "gameObjectName": "HumanC",
+      "spritePath": "sprites_pack/images/0064_HumanC.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 65,
+      "gameObjectName": "PulseGun",
+      "spritePath": "sprites_pack/images/0065_PulseGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 66,
+      "gameObjectName": "HumanP",
+      "spritePath": "sprites_pack/images/0066_HumanP.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 67,
+      "gameObjectName": "Impact Grenade",
+      "spritePath": "sprites_pack/images/0067_Impact Grenade_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 68,
+      "gameObjectName": "Jeans",
+      "spritePath": "sprites_pack/images/0068_Jeans.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 69,
+      "gameObjectName": "Knife",
+      "spritePath": "sprites_pack/images/0069_Knife.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 70,
+      "gameObjectName": "LandMineMini",
+      "spritePath": "sprites_pack/images/0070_LandMineMini.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 71,
+      "gameObjectName": "Mace",
+      "spritePath": "sprites_pack/images/0071_Mace_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 72,
+      "gameObjectName": "Machete",
+      "spritePath": "sprites_pack/images/0072_Machete.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 73,
+      "gameObjectName": "MedicalHat",
+      "spritePath": "sprites_pack/images/0073_MedicalHat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 74,
+      "gameObjectName": "Melon",
+      "spritePath": "sprites_pack/images/0074_Melon.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 75,
+      "gameObjectName": "MelonGibs",
+      "spritePath": "sprites_pack/images/0075_MelonGibs_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 76,
+      "gameObjectName": "MetalRod",
+      "spritePath": "sprites_pack/images/0076_MetalRod.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 77,
+      "gameObjectName": "MilitaryHelmet",
+      "spritePath": "sprites_pack/images/0077_MilitaryHelmet.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 78,
+      "gameObjectName": "MilitaryHelmetMedical",
+      "spritePath": "sprites_pack/images/0078_MilitaryHelmetMedical.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 79,
+      "gameObjectName": "Minigun",
+      "spritePath": "sprites_pack/images/0079_Minigun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 80,
+      "gameObjectName": "Molotov",
+      "spritePath": "sprites_pack/images/0080_Molotov.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 81,
+      "gameObjectName": "Melon cooler",
+      "spritePath": "sprites_pack/images/0081_Melon cooler.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 82,
+      "gameObjectName": "Mask",
+      "spritePath": "sprites_pack/images/0082_Mask_atlas.png",
+      "source": "manifest_fuzzy"
+    },
+    {
+      "objectId": 83,
+      "gameObjectName": "MPM",
+      "spritePath": "sprites_pack/images/0083_MPM.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 84,
+      "gameObjectName": "Pads",
+      "spritePath": "sprites_pack/images/0084_Pads.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 85,
+      "gameObjectName": "Pickaxe",
+      "spritePath": "sprites_pack/images/0085_Pickaxe.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 86,
+      "gameObjectName": "Pistol",
+      "spritePath": "sprites_pack/images/0086_Pistol.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 87,
+      "gameObjectName": "Plate",
+      "spritePath": "sprites_pack/images/0087_Plate.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 88,
+      "gameObjectName": "Present",
+      "spritePath": "sprites_pack/images/0088_Present.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 89,
+      "gameObjectName": "ProtoGun",
+      "spritePath": "sprites_pack/images/0089_ProtoGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 90,
+      "gameObjectName": "Pumpkin",
+      "spritePath": "sprites_pack/images/0090_Pumpkin.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 91,
+      "gameObjectName": "PumpkinGibs",
+      "spritePath": "sprites_pack/images/0091_PumpkinGibs_atlas.png",
+      "source": "manifest_fuzzy"
+    },
+    {
+      "objectId": 92,
+      "gameObjectName": "PushGranade",
+      "spritePath": "sprites_pack/images/0092_PushGranade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 93,
+      "gameObjectName": "Railgun",
+      "spritePath": "sprites_pack/images/0093_Railgun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 94,
+      "gameObjectName": "Ring",
+      "spritePath": "sprites_pack/images/0094_Ring.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 95,
+      "gameObjectName": "SawedOff",
+      "spritePath": "sprites_pack/images/0095_SawedOff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 96,
+      "gameObjectName": "Sunglasses",
+      "spritePath": "sprites_pack/images/0096_Sunglasses_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 97,
+      "gameObjectName": "Shoes",
+      "spritePath": "sprites_pack/images/0097_Shoes.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 98,
+      "gameObjectName": "Sniper",
+      "spritePath": "sprites_pack/images/0098_Sniper.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 99,
+      "gameObjectName": "SnowMan",
+      "spritePath": "sprites_pack/images/0099_SnowMan_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 100,
+      "gameObjectName": "Spas",
+      "spritePath": "sprites_pack/images/0100_Spas.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 101,
+      "gameObjectName": "Spear",
+      "spritePath": "sprites_pack/images/0101_Spear.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 102,
+      "gameObjectName": "Splint",
+      "spritePath": "sprites_pack/images/0102_Splint.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 103,
+      "gameObjectName": "FreezeStaff",
+      "spritePath": "sprites_pack/images/0103_FreezeStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 104,
+      "gameObjectName": "StickyBomb",
+      "spritePath": "sprites_pack/images/0104_StickyBomb.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 105,
+      "gameObjectName": "Sword",
+      "spritePath": "sprites_pack/images/0105_Sword.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 106,
+      "gameObjectName": "SyringeAcid",
+      "spritePath": "sprites_pack/images/0106_SyringeAcid.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 107,
+      "gameObjectName": "SyringeFireproof",
+      "spritePath": "sprites_pack/images/0107_SyringeFireproof.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 108,
+      "gameObjectName": "SyringeHeal",
+      "spritePath": "sprites_pack/images/0108_SyringeHeal.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 109,
+      "gameObjectName": "SyringeImmortal",
+      "spritePath": "sprites_pack/images/0109_SyringeImmortal.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 110,
+      "gameObjectName": "SyringeRegen",
+      "spritePath": "sprites_pack/images/0110_SyringeRegen.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 111,
+      "gameObjectName": "SyringeVirus",
+      "spritePath": "sprites_pack/images/0111_SyringeVirus.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 112,
+      "gameObjectName": "SyringeWater",
+      "spritePath": "sprites_pack/images/0112_SyringeWater.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 113,
+      "gameObjectName": "T-shirt",
+      "spritePath": "sprites_pack/images/0113_T-shirt.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 114,
+      "gameObjectName": "Table",
+      "spritePath": "sprites_pack/images/0114_Table.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 115,
+      "gameObjectName": "Tea box",
+      "spritePath": "sprites_pack/images/0115_Tea box.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 116,
+      "gameObjectName": "Tokarev",
+      "spritePath": "sprites_pack/images/0116_Tokarev.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 117,
+      "gameObjectName": "TrapMain",
+      "spritePath": "sprites_pack/images/0117_TrapMain.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 118,
+      "gameObjectName": "Trousers",
+      "spritePath": "sprites_pack/images/0118_Trousers.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 119,
+      "gameObjectName": "Watergun",
+      "spritePath": "sprites_pack/images/0119_Watergun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 120,
+      "gameObjectName": "Weight",
+      "spritePath": "sprites_pack/images/0120_Weight.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 121,
+      "gameObjectName": "Wheel",
+      "spritePath": "sprites_pack/images/0121_Wheel.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 122,
+      "gameObjectName": "Wooden lath",
+      "spritePath": "sprites_pack/images/0122_Wooden lath.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 123,
+      "gameObjectName": "WoodenBarel",
+      "spritePath": "sprites_pack/images/0123_WoodenBarel.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 124,
+      "gameObjectName": "Sunglasses",
+      "spritePath": "sprites_pack/images/0124_Sunglasses_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 125,
+      "gameObjectName": "WoodenStick",
+      "spritePath": "sprites_pack/images/0125_WoodenStick.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 126,
+      "gameObjectName": "Camouflage pants",
+      "spritePath": "sprites_pack/images/0126_Camouflage pants.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 127,
+      "gameObjectName": "Camouflage suit",
+      "spritePath": "sprites_pack/images/0127_Camouflage suit.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 128,
+      "gameObjectName": "Construction vest",
+      "spritePath": "sprites_pack/images/0128_Construction vest.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 129,
+      "gameObjectName": "Teapot",
+      "spritePath": "sprites_pack/images/0129_Teapot.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 130,
+      "gameObjectName": "Gyroscope",
+      "spritePath": "sprites_pack/images/0130_Gyroscope.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 131,
+      "gameObjectName": "ElectroMotor",
+      "spritePath": "sprites_pack/images/0131_ElectroMotor.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 132,
+      "gameObjectName": "Thruster",
+      "spritePath": "sprites_pack/images/0132_Thruster.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 133,
+      "gameObjectName": "Piston",
+      "spritePath": "sprites_pack/images/0133_Piston.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 134,
+      "gameObjectName": "Button",
+      "spritePath": "sprites_pack/images/0134_Button.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 135,
+      "gameObjectName": "CupThrower",
+      "spritePath": "sprites_pack/images/0135_CupThrower.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 136,
+      "gameObjectName": "Turret",
+      "spritePath": "sprites_pack/images/0136_Turret.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 137,
+      "gameObjectName": "ResizableCamoGreen",
+      "spritePath": "sprites_pack/images/0137_ResizableCamoGreen.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 138,
+      "gameObjectName": "ResizableCamoGrey",
+      "spritePath": "sprites_pack/images/0138_ResizableCamoGrey.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 139,
+      "gameObjectName": "ResizableCamoYellow",
+      "spritePath": "sprites_pack/images/0139_ResizableCamoYellow.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 140,
+      "gameObjectName": "ResizableMetal",
+      "spritePath": "sprites_pack/images/0140_ResizableMetal.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 141,
+      "gameObjectName": "ResizableWood",
+      "spritePath": "sprites_pack/images/0141_ResizableWood.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 142,
+      "gameObjectName": "ToolGun",
+      "spritePath": "sprites_pack/images/0142_ToolGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 143,
+      "gameObjectName": "Sunglasses",
+      "spritePath": "sprites_pack/images/0143_Sunglasses.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 144,
+      "gameObjectName": "Mask",
+      "spritePath": "sprites_pack/images/0144_Mask.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 145,
+      "gameObjectName": "Toy1",
+      "spritePath": "sprites_pack/images/0145_Toy1_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 146,
+      "gameObjectName": "Toy2",
+      "spritePath": "sprites_pack/images/0146_Toy2_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 147,
+      "gameObjectName": "Toy3",
+      "spritePath": "sprites_pack/images/0147_Toy3_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 148,
+      "gameObjectName": "Toy4",
+      "spritePath": "sprites_pack/images/0148_Toy4_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 149,
+      "gameObjectName": "Toy5",
+      "spritePath": "sprites_pack/images/0149_Toy5_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 150,
+      "gameObjectName": "Toy6",
+      "spritePath": "sprites_pack/images/0150_Toy6_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 151,
+      "gameObjectName": "Toy7",
+      "spritePath": "sprites_pack/images/0151_Toy7_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 152,
+      "gameObjectName": "Toy8",
+      "spritePath": "sprites_pack/images/0152_Toy8_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 153,
+      "gameObjectName": "Parachute",
+      "spritePath": "sprites_pack/images/0153_Parachute.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 154,
+      "gameObjectName": "LimbConnector",
+      "spritePath": "sprites_pack/images/0154_LimbConnector.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 155,
+      "gameObjectName": "ResizableCamoSand",
+      "spritePath": "sprites_pack/images/0155_ResizableCamoSand.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 156,
+      "gameObjectName": "SpaceSuit",
+      "spritePath": "sprites_pack/images/0156_SpaceSuit.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 157,
+      "gameObjectName": "SpaceHelmet",
+      "spritePath": "sprites_pack/images/0157_SpaceHelmet.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 158,
+      "gameObjectName": "Cactus",
+      "spritePath": "sprites_pack/images/0158_Cactus.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 159,
+      "gameObjectName": "Jeep",
+      "spritePath": "sprites_pack/images/0159_Jeep.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 160,
+      "gameObjectName": "SportsShorts",
+      "spritePath": "sprites_pack/images/0160_SportsShorts.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 161,
+      "gameObjectName": "BasketballBall",
+      "spritePath": "sprites_pack/images/0161_BasketballBall.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 162,
+      "gameObjectName": "BasketballHoop",
+      "spritePath": "sprites_pack/images/0162_BasketballHoop.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 163,
+      "gameObjectName": "FootballBall",
+      "spritePath": "sprites_pack/images/0163_FootballBall.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 164,
+      "gameObjectName": "FootballGoal",
+      "spritePath": "sprites_pack/images/0164_FootballGoal.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 165,
+      "gameObjectName": "TennisBall",
+      "spritePath": "sprites_pack/images/0165_TennisBall.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 166,
+      "gameObjectName": "TennisRacket",
+      "spritePath": "sprites_pack/images/0166_TennisRacket.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 167,
+      "gameObjectName": "HumanRobot",
+      "spritePath": "sprites_pack/images/0167_HumanRobot_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 168,
+      "gameObjectName": "AxeHev_B",
+      "spritePath": "sprites_pack/images/0168_AxeHev_B.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 169,
+      "gameObjectName": "Pistol_B",
+      "spritePath": "sprites_pack/images/0169_Pistol_B.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 170,
+      "gameObjectName": "Revolver_B",
+      "spritePath": "sprites_pack/images/0170_Revolver_B.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 171,
+      "gameObjectName": "Sword_B",
+      "spritePath": "sprites_pack/images/0171_Sword_B.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 172,
+      "gameObjectName": "BTR_Vehicle",
+      "spritePath": "sprites_pack/images/0172_BTR_Vehicle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 173,
+      "gameObjectName": "LaserGun",
+      "spritePath": "sprites_pack/images/0173_LaserGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 174,
+      "gameObjectName": "ScooterVehicle",
+      "spritePath": "sprites_pack/images/0174_ScooterVehicle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 175,
+      "gameObjectName": "PaintballGun",
+      "spritePath": "sprites_pack/images/0175_PaintballGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 176,
+      "gameObjectName": "StreetLight",
+      "spritePath": "sprites_pack/images/0176_StreetLight.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 177,
+      "gameObjectName": "FlashLight",
+      "spritePath": "sprites_pack/images/0177_FlashLight.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 178,
+      "gameObjectName": "EdisonLamp",
+      "spritePath": "sprites_pack/images/0178_EdisonLamp.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 179,
+      "gameObjectName": "CandleLight",
+      "spritePath": "sprites_pack/images/0179_CandleLight.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 180,
+      "gameObjectName": "Candlestick",
+      "spritePath": "sprites_pack/images/0180_Candlestick.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 181,
+      "gameObjectName": "FestoonLight",
+      "spritePath": "sprites_pack/images/0181_FestoonLight.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 182,
+      "gameObjectName": "Firework",
+      "spritePath": "sprites_pack/images/0182_Firework.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 183,
+      "gameObjectName": "Cake",
+      "spritePath": "sprites_pack/images/0183_Cake.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 184,
+      "gameObjectName": "ContraptionSpawner",
+      "spritePath": "sprites_pack/images/0184_ContraptionSpawner.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 185,
+      "gameObjectName": "VacuumCleaner",
+      "spritePath": "sprites_pack/images/0185_VacuumCleaner.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 186,
+      "gameObjectName": "HumanCactus",
+      "spritePath": "sprites_pack/images/0186_HumanCactus.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 187,
+      "gameObjectName": "HalloweenPumpkin",
+      "spritePath": "sprites_pack/images/0187_HalloweenPumpkin.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 188,
+      "gameObjectName": "RabbitHat",
+      "spritePath": "sprites_pack/images/0188_RabbitHat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 189,
+      "gameObjectName": "RabbitCostume",
+      "spritePath": "sprites_pack/images/0189_RabbitCostume.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 190,
+      "gameObjectName": "WitchHat",
+      "spritePath": "sprites_pack/images/0190_WitchHat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 191,
+      "gameObjectName": "FairyWings",
+      "spritePath": "sprites_pack/images/0191_FairyWings.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 192,
+      "gameObjectName": "Bus",
+      "spritePath": "sprites_pack/images/0192_Bus.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 193,
+      "gameObjectName": "Spruce",
+      "spritePath": "sprites_pack/images/0193_Spruce.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 194,
+      "gameObjectName": "KefiaFull",
+      "spritePath": "sprites_pack/images/0194_KefiaFull.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 195,
+      "gameObjectName": "KefiaPartial",
+      "spritePath": "sprites_pack/images/0195_KefiaPartial.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 196,
+      "gameObjectName": "Shirt",
+      "spritePath": "sprites_pack/images/0196_Shirt.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 197,
+      "gameObjectName": "Santa_Costume",
+      "spritePath": "sprites_pack/images/0197_Santa_Costume.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 198,
+      "gameObjectName": "ElfHat",
+      "spritePath": "sprites_pack/images/0198_ElfHat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 199,
+      "gameObjectName": "ElfCostume",
+      "spritePath": "sprites_pack/images/0199_ElfCostume.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 200,
+      "gameObjectName": "Sweater",
+      "spritePath": "sprites_pack/images/0200_Sweater.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 201,
+      "gameObjectName": "ResizableConcrete",
+      "spritePath": "sprites_pack/images/0201_ResizableConcrete.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 202,
+      "gameObjectName": "ResizablePlastic",
+      "spritePath": "sprites_pack/images/0202_ResizablePlastic.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 203,
+      "gameObjectName": "RedCoat",
+      "spritePath": "sprites_pack/images/0203_RedCoat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 204,
+      "gameObjectName": "FurCoat",
+      "spritePath": "sprites_pack/images/0204_FurCoat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 205,
+      "gameObjectName": "ResizableBrick",
+      "spritePath": "sprites_pack/images/0205_ResizableBrick.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 206,
+      "gameObjectName": "WinterJacket",
+      "spritePath": "sprites_pack/images/0206_WinterJacket.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 207,
+      "gameObjectName": "WinterCoat",
+      "spritePath": "sprites_pack/images/0207_WinterCoat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 208,
+      "gameObjectName": "WinterSocks",
+      "spritePath": "sprites_pack/images/0208_WinterSocks.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 209,
+      "gameObjectName": "WarmPants",
+      "spritePath": "sprites_pack/images/0209_WarmPants.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 210,
+      "gameObjectName": "PompomHat",
+      "spritePath": "sprites_pack/images/0210_PompomHat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 211,
+      "gameObjectName": "WinterBoots",
+      "spritePath": "sprites_pack/images/0211_WinterBoots.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 212,
+      "gameObjectName": "PilotHat",
+      "spritePath": "sprites_pack/images/0212_PilotHat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 213,
+      "gameObjectName": "Truck",
+      "spritePath": "sprites_pack/images/0213_Truck.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 214,
+      "gameObjectName": "HumanTomato",
+      "spritePath": "sprites_pack/images/0214_HumanTomato.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 215,
+      "gameObjectName": "Thing",
+      "spritePath": "sprites_pack/images/0215_Thing_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 216,
+      "gameObjectName": "AppleTree",
+      "spritePath": "sprites_pack/images/0216_AppleTree.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 217,
+      "gameObjectName": "Tree",
+      "spritePath": "sprites_pack/images/0217_Tree.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 218,
+      "gameObjectName": "Bush",
+      "spritePath": "sprites_pack/images/0218_Bush.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 219,
+      "gameObjectName": "Palm",
+      "spritePath": "sprites_pack/images/0219_Palm.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 220,
+      "gameObjectName": "SpruceBig",
+      "spritePath": "sprites_pack/images/0220_SpruceBig.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 221,
+      "gameObjectName": "FireStaff",
+      "spritePath": "sprites_pack/images/0221_FireStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 222,
+      "gameObjectName": "TriplexGlass",
+      "spritePath": "sprites_pack/images/0222_TriplexGlass.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 223,
+      "gameObjectName": "ResizableGothicBrick",
+      "spritePath": "sprites_pack/images/0223_ResizableGothicBrick.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 224,
+      "gameObjectName": "LogSide",
+      "spritePath": "sprites_pack/images/0224_LogSide.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 225,
+      "gameObjectName": "LogFront",
+      "spritePath": "sprites_pack/images/0225_LogFront.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 226,
+      "gameObjectName": "Cobblestone",
+      "spritePath": "sprites_pack/images/0226_Cobblestone.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 227,
+      "gameObjectName": "FuelBarrel1",
+      "spritePath": "sprites_pack/images/0227_FuelBarrel1.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 228,
+      "gameObjectName": "FuelBarrel2",
+      "spritePath": "sprites_pack/images/0228_FuelBarrel2.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 229,
+      "gameObjectName": "Generator",
+      "spritePath": "sprites_pack/images/0229_Generator.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 230,
+      "gameObjectName": "Adapter",
+      "spritePath": "sprites_pack/images/0230_Adapter.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 231,
+      "gameObjectName": "SyringeElectricityProtection",
+      "spritePath": "sprites_pack/images/0231_SyringeElectricityProtection.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 232,
+      "gameObjectName": "DuckNeon",
+      "spritePath": "sprites_pack/images/0232_DuckNeon.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 233,
+      "gameObjectName": "GlowLabel",
+      "spritePath": "sprites_pack/images/0233_GlowLabel.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 234,
+      "gameObjectName": "MelonNeon",
+      "spritePath": "sprites_pack/images/0234_MelonNeon.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 235,
+      "gameObjectName": "WatermelonNeon",
+      "spritePath": "sprites_pack/images/0235_WatermelonNeon.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 236,
+      "gameObjectName": "SyringeEmbalming",
+      "spritePath": "sprites_pack/images/0236_SyringeEmbalming.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 237,
+      "gameObjectName": "SyringeDamageResist",
+      "spritePath": "sprites_pack/images/0237_SyringeDamageResist.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 238,
+      "gameObjectName": "FreezeGrenade",
+      "spritePath": "sprites_pack/images/0238_FreezeGrenade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 239,
+      "gameObjectName": "SyringeJointDiluent",
+      "spritePath": "sprites_pack/images/0239_SyringeJointDiluent.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 240,
+      "gameObjectName": "DarkStaff",
+      "spritePath": "sprites_pack/images/0240_DarkStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 241,
+      "gameObjectName": "SmokeGrenade",
+      "spritePath": "sprites_pack/images/0241_SmokeGrenade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 242,
+      "gameObjectName": "GasGrenade",
+      "spritePath": "sprites_pack/images/0242_GasGrenade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 243,
+      "gameObjectName": "FragmentionGrenade",
+      "spritePath": "sprites_pack/images/0243_FragmentionGrenade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 244,
+      "gameObjectName": "HumanDragonFruit",
+      "spritePath": "sprites_pack/images/0244_HumanDragonFruit_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 245,
+      "gameObjectName": "HumanDragonFruitNew",
+      "spritePath": "sprites_pack/images/0245_HumanDragonFruitNew.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 246,
+      "gameObjectName": "Door",
+      "spritePath": "sprites_pack/images/0246_Door.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 247,
+      "gameObjectName": "Grabber",
+      "spritePath": "sprites_pack/images/0247_Grabber.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 248,
+      "gameObjectName": "VPchip",
+      "spritePath": "sprites_pack/images/0248_VPchip.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 249,
+      "gameObjectName": "VPchipTutorial1",
+      "spritePath": "sprites_pack/images/0249_VPchipTutorial1.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 250,
+      "gameObjectName": "VPchipTutorial2",
+      "spritePath": "sprites_pack/images/0250_VPchipTutorial2.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 251,
+      "gameObjectName": "VPchipTutorial3",
+      "spritePath": "sprites_pack/images/0251_VPchipTutorial3.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 252,
+      "gameObjectName": "Trigger",
+      "spritePath": "sprites_pack/images/0252_Trigger.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 253,
+      "gameObjectName": "Timer",
+      "spritePath": "sprites_pack/images/0253_Timer.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 254,
+      "gameObjectName": "ContextActivator",
+      "spritePath": "sprites_pack/images/0254_ContextActivator.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 255,
+      "gameObjectName": "ElectricBaton",
+      "spritePath": "sprites_pack/images/0255_ElectricBaton.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 256,
+      "gameObjectName": "CameraDevice",
+      "spritePath": "sprites_pack/images/0256_CameraDevice.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 257,
+      "gameObjectName": "ScreenDevice",
+      "spritePath": "sprites_pack/images/0257_ScreenDevice.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 258,
+      "gameObjectName": "Radio",
+      "spritePath": "sprites_pack/images/0258_Radio.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 259,
+      "gameObjectName": "StunGun",
+      "spritePath": "sprites_pack/images/0259_StunGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 260,
+      "gameObjectName": "Helicopter",
+      "spritePath": "sprites_pack/images/0260_Helicopter.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 261,
+      "gameObjectName": "ScreenTextDevice",
+      "spritePath": "sprites_pack/images/0261_ScreenTextDevice.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 262,
+      "gameObjectName": "Synthesizer",
+      "spritePath": "sprites_pack/images/0262_Synthesizer.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 263,
+      "gameObjectName": "SyringeRegrowth",
+      "spritePath": "sprites_pack/images/0263_SyringeRegrowth.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 264,
+      "gameObjectName": "GasMask",
+      "spritePath": "sprites_pack/images/0264_GasMask.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 265,
+      "gameObjectName": "DragonFruit",
+      "spritePath": "sprites_pack/images/0265_DragonFruit.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 266,
+      "gameObjectName": "Icicle",
+      "spritePath": "sprites_pack/images/0266_Icicle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 267,
+      "gameObjectName": "TomatoCan",
+      "spritePath": "sprites_pack/images/0267_TomatoCan.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 268,
+      "gameObjectName": "HumanRobotLivingMetal",
+      "spritePath": "sprites_pack/images/0268_HumanRobotLivingMetal.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 269,
+      "gameObjectName": "Snowblock",
+      "spritePath": "sprites_pack/images/0269_Snowblock.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 270,
+      "gameObjectName": "SnowMan2024",
+      "spritePath": "sprites_pack/images/0270_SnowMan2024.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 271,
+      "gameObjectName": "FreezeGun",
+      "spritePath": "sprites_pack/images/0271_FreezeGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 272,
+      "gameObjectName": "ImpulseThruster",
+      "spritePath": "sprites_pack/images/0272_ImpulseThruster.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 273,
+      "gameObjectName": "DirectionalEngineOld",
+      "spritePath": "sprites_pack/images/0273_DirectionalEngineOld_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 274,
+      "gameObjectName": "WeightingAgent",
+      "spritePath": "sprites_pack/images/0274_WeightingAgent.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 275,
+      "gameObjectName": "Magnet",
+      "spritePath": "sprites_pack/images/0275_Magnet.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 276,
+      "gameObjectName": "DamageSensor",
+      "spritePath": "sprites_pack/images/0276_DamageSensor.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 277,
+      "gameObjectName": "ExplosiveCharge",
+      "spritePath": "sprites_pack/images/0277_ExplosiveCharge.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 278,
+      "gameObjectName": "BubbleLevel",
+      "spritePath": "sprites_pack/images/0278_BubbleLevel.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 279,
+      "gameObjectName": "Nanoassembler",
+      "spritePath": "sprites_pack/images/0279_Nanoassembler.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 280,
+      "gameObjectName": "Brick golem",
+      "spritePath": "sprites_pack/images/0280_Brick golem_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 281,
+      "gameObjectName": "Ceramic golem",
+      "spritePath": "sprites_pack/images/0281_Ceramic golem_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 282,
+      "gameObjectName": "Glass golem",
+      "spritePath": "sprites_pack/images/0282_Glass golem_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 283,
+      "gameObjectName": "Iron golem",
+      "spritePath": "sprites_pack/images/0283_Iron golem_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 284,
+      "gameObjectName": "Plastic golem",
+      "spritePath": "sprites_pack/images/0284_Plastic golem_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 285,
+      "gameObjectName": "Toy golem",
+      "spritePath": "sprites_pack/images/0285_Toy golem_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 286,
+      "gameObjectName": "Wood golem",
+      "spritePath": "sprites_pack/images/0286_Wood golem_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 287,
+      "gameObjectName": "ChemicalProtectionHelmet",
+      "spritePath": "sprites_pack/images/0287_ChemicalProtectionHelmet.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 288,
+      "gameObjectName": "ChemicalProtectionSuit",
+      "spritePath": "sprites_pack/images/0288_ChemicalProtectionSuit.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 289,
+      "gameObjectName": "FlaskAcid",
+      "spritePath": "sprites_pack/images/0289_FlaskAcid.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 290,
+      "gameObjectName": "FlaskDamageResist",
+      "spritePath": "sprites_pack/images/0290_FlaskDamageResist.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 291,
+      "gameObjectName": "FlaskElectricityProtection",
+      "spritePath": "sprites_pack/images/0291_FlaskElectricityProtection.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 292,
+      "gameObjectName": "FlaskEmbalming",
+      "spritePath": "sprites_pack/images/0292_FlaskEmbalming.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 293,
+      "gameObjectName": "FlaskFireproof",
+      "spritePath": "sprites_pack/images/0293_FlaskFireproof.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 294,
+      "gameObjectName": "FlaskHeal",
+      "spritePath": "sprites_pack/images/0294_FlaskHeal.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 295,
+      "gameObjectName": "FlaskImmortal",
+      "spritePath": "sprites_pack/images/0295_FlaskImmortal.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 296,
+      "gameObjectName": "FlaskJointDiluent",
+      "spritePath": "sprites_pack/images/0296_FlaskJointDiluent.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 297,
+      "gameObjectName": "FlaskRegen",
+      "spritePath": "sprites_pack/images/0297_FlaskRegen.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 298,
+      "gameObjectName": "FlaskRegrowth",
+      "spritePath": "sprites_pack/images/0298_FlaskRegrowth.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 299,
+      "gameObjectName": "FlaskVirus",
+      "spritePath": "sprites_pack/images/0299_FlaskVirus.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 300,
+      "gameObjectName": "FlaskWater",
+      "spritePath": "sprites_pack/images/0300_FlaskWater.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 301,
+      "gameObjectName": "RackDecor",
+      "spritePath": "sprites_pack/images/0301_RackDecor.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 302,
+      "gameObjectName": "FluorescentLamp 2",
+      "spritePath": "sprites_pack/images/0302_FluorescentLamp 2.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 303,
+      "gameObjectName": "FluorescentLamp 1",
+      "spritePath": "sprites_pack/images/0303_FluorescentLamp 1.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 304,
+      "gameObjectName": "DecorConicalFlask",
+      "spritePath": "sprites_pack/images/0304_DecorConicalFlask.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 305,
+      "gameObjectName": "DecorMeasuringFlask",
+      "spritePath": "sprites_pack/images/0305_DecorMeasuringFlask.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 306,
+      "gameObjectName": "DecorReactionFlask",
+      "spritePath": "sprites_pack/images/0306_DecorReactionFlask.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 307,
+      "gameObjectName": "DecorSectionalTestTube",
+      "spritePath": "sprites_pack/images/0307_DecorSectionalTestTube.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 308,
+      "gameObjectName": "DecorThinTestTube",
+      "spritePath": "sprites_pack/images/0308_DecorThinTestTube.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 309,
+      "gameObjectName": "DecorWideTestTube",
+      "spritePath": "sprites_pack/images/0309_DecorWideTestTube.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 310,
+      "gameObjectName": "EffectGenerator",
+      "spritePath": "sprites_pack/images/0310_EffectGenerator.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 311,
+      "gameObjectName": "WelderGloves",
+      "spritePath": "sprites_pack/images/0311_WelderGloves.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 312,
+      "gameObjectName": "WelderMask",
+      "spritePath": "sprites_pack/images/0312_WelderMask.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 313,
+      "gameObjectName": "WelderSuit",
+      "spritePath": "sprites_pack/images/0313_WelderSuit.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 314,
+      "gameObjectName": "VatOfAcid",
+      "spritePath": "sprites_pack/images/0314_VatOfAcid.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 315,
+      "gameObjectName": "VirusBarrel",
+      "spritePath": "sprites_pack/images/0315_VirusBarrel.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 316,
+      "gameObjectName": "WasteBarrel",
+      "spritePath": "sprites_pack/images/0316_WasteBarrel.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 317,
+      "gameObjectName": "Wings",
+      "spritePath": "sprites_pack/images/0317_Wings.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 318,
+      "gameObjectName": "Nimbus",
+      "spritePath": "sprites_pack/images/0318_Nimbus.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 319,
+      "gameObjectName": "Iceblock",
+      "spritePath": "sprites_pack/images/0319_Iceblock.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 320,
+      "gameObjectName": "HeadPhones",
+      "spritePath": "sprites_pack/images/0320_HeadPhones.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 321,
+      "gameObjectName": "Wig",
+      "spritePath": "sprites_pack/images/0321_Wig.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 322,
+      "gameObjectName": "DarkWig",
+      "spritePath": "sprites_pack/images/0322_DarkWig.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 323,
+      "gameObjectName": "EmoWig",
+      "spritePath": "sprites_pack/images/0323_EmoWig.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 324,
+      "gameObjectName": "Iroquois",
+      "spritePath": "sprites_pack/images/0324_Iroquois.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 325,
+      "gameObjectName": "Piano",
+      "spritePath": "sprites_pack/images/0325_Piano.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 326,
+      "gameObjectName": "Guitar",
+      "spritePath": "sprites_pack/images/0326_Guitar.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 327,
+      "gameObjectName": "Xylophone",
+      "spritePath": "sprites_pack/images/0327_Xylophone.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 328,
+      "gameObjectName": "Flutes",
+      "spritePath": "sprites_pack/images/0328_Flutes.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 329,
+      "gameObjectName": "Drums",
+      "spritePath": "sprites_pack/images/0329_Drums.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 330,
+      "gameObjectName": "Chainsaw",
+      "spritePath": "sprites_pack/images/0330_Chainsaw.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 331,
+      "gameObjectName": "Battery",
+      "spritePath": "sprites_pack/images/0331_Battery.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 332,
+      "gameObjectName": "AcidicAmmoBox",
+      "spritePath": "sprites_pack/images/0332_AcidicAmmoBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 333,
+      "gameObjectName": "ArmorPiercingAmmoBox",
+      "spritePath": "sprites_pack/images/0333_ArmorPiercingAmmoBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 334,
+      "gameObjectName": "BouncingAmmoBox",
+      "spritePath": "sprites_pack/images/0334_BouncingAmmoBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 335,
+      "gameObjectName": "ExpandingAmmoBox",
+      "spritePath": "sprites_pack/images/0335_ExpandingAmmoBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 336,
+      "gameObjectName": "ExplosiveAmmoBox",
+      "spritePath": "sprites_pack/images/0336_ExplosiveAmmoBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 337,
+      "gameObjectName": "IncendiaryAmmoBox",
+      "spritePath": "sprites_pack/images/0337_IncendiaryAmmoBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 338,
+      "gameObjectName": "InvisibleAmmoBox",
+      "spritePath": "sprites_pack/images/0338_InvisibleAmmoBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 339,
+      "gameObjectName": "MixedAmmoBox",
+      "spritePath": "sprites_pack/images/0339_MixedAmmoBox_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 340,
+      "gameObjectName": "StandardAmmoBox",
+      "spritePath": "sprites_pack/images/0340_StandardAmmoBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 341,
+      "gameObjectName": "UnderwaterAmmoBox",
+      "spritePath": "sprites_pack/images/0341_UnderwaterAmmoBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 342,
+      "gameObjectName": "AmmoMixer",
+      "spritePath": "sprites_pack/images/0342_AmmoMixer.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 343,
+      "gameObjectName": "Relay",
+      "spritePath": "sprites_pack/images/0343_Relay.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 344,
+      "gameObjectName": "Defibrillator",
+      "spritePath": "sprites_pack/images/0344_Defibrillator.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 345,
+      "gameObjectName": "Slider",
+      "spritePath": "sprites_pack/images/0345_Slider.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 346,
+      "gameObjectName": "Voltmeter",
+      "spritePath": "sprites_pack/images/0346_Voltmeter.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 347,
+      "gameObjectName": "Conveyor",
+      "spritePath": "sprites_pack/images/0347_Conveyor.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 348,
+      "gameObjectName": "Transformer",
+      "spritePath": "sprites_pack/images/0348_Transformer.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 349,
+      "gameObjectName": "Plug",
+      "spritePath": "sprites_pack/images/0349_Plug.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 350,
+      "gameObjectName": "Socket",
+      "spritePath": "sprites_pack/images/0350_Socket.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 351,
+      "gameObjectName": "Old shawl",
+      "spritePath": "sprites_pack/images/0351_Old shawl.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 352,
+      "gameObjectName": "Old skirt",
+      "spritePath": "sprites_pack/images/0352_Old skirt.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 353,
+      "gameObjectName": "Old slippers",
+      "spritePath": "sprites_pack/images/0353_Old slippers.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 354,
+      "gameObjectName": "Old sweater",
+      "spritePath": "sprites_pack/images/0354_Old sweater.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 355,
+      "gameObjectName": "SpikedStaff",
+      "spritePath": "sprites_pack/images/0355_SpikedStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 356,
+      "gameObjectName": "FluorescentStaff",
+      "spritePath": "sprites_pack/images/0356_FluorescentStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 357,
+      "gameObjectName": "GlueStaff",
+      "spritePath": "sprites_pack/images/0357_GlueStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 358,
+      "gameObjectName": "SlickStaff",
+      "spritePath": "sprites_pack/images/0358_SlickStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 359,
+      "gameObjectName": "BallooningStaff",
+      "spritePath": "sprites_pack/images/0359_BallooningStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 360,
+      "gameObjectName": "GhostlyStaff",
+      "spritePath": "sprites_pack/images/0360_GhostlyStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 361,
+      "gameObjectName": "MutationStaff",
+      "spritePath": "sprites_pack/images/0361_MutationStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 362,
+      "gameObjectName": "RoachesStaff",
+      "spritePath": "sprites_pack/images/0362_RoachesStaff.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 363,
+      "gameObjectName": "UIControl",
+      "spritePath": "sprites_pack/images/0363_UIControl.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 364,
+      "gameObjectName": "Policeman cap",
+      "spritePath": "sprites_pack/images/0364_Policeman cap.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 365,
+      "gameObjectName": "Policeman shirt",
+      "spritePath": "sprites_pack/images/0365_Policeman shirt.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 366,
+      "gameObjectName": "Policeman trousers",
+      "spritePath": "sprites_pack/images/0366_Policeman trousers.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 367,
+      "gameObjectName": "Clown nose",
+      "spritePath": "sprites_pack/images/0367_Clown nose.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 368,
+      "gameObjectName": "Clown shirt",
+      "spritePath": "sprites_pack/images/0368_Clown shirt.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 369,
+      "gameObjectName": "Clown shoes",
+      "spritePath": "sprites_pack/images/0369_Clown shoes.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 370,
+      "gameObjectName": "Clown trousers",
+      "spritePath": "sprites_pack/images/0370_Clown trousers.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 371,
+      "gameObjectName": "Clown wig",
+      "spritePath": "sprites_pack/images/0371_Clown wig.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 372,
+      "gameObjectName": "WizardBeard",
+      "spritePath": "sprites_pack/images/0372_WizardBeard.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 373,
+      "gameObjectName": "WizardRobe",
+      "spritePath": "sprites_pack/images/0373_WizardRobe.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 374,
+      "gameObjectName": "WizardShoes",
+      "spritePath": "sprites_pack/images/0374_WizardShoes.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 375,
+      "gameObjectName": "StopSign",
+      "spritePath": "sprites_pack/images/0375_StopSign.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 376,
+      "gameObjectName": "DirectionalEngine",
+      "spritePath": "sprites_pack/images/0376_DirectionalEngine.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 377,
+      "gameObjectName": "HeliumCylinder",
+      "spritePath": "sprites_pack/images/0377_HeliumCylinder.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 378,
+      "gameObjectName": "HeliumBalloon",
+      "spritePath": "sprites_pack/images/0378_HeliumBalloon_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 379,
+      "gameObjectName": "PartyHat",
+      "spritePath": "sprites_pack/images/0379_PartyHat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 380,
+      "gameObjectName": "PartyHorn",
+      "spritePath": "sprites_pack/images/0380_PartyHorn.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 381,
+      "gameObjectName": "HumanCake",
+      "spritePath": "sprites_pack/images/0381_HumanCake_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 382,
+      "gameObjectName": "ModularTurret",
+      "spritePath": "sprites_pack/images/0382_ModularTurret.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 383,
+      "gameObjectName": "HealingTurret",
+      "spritePath": "sprites_pack/images/0383_HealingTurret.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 384,
+      "gameObjectName": "RocketTurret",
+      "spritePath": "sprites_pack/images/0384_RocketTurret.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 385,
+      "gameObjectName": "KnifeTurret",
+      "spritePath": "sprites_pack/images/0385_KnifeTurret.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 386,
+      "gameObjectName": "KnifeProjectile",
+      "spritePath": "sprites_pack/images/0386_KnifeProjectile_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 387,
+      "gameObjectName": "RocketTurretProjectile",
+      "spritePath": "sprites_pack/images/0387_RocketTurretProjectile_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 388,
+      "gameObjectName": "Servo",
+      "spritePath": "sprites_pack/images/0388_Servo.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 389,
+      "gameObjectName": "BladeTrap",
+      "spritePath": "sprites_pack/images/0389_BladeTrap.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 390,
+      "gameObjectName": "SyringeFrozeProtection",
+      "spritePath": "sprites_pack/images/0390_SyringeFrozeProtection.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 391,
+      "gameObjectName": "RopeControllerDevice",
+      "spritePath": "sprites_pack/images/0391_RopeControllerDevice.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 392,
+      "gameObjectName": "FluidTank",
+      "spritePath": "sprites_pack/images/0392_FluidTank.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 393,
+      "gameObjectName": "OilCan",
+      "spritePath": "sprites_pack/images/0393_OilCan.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 394,
+      "gameObjectName": "JuiceBottle",
+      "spritePath": "sprites_pack/images/0394_JuiceBottle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 395,
+      "gameObjectName": "TomatoBottle",
+      "spritePath": "sprites_pack/images/0395_TomatoBottle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 396,
+      "gameObjectName": "PumpkinBottle",
+      "spritePath": "sprites_pack/images/0396_PumpkinBottle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 397,
+      "gameObjectName": "MelonBottle",
+      "spritePath": "sprites_pack/images/0397_MelonBottle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 398,
+      "gameObjectName": "DragonFruitBottle",
+      "spritePath": "sprites_pack/images/0398_DragonFruitBottle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 399,
+      "gameObjectName": "CornBottle",
+      "spritePath": "sprites_pack/images/0399_CornBottle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 400,
+      "gameObjectName": "CactusBottle",
+      "spritePath": "sprites_pack/images/0400_CactusBottle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 401,
+      "gameObjectName": "AppleBottle",
+      "spritePath": "sprites_pack/images/0401_AppleBottle.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 402,
+      "gameObjectName": "WateringCan",
+      "spritePath": "sprites_pack/images/0402_WateringCan.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 403,
+      "gameObjectName": "GlassJar",
+      "spritePath": "sprites_pack/images/0403_GlassJar.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 404,
+      "gameObjectName": "LiquidCollector",
+      "spritePath": "sprites_pack/images/0404_LiquidCollector.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 405,
+      "gameObjectName": "LiquidValve",
+      "spritePath": "sprites_pack/images/0405_LiquidValve.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 406,
+      "gameObjectName": "Engine",
+      "spritePath": "sprites_pack/images/0406_Engine.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 407,
+      "gameObjectName": "Copywriter",
+      "spritePath": "sprites_pack/images/0407_Copywriter.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 408,
+      "gameObjectName": "NailGun",
+      "spritePath": "sprites_pack/images/0408_NailGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 409,
+      "gameObjectName": "Nail",
+      "spritePath": "sprites_pack/images/0409_Nail_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 410,
+      "gameObjectName": "Syringe",
+      "spritePath": "sprites_pack/images/0410_Syringe_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 411,
+      "gameObjectName": "SyringeMachine",
+      "spritePath": "sprites_pack/images/0411_SyringeMachine.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 412,
+      "gameObjectName": "PumpkinLauncher",
+      "spritePath": "sprites_pack/images/0412_PumpkinLauncher.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 413,
+      "gameObjectName": "PumpkinProjectile",
+      "spritePath": "sprites_pack/images/0413_PumpkinProjectile_atlas.png",
+      "source": "manifest_fuzzy"
+    },
+    {
+      "objectId": 414,
+      "gameObjectName": "LiquidProbe",
+      "spritePath": "sprites_pack/images/0414_LiquidProbe.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 415,
+      "gameObjectName": "LiquidScanner",
+      "spritePath": "sprites_pack/images/0415_LiquidScanner.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 416,
+      "gameObjectName": "LeafBlower",
+      "spritePath": "sprites_pack/images/0416_LeafBlower.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 417,
+      "gameObjectName": "LiquidPump",
+      "spritePath": "sprites_pack/images/0417_LiquidPump.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 418,
+      "gameObjectName": "FlaskFrostProtection",
+      "spritePath": "sprites_pack/images/0418_FlaskFrostProtection.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 419,
+      "gameObjectName": "Radar",
+      "spritePath": "sprites_pack/images/0419_Radar.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 420,
+      "gameObjectName": "EntitiesMarker",
+      "spritePath": "sprites_pack/images/0420_EntitiesMarker.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 421,
+      "gameObjectName": "Saw",
+      "spritePath": "sprites_pack/images/0421_Saw_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 422,
+      "gameObjectName": "SawGun",
+      "spritePath": "sprites_pack/images/0422_SawGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 423,
+      "gameObjectName": "EnergySaber",
+      "spritePath": "sprites_pack/images/0423_EnergySaber.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 424,
+      "gameObjectName": "LEDMatrix",
+      "spritePath": "sprites_pack/images/0424_LEDMatrix.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 425,
+      "gameObjectName": "VPchipTutorial4_ArrayExample",
+      "spritePath": "sprites_pack/images/0425_VPchipTutorial4_ArrayExample.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 426,
+      "gameObjectName": "ImprovisedCharge",
+      "spritePath": "sprites_pack/images/0426_ImprovisedCharge.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 427,
+      "gameObjectName": "HomingLauncher",
+      "spritePath": "sprites_pack/images/0427_HomingLauncher.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 428,
+      "gameObjectName": "LetterGun",
+      "spritePath": "sprites_pack/images/0428_LetterGun.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 429,
+      "gameObjectName": "ParasiteCap",
+      "spritePath": "sprites_pack/images/0429_ParasiteCap.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 430,
+      "gameObjectName": "BouncyBombBox",
+      "spritePath": "sprites_pack/images/0430_BouncyBombBox.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 431,
+      "gameObjectName": "HoneyGrenade",
+      "spritePath": "sprites_pack/images/0431_HoneyGrenade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 432,
+      "gameObjectName": "MutationGrenade",
+      "spritePath": "sprites_pack/images/0432_MutationGrenade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 433,
+      "gameObjectName": "NastyBomb",
+      "spritePath": "sprites_pack/images/0433_NastyBomb.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 434,
+      "gameObjectName": "SpikeGrenade",
+      "spritePath": "sprites_pack/images/0434_SpikeGrenade.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 435,
+      "gameObjectName": "BouncyBomb",
+      "spritePath": "sprites_pack/images/0435_BouncyBomb_plastic.png",
+      "source": "plastic_fallback"
+    },
+    {
+      "objectId": 436,
+      "gameObjectName": "TeslaCoil",
+      "spritePath": "sprites_pack/images/0436_TeslaCoil.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 437,
+      "gameObjectName": "NewYearPresent",
+      "spritePath": "sprites_pack/images/0437_NewYearPresent.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 438,
+      "gameObjectName": "RectEndlessOceanRoom",
+      "spritePath": "sprites_pack/images/0438_RectEndlessOceanRoom.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 439,
+      "gameObjectName": "DepthAndPressureSensor",
+      "spritePath": "sprites_pack/images/0439_DepthAndPressureSensor.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 440,
+      "gameObjectName": "Speedboat",
+      "spritePath": "sprites_pack/images/0440_Speedboat.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 441,
+      "gameObjectName": "Submarine",
+      "spritePath": "sprites_pack/images/0441_Submarine.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 442,
+      "gameObjectName": "BoatVehicle",
+      "spritePath": "sprites_pack/images/0442_BoatVehicle.png",
+      "source": "reliable_apk"
+    },
+    {
+      "objectId": 443,
+      "gameObjectName": "Wetsuit",
+      "spritePath": "sprites_pack/images/0443_Wetsuit.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 444,
+      "gameObjectName": "Diving armor",
+      "spritePath": "sprites_pack/images/0444_Diving armor.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 445,
+      "gameObjectName": "Diving suit",
+      "spritePath": "sprites_pack/images/0445_Diving suit.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 446,
+      "gameObjectName": "Ballast",
+      "spritePath": "sprites_pack/images/0446_Ballast.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 447,
+      "gameObjectName": "HermeticDoor",
+      "spritePath": "sprites_pack/images/0447_HermeticDoor.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 448,
+      "gameObjectName": "HumanCoral",
+      "spritePath": "sprites_pack/images/0448_HumanCoral.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 449,
+      "gameObjectName": "Passageway",
+      "spritePath": "sprites_pack/images/0449_Passageway.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 450,
+      "gameObjectName": "GlassDome",
+      "spritePath": "sprites_pack/images/0450_GlassDome.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 451,
+      "gameObjectName": "HermeticDoorBlue",
+      "spritePath": "sprites_pack/images/0451_HermeticDoorBlue.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 452,
+      "gameObjectName": "PassagewayBlue",
+      "spritePath": "sprites_pack/images/0452_PassagewayBlue.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 453,
+      "gameObjectName": "RectEndlessOceanRoomBlue",
+      "spritePath": "sprites_pack/images/0453_RectEndlessOceanRoomBlue.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 454,
+      "gameObjectName": "RectEndlessOceanDockingHatch",
+      "spritePath": "sprites_pack/images/0454_RectEndlessOceanDockingHatch.png",
+      "source": "aigcsave_icon"
+    },
+    {
+      "objectId": 455,
+      "gameObjectName": "GlassDomeBlue",
+      "spritePath": "sprites_pack/images/0455_GlassDomeBlue.png",
+      "source": "aigcsave_icon"
+    }
+  ]
+}

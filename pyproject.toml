@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "melon-lua"
+version = "3.1.0"
+description = "甜瓜游乐场 Lua 芯片执行器模拟 - Melon Playground Lua chip sandbox"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "lupa>=2.0",
+    "Box2D>=2.3",
+    "pillow>=10.0",
+]
+authors = [
+    { name = "melonapk" },
+]
+keywords = ["lua", "sandbox", "melon-playground", "game-modding"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Interpreters",
+    "Topic :: Games/Entertainment :: Simulation",
+]
+
+[project.scripts]
+melon-lua = "melon_lua.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/nuskey8/Lua-CSharp"
+Repository = "https://github.com/nuskey8/Lua-CSharp"
+
+[tool.setuptools.packages.find]
+include = ["melon_lua*"]
+
+[tool.setuptools.package-data]
+melon_lua = [
+    "preamble.lua",
+    "stdlib_bit32_shim.lua",
+    "data/*.json",
+    "data/sprites_pack/**/*",
+]

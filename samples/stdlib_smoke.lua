@@ -1,0 +1,10 @@
+function OnInit()
+    print("bit32", bit32.band(0xFF, 0x0F))
+    print("math", math.floor(math.pi * 100))
+    print("string", string.sub("melon", 1, 3))
+    print("table", table.concat({1, 2, 3}, ","))
+    print("os", type(os.time()), type(os.clock()))
+    local co = coroutine.create(function() return 7 end)
+    local ok, v = coroutine.resume(co)
+    print("coroutine", ok, v)
+end
