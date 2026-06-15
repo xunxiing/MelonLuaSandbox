@@ -1,0 +1,7 @@
+# MelonLuaSandbox runtime dependencies
+# Install with: pip install -r requirements.txt
+# These match the [project.dependencies] in pyproject.toml
+
+lupa>=2.0
+Box2D>=2.3
+pillow>=10.0
