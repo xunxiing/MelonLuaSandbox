@@ -172,7 +172,7 @@ class WorldContext:
         if _HAS_BOX2D:
             self.b2_world = b2World(gravity=self.gravity)
         # Load real physics profile from APK reverse engineering.
-        # Source: D:\\程序\\melonapk\\lua-triage\\object_physics_merged.json (329 items)
+        # Source: object_physics_merged.json (329 items from APK triage)
         self.physics_db: dict[str, dict] = _load_physics_db()
         from .spawn_queue import SpawnQueue
 
