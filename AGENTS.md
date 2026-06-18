@@ -78,7 +78,15 @@ There is **no** CI workflow, ruff, or mypy config in-repo; do not invent a lint 
 
 ## VPchip / subagent work
 
-Target: **Melon 36.x VPchip** subset compiler under `melon_lua/vpcompile/` (see `docs/VPCHIP_TO_LUA.md`). Use feature branch `feature/vp36-compile`; deliver IR + node registry + tests per slice, not “all NodeOperationType” in one pass.
+Target: **Melon 36.x VPchip** under `melon_lua/vpcompile/` (`docs/VPCHIP_TO_LUA.md`, `docs/SUBAGENT_VP_NODE_SHARDS.md`).
+
+- **Full enum**: `melon_lua/vpcompile/ops.py` (178 ops from IL2CPP `NodeOperationType.cs`).
+- **Node emitters**: `melon_lua/vpcompile/nodes/*.py` → `REGISTRY` (shards A–I; parallel subagents).
+- **Inventory saves**: `python scripts/vp_inventory_melsave.py` on gitignored `temp/*.melsave` (`jixiebi`, user `atm`).
+- **Compile**: `python scripts/compile_vp_from_melsave.py temp/jixiebi.melsave --instance -522198 -o out.lua`
+- **Smoke**: `python scripts/smoke_vp_compile.py`
+
+Branch: `feature/vp36-compile`. `temp/atm.melsave` is objectId **249** (not VP 248) — use for future Lua-chip / mod formats, not VP inventory union.
 
 ## Optional local assets
 
