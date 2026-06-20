@@ -67,9 +67,23 @@ def emit_root(uid: str, ins: list[str], n: VPNode) -> list[str]:
     gate = _gate_name_from_save(n, "a")
     obj = _save_data_obj(n)
     ent = obj.get("EntityId") or obj.get("entityId")
+    gdt = n.raw.get("GateDataType")
+    gdt = gdt.strip() if isinstance(gdt, str) else ""
     lines = [f"    -- Root {uid}: entity/input gate"]
+
     if ent is not None:
         lines.append(f'    G["{uid}"] = {int(ent)}')
+    elif gdt == "Vector":
+        # Vector input: store scalar primary + vector form in _vec
+        lines.append(f'    local _rv = inputs.vec and inputs.vec.{gate}')
+        lines.append(f'    if _rv then')
+        lines.append(f'      G["{uid}_vec"] = _rv')
+        lines.append(f'      G["{uid}"] = type(_rv) == "table" and (_rv.x or _rv[1] or 0) or _rv')
+        lines.append(f'    else')
+        lines.append(f'      local _n = (inputs.num and inputs.num.{gate}) or 0')
+        lines.append(f'      G["{uid}"] = _n')
+        lines.append(f'      G["{uid}_vec"] = {{x = _n, y = 0, z = 0, w = 0}}')
+        lines.append(f'    end')
     elif ins:
         lines.append(f'    G["{uid}"] = {ins[0]}')
     else:
@@ -155,10 +169,8 @@ def emit_time(uid: str, _ins: list[str], n: VPNode) -> list[str]:
         else:
             lines.append(f'    G["{key}"] = G._vp_tick or 0')
         lines.append(f'    G["{uid}_{keys[i]}"] = G["{key}"]')
-    if not outs:
-        lines.append(
-            f'    G["{uid}"] = (G._vp_tick or 0) / math.max(1, chip_tps or 20)'
-        )
+    # Always set primary G[uid] so downstream nodes can reference it
+    lines.append(f'    G["{uid}"] = G["{uid}_o0"]')
     return lines
 
 

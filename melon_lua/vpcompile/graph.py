@@ -73,8 +73,14 @@ def parse_chip_graph(graph: dict[str, Any]) -> MelonGraph:
                 )
 
     topo = _topo_sort(nodes, edges)
+    vs_raw = graph.get("ValidationState", 0)
+    if isinstance(vs_raw, str):
+        vs_map = {"Valid": 0, "Invalid": 1, "Warning": 2}
+        validation_state = vs_map.get(vs_raw, 0)
+    else:
+        validation_state = int(vs_raw)
     return MelonGraph(
-        validation_state=int(graph.get("ValidationState", 0)),
+        validation_state=validation_state,
         nodes=nodes,
         edges=edges,
         topo_order=topo,

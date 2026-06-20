@@ -28,6 +28,18 @@ def _wire_inputs(graph: MelonGraph) -> dict[str, dict[int, str]]:
     return by_to
 
 
+def _is_vector_node(n: VPNode) -> bool:
+    """Check if a node operates on vector data (GateDataType or input DataType)."""
+    gdt = n.raw.get("GateDataType")
+    if isinstance(gdt, str) and gdt.strip() == "Vector":
+        return True
+    for inp in n.inputs:
+        dt = inp.get("DataType")
+        if isinstance(dt, str) and dt.strip() == "Vector":
+            return True
+    return False
+
+
 def generate_lua(
     graph: MelonGraph,
     *,
@@ -85,10 +97,17 @@ def _input_exprs(
     graph: MelonGraph,
 ) -> list[str]:
     wired = wires.get(uid, {})
+    # If this node consumes vectors, prefer _vec suffix from entity_read nodes
+    want_vec = _is_vector_node(n)
     exprs: list[str] = []
     for i, inp in enumerate(n.inputs):
         if i in wired:
-            exprs.append(f'G["{wired[i]}"]')
+            from_uid = wired[i]
+            from_node = graph.nodes.get(from_uid)
+            if want_vec and from_node and from_node.name in ("Position", "Velocity", "Elevation"):
+                exprs.append(f'G["{from_uid}_vec"]')
+            else:
+                exprs.append(f'G["{from_uid}"]')
         else:
             exprs.append("(inputs.num and inputs.num.a) or 0" if i == 1 else "0")
     return exprs

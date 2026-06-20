@@ -27,13 +27,19 @@ def _emit_multi_xy(
     call: str,
     ent_idx: int = 0,
 ) -> list[str]:
+    """Emit position/velocity: scalar x as primary, x/y components in _o0/_o1.
+    Also store vector form in _vec for downstream vector nodes."""
     e = _ent(ins, ent_idx)
     outs = n.outputs or []
     lines = [f"    local _vx, _vy = {call}"]
+    # Primary output is scalar x (backward compat with scalar chips)
+    lines.append(f'    G["{uid}"] = _vx')
+    # Component outputs
     if len(outs) >= 2:
         lines.append(f'    G["{uid}_o0"] = _vx')
         lines.append(f'    G["{uid}_o1"] = _vy')
-    lines.append(f'    G["{uid}"] = _vx')
+    # Vector form for downstream vector nodes
+    lines.append(f'    G["{uid}_vec"] = {{x = _vx, y = _vy, z = 0, w = 0}}')
     return lines
 
 

@@ -13,7 +13,40 @@ def _g(i: int, ins: list[str], default: str = "0") -> str:
     return ins[i] if i < len(ins) else default
 
 
-def emit_add(uid: str, ins: list[str], _n: VPNode) -> list[str]:
+def _is_vector(n: VPNode) -> bool:
+    """Check if node operates on vector data."""
+    gdt = n.raw.get("GateDataType")
+    if isinstance(gdt, str) and gdt.strip() == "Vector":
+        return True
+    for inp in n.inputs:
+        dt = inp.get("DataType")
+        if isinstance(dt, str) and dt.strip() == "Vector":
+            return True
+    return False
+
+
+def _vector_binop(uid: str, a: str, b: str, op: str) -> list[str]:
+    """Emit vector binary operation (a op b) component-wise."""
+    op_map = {"+": " + ", "-": " - ", "*": " * ", "/": " / "}
+    op_str = op_map.get(op, op)
+    return [
+        f"    local _va, _vb = {a}, {b}",
+        f"    local _vax = type(_va) == 'table' and (_va.x or _va[1] or 0) or _va",
+        f"    local _vay = type(_va) == 'table' and (_va.y or _va[2] or 0) or 0",
+        f"    local _vaz = type(_va) == 'table' and (_va.z or _va[3] or 0) or 0",
+        f"    local _vaw = type(_va) == 'table' and (_va.w or _va[4] or 0) or 0",
+        f"    local _vbx = type(_vb) == 'table' and (_vb.x or _vb[1] or 0) or _vb",
+        f"    local _vby = type(_vb) == 'table' and (_vb.y or _vb[2] or 0) or 0",
+        f"    local _vbz = type(_vb) == 'table' and (_vb.z or _vb[3] or 0) or 0",
+        f"    local _vbw = type(_vb) == 'table' and (_vb.w or _vb[4] or 0) or 0",
+        f'    G["{uid}"] = {{x = _vax {op_str} _vbx, y = _vay {op_str} _vby, z = _vaz {op_str} _vbz, w = _vaw {op_str} _vbw}}',
+    ]
+
+
+def emit_add(uid: str, ins: list[str], n: VPNode) -> list[str]:
+    if _is_vector(n):
+        a, b = _g(0, ins, "{x=0,y=0,z=0,w=0}"), _g(1, ins, "{x=0,y=0,z=0,w=0}")
+        return _vector_binop(uid, a, b, "+")
     if len(ins) >= 2:
         return _assign(uid, f"({ins[0]}) + ({ins[1]})")
     if len(ins) == 1:
@@ -21,25 +54,55 @@ def emit_add(uid: str, ins: list[str], _n: VPNode) -> list[str]:
     return _assign(uid, "0")
 
 
-def emit_subtract(uid: str, ins: list[str], _n: VPNode) -> list[str]:
+def emit_subtract(uid: str, ins: list[str], n: VPNode) -> list[str]:
+    if _is_vector(n):
+        a, b = _g(0, ins, "{x=0,y=0,z=0,w=0}"), _g(1, ins, "{x=0,y=0,z=0,w=0}")
+        return _vector_binop(uid, a, b, "-")
     if len(ins) >= 2:
         return _assign(uid, f"({ins[0]}) - ({ins[1]})")
     return _assign(uid, "0")
 
 
-def emit_multiply(uid: str, ins: list[str], _n: VPNode) -> list[str]:
+def emit_multiply(uid: str, ins: list[str], n: VPNode) -> list[str]:
+    if _is_vector(n):
+        a, b = _g(0, ins, "{x=0,y=0,z=0,w=0}"), _g(1, ins, "{x=0,y=0,z=0,w=0}")
+        return _vector_binop(uid, a, b, "*")
     if len(ins) >= 2:
         return _assign(uid, f"({ins[0]}) * ({ins[1]})")
     return _assign(uid, "0")
 
 
-def emit_divide(uid: str, ins: list[str], _n: VPNode) -> list[str]:
+def emit_divide(uid: str, ins: list[str], n: VPNode) -> list[str]:
+    if _is_vector(n):
+        a, b = _g(0, ins, "{x=0,y=0,z=0,w=0}"), _g(1, ins, "{x=0,y=0,z=0,w=0}")
+        return [
+            f"    local _va, _vb = {a}, {b}",
+            f"    local _vax = type(_va) == 'table' and (_va.x or _va[1] or 0) or _va",
+            f"    local _vay = type(_va) == 'table' and (_va.y or _va[2] or 0) or 0",
+            f"    local _vaz = type(_va) == 'table' and (_va.z or _va[3] or 0) or 0",
+            f"    local _vaw = type(_va) == 'table' and (_va.w or _va[4] or 0) or 0",
+            f"    local _vbx = type(_vb) == 'table' and (_vb.x or _vb[1] or 0) or _vb",
+            f"    local _vby = type(_vb) == 'table' and (_vb.y or _vb[2] or 0) or 0",
+            f"    local _vbz = type(_vb) == 'table' and (_vb.z or _vb[3] or 0) or 0",
+            f"    local _vbw = type(_vb) == 'table' and (_vb.w or _vb[4] or 0) or 0",
+            f'    G["{uid}"] = {{x = _vbx ~= 0 and _vax / _vbx or 0, y = _vby ~= 0 and _vay / _vby or 0, z = _vbz ~= 0 and _vaz / _vbz or 0, w = _vbw ~= 0 and _vaw / _vbw or 0}}',
+        ]
     if len(ins) >= 2:
         return _assign(uid, f"(({ins[1]}) ~= 0 and ({ins[0]}) / ({ins[1]}) or 0)")
     return _assign(uid, "0")
 
 
-def emit_negate(uid: str, ins: list[str], _n: VPNode) -> list[str]:
+def emit_negate(uid: str, ins: list[str], n: VPNode) -> list[str]:
+    if _is_vector(n):
+        v = _g(0, ins, "{x=0,y=0,z=0,w=0}")
+        return [
+            f"    local _nv = {v}",
+            f"    local _nvx = type(_nv) == 'table' and (_nv.x or _nv[1] or 0) or _nv",
+            f"    local _nvy = type(_nv) == 'table' and (_nv.y or _nv[2] or 0) or 0",
+            f"    local _nvz = type(_nv) == 'table' and (_nv.z or _nv[3] or 0) or 0",
+            f"    local _nvw = type(_nv) == 'table' and (_nv.w or _nv[4] or 0) or 0",
+            f'    G["{uid}"] = {{x = -_nvx, y = -_nvy, z = -_nvz, w = -_nvw}}',
+        ]
     return _assign(uid, f"-({_g(0, ins)})")
 
 
