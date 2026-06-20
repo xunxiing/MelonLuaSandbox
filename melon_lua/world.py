@@ -248,6 +248,11 @@ class WorldContext:
 
     def _create_body(self, e: Entity, dynamic: bool = True):
         sx, sy = e.real_size()
+        # Guard against zero/near-zero area which Box2D rejects (area > b2_epsilon)
+        if sx < 0.02:
+            sx = 0.2
+        if sy < 0.02:
+            sy = 0.2
         body_def = {
             "type": b2_dynamicBody if dynamic else b2_staticBody,
             "position": (e.position_x, e.position_y),
