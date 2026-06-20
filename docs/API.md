@@ -188,3 +188,121 @@ melon-lua --api-list
 ## 版本
 
 当前 `__version__` 见 `melon_lua/__init__.py`。
+
+## melsave 全周期管理（MelsaveSession）
+
+`MelsaveSession` 把 .melsave 文件的读、改、写收拢到一个对象里。原始存档文档
+在内部持有，`save_as` 时自动 diff 当前 world 状态与原始存档，只 patch 改动
+字段，保留所有未触碰字段。
+
+### 最小示例
+
+```python
+from melon_lua import MelsaveSession
+
+with MelsaveSession("input.melsave") as session:
+    session.load()
+    # 跑一个 Lua 芯片 100 tick
+    session.run_chip(chip_source, ticks=100)
+    # 拉一条绳子
+    session.create_rope(from_id=1, to_id=2, kind="Simple", distance=1.5)
+    # 看当前状态
+    snap = session.snapshot()
+    print(snap["entity_count"], snap["ropes"])
+    # 写回新存档
+    session.save_as("output.melsave")
+```
+
+### 生命周期
+
+```
+MelsaveSession(path)        # 创建（不读文件）
+    .load()                 # 读取 + spawn 到 world + 构建 runner
+    [run_chip / tick]       # 编译并运行 Lua 芯片
+    [create_rope / remove]  # 管理绳子/关节
+    [spawn / remove]        # 增删实体
+    [snapshot / diff]       # 观察状态
+    .save_as(out_path)      # diff + 写回 .melsave
+    .close()                # 释放 Box2D world + Lua VM
+```
+
+支持 `with` 上下文管理器（自动 load + close）。
+
+### API 一览
+
+**芯片执行**
+
+- `run_chip(source, *, ticks=1, inputs=None) -> {"error", "outputs"}`
+  编译 + OnInit + 跑 N tick。ticks=0 只编译+OnInit。
+- `compile_only(source) -> bool` — 只编译不跑
+- `tick(inputs=None) -> dict` — 单步 OnTick（需先 compile）
+- `.outputs` / `.logs` / `.last_error` — 当前输出/日志/错误
+
+**实体**
+
+- `entities() -> list[dict]` — 所有存活实体快照
+- `get_entity(eid)` — 取实体对象
+- `spawn(name_or_id, x, y, **kw)` — 新增实体
+- `remove(eid) -> bool` — 删除实体
+
+**绳子/关节**（16 种 RopeTool 类型：Simple/Spring/FixedDistance/FixedLine/
+Friction/Slider/Wheel/Relative/...）
+
+- `create_rope(from_id, to_id, kind, **params) -> int` — 建绳，返回 constraint_id
+- `remove_rope(constraint_id) -> bool` — 删绳
+- `set_rope_param(constraint_id, key, value) -> bool` — 改绳参数
+  （breakForce/distance/frequency/damping/enableCollisions/...）
+- `ropes() -> list[dict]` — 当前所有绳子
+
+**快照/写回**
+
+- `snapshot() -> dict` — {tick, elapsed, entities, ropes, variables, entity_count}
+- `diff() -> dict` — 与原始存档的差异（modified/added/removed/constraints）
+- `save_as(out_path, *, write_icon=True) -> Path` — diff + 写回 .melsave
+
+**底层访问**
+
+- `.world` — WorldContext 对象
+- `.runner` — MelonScriptRunner 对象
+- `.document` — 原始 MelsaveDocument（只读）
+
+### 低层 API（不通过 Session）
+
+```python
+from melon_lua import (
+    read_melsave, write_world_to_melsave, build_diff_from_world,
+    WorldContext, MelonScriptRunner,
+)
+from melon_lua.melsave import spawn_document_into_world
+
+doc = read_melsave("input.melsave")
+world = WorldContext()
+spawn_document_into_world(doc, world)
+runner = MelonScriptRunner(world=world)
+runner.compile(source)
+runner.run_loop(ticks=100)
+write_world_to_melsave(world, doc, "output.melsave")
+```
+
+### 写回原理
+
+1. `read_melsave` 把整个 `saveObjects` dict 存进 `MelsaveObject.raw`，零字段丢失
+2. `build_diff_from_world` 比较当前 world 和原始 doc：
+   - **modified**：position/rotation/scale/gravity/freezed/color 有变化的物体
+   - **added**：world 里新增的实体（从 `temp/objectid_templates/<oid>.json` 克隆模板）
+   - **removed**：world 里删掉但存档里有的实体
+   - **constraints**：新建的绳子（按 startObjectId/endObjectId 分配到对应对象）
+3. `patch_save_data` 在原始 Data JSON 的 deep copy 上应用 diff：
+   - 修改的物体：deep merge patch 字段
+   - 新增物体：追加到 saveObjectContainers
+   - 删除的物体：从 containers 移除
+   - 约束：合并到对应对象的 constraints 列表（按 mainGuid 去重保留原有约束）
+4. **instanceId 填什么都行**——真机加载时重新分配
+5. **localId** 在存档里常为 0，真机加载时重建层级；沙盒用 index+1 作为匹配键
+
+### 限制
+
+- 新增物体只能用模板池里已有的 objectId（72 个常见物体）；不支持 modded objectId
+- 物理精度不等价于真机（Box2D vs Unity 2D Physics）
+- 渲染为简易 2D 预览，非真实 sprite
+- mechanicData 的三重嵌套 JSON 改动需逐层 stringify（不动 mechanic 则原样保留）
