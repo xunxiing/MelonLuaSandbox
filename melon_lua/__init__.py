@@ -7,6 +7,7 @@ from .runner import MelonScriptRunner
 from .preview import render_world
 from .world import WorldContext, CameraState, InputState
 from .entity import Entity
+from .constraints import ConstraintRegistry, Constraint
 from .catalog import (
     catalog_stats,
     get_profile_by_object_id,
@@ -26,6 +27,8 @@ __all__ = [
     "CameraState",
     "InputState",
     "Entity",
+    "ConstraintRegistry",
+    "Constraint",
     "catalog_stats",
     "get_profile_by_object_id",
     "get_profile_by_name",

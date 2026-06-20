@@ -243,6 +243,14 @@ def spawn_document_into_world(doc: MelsaveDocument, world: Any, *, melmod_overri
             is_frozen=o.freezed,
             gravity_scale=0.0 if not o.gravity else 1.0,
         )
+        raw_col = (o.raw or {}).get("color") if isinstance(o.raw, dict) else None
+        if isinstance(raw_col, dict) and any(
+            abs(float(raw_col.get(k, 0.0))) > 1e-6 for k in ("r", "g", "b", "a")
+        ):
+            e.color_r = float(raw_col.get("r", 1.0))
+            e.color_g = float(raw_col.get("g", 1.0))
+            e.color_b = float(raw_col.get("b", 1.0))
+            e.color_a = float(raw_col.get("a", 1.0))
         # if the child entry had isVisible=False we can hide it
         if not o.visible:
             try:
@@ -259,5 +267,9 @@ def spawn_document_into_world(doc: MelsaveDocument, world: Any, *, melmod_overri
                     _vis.apply_melmod_texture(e, str(uid))
                 except Exception:
                     pass
+        raw_lid = int(o.raw.get("localId", 0)) if isinstance(o.raw, dict) else 0
+        if not raw_lid:
+            raw_lid = o.index + 1 if o.index < 100000 else o.index
+        e.local_id = raw_lid
         ids.append(e.entity_id)
     return ids

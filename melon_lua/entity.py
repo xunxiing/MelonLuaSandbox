@@ -11,6 +11,7 @@ from typing import Any, Optional
 @dataclass
 class Entity:
     entity_id: int
+    local_id: int = 0
     name: str = "object"
     object_id: Optional[int] = None
     localized_name: str = ""

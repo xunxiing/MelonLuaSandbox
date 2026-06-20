@@ -14,6 +14,7 @@ from pathlib import Path
 
 from .entity import Entity
 from . import catalog as _catalog
+from .constraints import ConstraintRegistry
 
 try:
     from Box2D import b2World, b2_dynamicBody, b2_kinematicBody, b2_staticBody
@@ -130,6 +131,10 @@ class WorldContext:
     b2_world: Optional[Any] = field(default=None, repr=False)
     gravity: tuple[float, float] = (0.0, -9.8)
     _b2_bodies: dict[int, Any] = field(default_factory=dict, repr=False)  # entity_id → b2Body
+    _b2_joints: dict[int, Any] = field(default_factory=dict, repr=False)  # constraint_id → b2Joint
+
+    # Rope / constraint data layer (serializes back to melsave)
+    constraints: ConstraintRegistry = field(default_factory=ConstraintRegistry)
 
     # Chip variables (variables.Set/Get) — type-locked per key
     chip_variables: dict[str, Any] = field(default_factory=dict)
@@ -229,6 +234,7 @@ class WorldContext:
         self.entity_counter += 1
         e = Entity(
             entity_id=self.entity_counter,
+            local_id=self.entity_counter,
             name=resolved,
             object_id=object_id,
             position_x=x,
@@ -350,3 +356,178 @@ class WorldContext:
                 e.velocity_x = float(body.linearVelocity.x)
                 e.velocity_y = float(body.linearVelocity.y)
                 e.angular_velocity = _degrees(float(body.angularVelocity))
+
+    # ——— Ropes / constraints ———
+
+    def create_rope(
+        self,
+        from_entity_id: int,
+        to_entity_id: int,
+        kind: str | int = "Simple",
+        *,
+        distance: float = 0.0,
+        break_force: float = 5000.0,
+        frequency: float = 4.0,
+        damping: float = 0.7,
+        **kw,
+    ) -> int:
+        """Register a constraint and create a matching Box2D joint.
+
+        Returns the constraint id. When Box2D is unavailable or the kind has
+        no physics representation, only the registry entry is created.
+        """
+        from_e = self.entities.get(from_entity_id)
+        to_e = self.entities.get(to_entity_id)
+        if from_e is None or to_e is None:
+            raise ValueError(
+                f"create_rope: missing entity ({from_entity_id=}, {to_entity_id=})"
+            )
+        cid = self.constraints.create_constraint(
+            from_e.local_id,
+            to_e.local_id,
+            kind,
+            distance=distance,
+            start_material=kw.get("start_material", "Wood"),
+            end_material=kw.get("end_material", "Wood"),
+            name=kw.get("name", ""),
+            custom_rope=kw.get("custom_rope"),
+        )
+        if self.b2_world is None:
+            return cid
+        body_a = self._b2_bodies.get(from_entity_id)
+        body_b = self._b2_bodies.get(to_entity_id)
+        if body_a is None or body_b is None:
+            return cid
+        c = self.constraints.get(cid)
+        kind_id = c.constraint_id if c is not None else 0
+        # Resolve effective length: caller value or current body separation.
+        if distance <= 0:
+            dx = float(body_b.position.x) - float(body_a.position.x)
+            dy = float(body_b.position.y) - float(body_a.position.y)
+            length = _math.sqrt(dx * dx + dy * dy)
+            if length < 1e-4:
+                length = 0.1
+        else:
+            length = float(distance)
+        anchor = (
+            (float(body_a.position.x) + float(body_b.position.x)) * 0.5,
+            (float(body_a.position.y) + float(body_b.position.y)) * 0.5,
+        )
+        joint = None
+        try:
+            if kind_id in (2, 3, 4, 5):
+                # Simple / SimpleBreakable / FixedDistance / BreakableFixedDistance
+                joint = self.b2_world.CreateDistanceJoint(
+                    bodyA=body_a,
+                    bodyB=body_b,
+                    anchorA=(float(body_a.position.x), float(body_a.position.y)),
+                    anchorB=(float(body_b.position.x), float(body_b.position.y)),
+                    length=length,
+                    frequencyHz=frequency,
+                    dampingRatio=damping,
+                    collideConnected=False,
+                )
+            elif kind_id in (6, 7):
+                # FixedLine / BreakableFixedLine — weld the two bodies together.
+                joint = self.b2_world.CreateWeldJoint(
+                    bodyA=body_a,
+                    bodyB=body_b,
+                    anchor=anchor,
+                    frequencyHz=frequency,
+                    dampingRatio=damping,
+                )
+            elif kind_id == 9:
+                # Spring — soft distance joint.
+                joint = self.b2_world.CreateDistanceJoint(
+                    bodyA=body_a,
+                    bodyB=body_b,
+                    anchorA=(float(body_a.position.x), float(body_a.position.y)),
+                    anchorB=(float(body_b.position.x), float(body_b.position.y)),
+                    length=length,
+                    frequencyHz=frequency,
+                    dampingRatio=damping,
+                    collideConnected=False,
+                )
+            elif kind_id == 16:
+                # Slider — prismatic along the body-to-body axis.
+                axis_x = float(body_b.position.x) - float(body_a.position.x)
+                axis_y = float(body_b.position.y) - float(body_a.position.y)
+                amag = _math.sqrt(axis_x * axis_x + axis_y * axis_y) or 1.0
+                joint = self.b2_world.CreatePrismaticJoint(
+                    bodyA=body_a,
+                    bodyB=body_b,
+                    anchor=anchor,
+                    axis=(axis_x / amag, axis_y / amag),
+                    collideConnected=False,
+                )
+            elif kind_id == 18:
+                # Wheel — suspension along the body-to-body axis.
+                axis_x = float(body_b.position.x) - float(body_a.position.x)
+                axis_y = float(body_b.position.y) - float(body_a.position.y)
+                amag = _math.sqrt(axis_x * axis_x + axis_y * axis_y) or 1.0
+                joint = self.b2_world.CreateWheelJoint(
+                    bodyA=body_a,
+                    bodyB=body_b,
+                    anchor=anchor,
+                    axis=(axis_x / amag, axis_y / amag),
+                    frequencyHz=frequency,
+                    dampingRatio=damping,
+                    collideConnected=False,
+                )
+            elif kind_id == 17:
+                # Friction
+                joint = self.b2_world.CreateFrictionJoint(
+                    bodyA=body_a,
+                    bodyB=body_b,
+                    anchor=anchor,
+                    maxForce=break_force,
+                    maxTorque=break_force,
+                    collideConnected=False,
+                )
+            elif kind_id == 19:
+                # Relative — motor joint
+                joint = self.b2_world.CreateMotorJoint(
+                    bodyA=body_a,
+                    bodyB=body_b,
+                    collideConnected=False,
+                )
+            # kinds 14, 15, 20, 21, 23, 24 have no Box2D representation.
+        except Exception:
+            joint = None
+        if joint is not None:
+            self._b2_joints[cid] = joint
+        return cid
+
+    def destroy_rope(self, constraint_id: int) -> bool:
+        """Remove a constraint and destroy its Box2D joint if any."""
+        joint = self._b2_joints.pop(constraint_id, None)
+        if joint is not None and self.b2_world is not None:
+            try:
+                self.b2_world.DestroyJoint(joint)
+            except Exception:
+                pass
+        return self.constraints.remove(constraint_id)
+
+    def set_rope_param(self, constraint_id: int, key: str, value) -> bool:
+        """Forward to registry; also nudge the live Box2D joint when possible."""
+        ok = self.constraints.set_param(constraint_id, key, value)
+        if not self.constraints.get(constraint_id):
+            return ok
+        joint = self._b2_joints.get(constraint_id)
+        if joint is None:
+            return ok
+        try:
+            if key == "breakForce":
+                joint.breakForce = float(value)
+            elif key == "distance":
+                try:
+                    joint.length = float(value)
+                except Exception:
+                    pass
+            elif key == "frequency":
+                joint.frequencyHz = float(value)
+            elif key == "damping":
+                joint.dampingRatio = float(value)
+        except Exception:
+            pass
+        return ok
