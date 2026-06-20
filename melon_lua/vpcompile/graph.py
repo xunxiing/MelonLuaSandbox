@@ -27,7 +27,15 @@ def parse_chip_graph(graph: dict[str, Any]) -> MelonGraph:
 
     for raw_n in graph.get("Nodes") or []:
         full_id = str(raw_n.get("Id") or "")
-        op = int(raw_n.get("OperationType", 0))
+        op_val = raw_n.get("OperationType", 0)
+        if isinstance(op_val, str):
+            if op_val.isdigit():
+                op = int(op_val)
+            else:
+                from .ops import NAME_TO_OP
+                op = NAME_TO_OP.get(op_val, 0)
+        else:
+            op = int(op_val)
         name = op_name(op, full_id)
         uid = f"{name}_{_short_uid(full_id)}"
         full_to_uid[full_id] = uid

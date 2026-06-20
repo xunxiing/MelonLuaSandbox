@@ -176,6 +176,29 @@ def emit_sticker(uid: str, _ins: list[str], _n: VPNode) -> list[str]:
     return [f"    -- Sticker {uid}: editor-only (no runtime)"]
 
 
+def emit_delta_previous_current(uid: str, ins: list[str], _n: VPNode) -> list[str]:
+    cur = _g(0, ins)
+    mem = f'["_dpc_prev_{uid}"]'
+    return [
+        f"    G{mem} = G{mem}",
+        f'    G["{uid}"] = (({cur}) or 0) - (G{mem} or 0)',
+        f"    G{mem} = ({cur}) or 0",
+    ]
+
+
+def emit_accumulate(uid: str, ins: list[str], _n: VPNode) -> list[str]:
+    val = _g(0, ins, "0")
+    rst = _g(1, ins, "0")
+    mem = f'["_acc_{uid}"]'
+    dt = "1 / math.max(1, chip_tps or 20)"
+    return [
+        f"    G{mem} = G{mem} or 0",
+        f"    if ({rst}) ~= 0 then G{mem} = 0 end",
+        f"    G{mem} = G{mem} + ({val}) * ({dt})",
+        f'    G["{uid}"] = G{mem}',
+    ]
+
+
 FLOW_EMITTERS: dict[str, NodeEmitter] = {
     "Root": emit_root,
     "Exit": emit_exit,
@@ -190,4 +213,6 @@ FLOW_EMITTERS: dict[str, NodeEmitter] = {
     "E": emit_e,
     "Time": emit_time,
     "Random": emit_random,
+    "DeltaPreviousCurrent": emit_delta_previous_current,
+    "Accumulate": emit_accumulate,
 }

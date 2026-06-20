@@ -106,6 +106,11 @@ def emit_in_range_inclusive(uid: str, ins: list[str], _n: VPNode) -> list[str]:
     ]
 
 
+def emit_nxor(uid: str, ins: list[str], _n: VPNode) -> list[str]:
+    a, b = _g(0, ins), _g(1, ins)
+    return _assign(uid, f"((({a}) ~= 0) == (({b}) ~= 0)) and 1 or 0")
+
+
 LOGIC_EMITTERS: dict[str, NodeEmitter] = {
     "And": emit_and,
     "Or": emit_or,
@@ -122,4 +127,5 @@ LOGIC_EMITTERS: dict[str, NodeEmitter] = {
     "GreaterOrEqual": emit_greater_or_equal,
     "LessOrEqual": emit_less_or_equal,
     "InRangeInclusive": emit_in_range_inclusive,
+    "Nxor": emit_nxor,
 }

@@ -32,17 +32,26 @@ def inventory(path: Path) -> Counter:
         g = json.loads(graph_raw)
         inst = so.get("instanceId")
         for n in g.get("Nodes") or []:
-            op = int(n.get("OperationType", 0))
+            op_val = n.get("OperationType", 0)
+            if isinstance(op_val, str):
+                if op_val.isdigit():
+                    op = int(op_val)
+                else:
+                    from melon_lua.vpcompile.ops import NAME_TO_OP
+                    op = NAME_TO_OP.get(op_val, 0)
+            else:
+                op = int(op_val)
             name = op_name(op, str(n.get("Id") or ""))
             c[(op, name, inst)] += 1
     return c
 
 
 def main() -> int:
-    temp = ROOT / "temp"
-    paths = list(temp.glob("*.melsave")) if temp.is_dir() else []
-    if not paths and len(sys.argv) > 1:
+    if len(sys.argv) > 1:
         paths = [Path(p) for p in sys.argv[1:]]
+    else:
+        temp = ROOT / "temp"
+        paths = list(temp.glob("*.melsave")) if temp.is_dir() else []
     if not paths:
         print("No .melsave in temp/ or argv")
         return 1
