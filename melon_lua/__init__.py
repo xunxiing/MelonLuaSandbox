@@ -15,6 +15,7 @@ from .catalog import (
     object_id_for_name,
     resolve_spawn_name,
 )
+from .melmod import load_melmod_pack, MelmodEntry, MelmodPart
 
 __version__ = "3.1.0"
 
@@ -31,4 +32,7 @@ __all__ = [
     "list_spawnables",
     "object_id_for_name",
     "resolve_spawn_name",
+    "load_melmod_pack",
+    "MelmodEntry",
+    "MelmodPart",
 ]

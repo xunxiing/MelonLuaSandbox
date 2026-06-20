@@ -63,6 +63,10 @@ class Entity:
     parent_id: Optional[int] = None
     children_ids: list[int] = field(default_factory=list)
 
+    # Custom texture override (from .melmod)
+    custom_texture_png: str | None = None
+    custom_texture_ppu: float | None = None
+
     # Bookkeeping
     alive: bool = True
     custom_data: dict[str, Any] = field(default_factory=dict)

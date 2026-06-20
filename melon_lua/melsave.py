@@ -34,6 +34,7 @@ class MelsaveObject:
     gravity: bool = True
     freezed: bool = False
     children_count: int = 0
+    visible: bool = True
     raw: dict[str, Any] = field(default_factory=dict, repr=False)
 
 
@@ -85,37 +86,73 @@ def read_melsave(path: str | Path) -> MelsaveDocument:
 
     containers = data.get("saveObjectContainers") or []
     objects: list[MelsaveObject] = []
+    child_index = 100000  # offset so children don't collide with root indices in simple lists
 
     for idx, container in enumerate(containers):
         so = container.get("saveObjects") or {}
-        if not so:
-            continue
-        oid = int(so.get("objectId", 0))
-        name, hint = _resolve_name(oid)
-        px, py, pz = _vec3(so, "position")
-        _, _, rz = _vec3(so, "rotation")
-        sx, sy, _ = _vec3(so, "scale", 1.0)
-        children = container.get("saveObjectChildren") or []
-        objects.append(
-            MelsaveObject(
-                index=idx,
-                object_id=oid,
-                instance_id=int(so.get("instanceId", 0)),
-                name=name,
-                localized_hint=hint,
-                x=px,
-                y=py,
-                z=pz,
-                rotation_z=rz,
-                scale_x=sx,
-                scale_y=sy,
-                parent_id=int(so.get("parentId", -1)),
-                gravity=bool(so.get("gravity", True)),
-                freezed=bool(so.get("freezed", False)),
-                children_count=len(children) if isinstance(children, list) else 0,
-                raw=so,
+        if so:
+            oid = int(so.get("objectId", 0))
+            name, hint = _resolve_name(oid)
+            px, py, pz = _vec3(so, "position")
+            _, _, rz = _vec3(so, "rotation")
+            sx, sy, _ = _vec3(so, "scale", 1.0)
+            children = container.get("saveObjectChildren") or []
+            objects.append(
+                MelsaveObject(
+                    index=idx,
+                    object_id=oid,
+                    instance_id=int(so.get("instanceId", 0)),
+                    name=name,
+                    localized_hint=hint,
+                    x=px,
+                    y=py,
+                    z=pz,
+                    rotation_z=rz,
+                    scale_x=sx,
+                    scale_y=sy,
+                    parent_id=int(so.get("parentId", -1)),
+                    gravity=bool(so.get("gravity", True)),
+                    freezed=bool(so.get("freezed", False)),
+                    children_count=len(children) if isinstance(children, list) else 0,
+                    raw=so,
+                )
             )
-        )
+
+        # Also parse direct children as separate spawnable objects.
+        # objectId==0 children are named sub-components (Motor, PistonPart, Wheel, Handle...).
+        # They carry their own world position/rotation in the save, so we can spawn them.
+        # We treat objectId=0 as "part" with the childName as the visual name.
+        kids = container.get("saveObjectChildren") or []
+        for k in kids:
+            if not isinstance(k, dict):
+                continue
+            koid = int(k.get("objectId", 0))
+            kname = k.get("childName") or "part"
+            khint = kname
+            kpx, kpy, _ = _vec3(k, "position")
+            _, _, krz = _vec3(k, "rotation")
+            ksx, ksy, _ = _vec3(k, "scale", 1.0)
+            objects.append(
+                MelsaveObject(
+                    index=child_index,
+                    object_id=koid,
+                    instance_id=int(k.get("instanceId", 0)),
+                    name=kname,
+                    localized_hint=khint,
+                    x=kpx,
+                    y=kpy,
+                    z=0.0,
+                    rotation_z=krz,
+                    scale_x=ksx,
+                    scale_y=ksy,
+                    parent_id=int(k.get("parentId", -1)),
+                    gravity=bool(k.get("gravity", True)),
+                    freezed=bool(k.get("freezed", False)),
+                    children_count=0,
+                    raw=k,
+                )
+            )
+            child_index += 1
 
     md = meta.get("metadata") or {}
     save_name = str(md.get("Name") or path.stem)
@@ -188,12 +225,13 @@ def list_objects(path: str | Path) -> list[MelsaveObject]:
     return read_melsave(path).objects
 
 
-def spawn_document_into_world(doc: MelsaveDocument, world: Any) -> list[int]:
-    """Spawn all root objects (parentId == -1) into WorldContext. Returns entity ids."""
+def spawn_document_into_world(doc: MelsaveDocument, world: Any, *, melmod_overrides: dict[int, str] | None = None) -> list[int]:
+    """Spawn all objects (roots + children saved in the melsave) into WorldContext.
+
+    melmod_overrides: optional map instanceId -> melmod uniqueId or Part_assetId
+    """
     ids: list[int] = []
     for o in doc.objects:
-        if o.parent_id != -1:
-            continue
         e = world.spawn_entity(
             str(o.object_id),
             o.x,
@@ -205,5 +243,21 @@ def spawn_document_into_world(doc: MelsaveDocument, world: Any) -> list[int]:
             is_frozen=o.freezed,
             gravity_scale=0.0 if not o.gravity else 1.0,
         )
+        # if the child entry had isVisible=False we can hide it
+        if not o.visible:
+            try:
+                e.visible = False
+            except Exception:
+                pass
+        # Apply melmod custom texture if provided for this instance
+        if melmod_overrides:
+            key = o.instance_id
+            uid = melmod_overrides.get(key) or melmod_overrides.get(int(key)) if isinstance(key, (int, float)) else None
+            if uid:
+                try:
+                    from . import visuals as _vis
+                    _vis.apply_melmod_texture(e, str(uid))
+                except Exception:
+                    pass
         ids.append(e.entity_id)
     return ids
