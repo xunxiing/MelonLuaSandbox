@@ -77,6 +77,8 @@ env/
 # Project-specific generated artifacts (demos, previews, videos, temp logs)
 # These are produced by demo scripts and CLI runs
 frames/
+firework_frames/
+tank_frames/
 *.mp4
 final_frame*.png
 plastic_preview*.png

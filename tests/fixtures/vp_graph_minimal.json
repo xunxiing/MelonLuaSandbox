@@ -1,0 +1,55 @@
+{
+  "ValidationState": 0,
+  "Nodes": [
+    {
+      "Id": "Constant : aaaaaaaa-1111-1111-1111-111111111101",
+      "OperationType": 257,
+      "Inputs": [],
+      "Outputs": [{"Id": "out0"}],
+      "SaveData": "{\"DataValue\": 3.0}"
+    },
+    {
+      "Id": "Constant : bbbbbbbb-1111-1111-1111-111111111102",
+      "OperationType": 257,
+      "Inputs": [],
+      "Outputs": [{"Id": "out0"}],
+      "SaveData": "{\"DataValue\": 5.0}"
+    },
+    {
+      "Id": "Add : cccccccc-1111-1111-1111-111111111201",
+      "OperationType": 2304,
+      "Inputs": [
+        {
+          "Id": "in0",
+          "connectedOutputIdModel": {
+            "NodeId": "Constant : aaaaaaaa-1111-1111-1111-111111111101",
+            "Id": "out0"
+          }
+        },
+        {
+          "Id": "in1",
+          "connectedOutputIdModel": {
+            "NodeId": "Constant : bbbbbbbb-1111-1111-1111-111111111102",
+            "Id": "out0"
+          }
+        }
+      ],
+      "Outputs": [{"Id": "out0"}]
+    },
+    {
+      "Id": "Exit : dddddddd-1111-1111-1111-111111111301",
+      "OperationType": 512,
+      "Inputs": [
+        {
+          "Id": "in0",
+          "connectedOutputIdModel": {
+            "NodeId": "Add : cccccccc-1111-1111-1111-111111111201",
+            "Id": "out0"
+          }
+        }
+      ],
+      "Outputs": [],
+      "SaveData": "{\"DataName\": \"sum\"}"
+    }
+  ]
+}

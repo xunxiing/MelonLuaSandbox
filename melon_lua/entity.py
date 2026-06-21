@@ -11,6 +11,7 @@ from typing import Any, Optional
 @dataclass
 class Entity:
     entity_id: int
+    local_id: int = 0
     name: str = "object"
     object_id: Optional[int] = None
     localized_name: str = ""
@@ -62,6 +63,10 @@ class Entity:
     # Hierarchy
     parent_id: Optional[int] = None
     children_ids: list[int] = field(default_factory=list)
+
+    # Custom texture override (from .melmod)
+    custom_texture_png: str | None = None
+    custom_texture_ppu: float | None = None
 
     # Bookkeeping
     alive: bool = True
