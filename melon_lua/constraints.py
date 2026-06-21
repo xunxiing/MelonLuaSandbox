@@ -7,6 +7,11 @@ so a save writer can round-trip them back into a `.melsave` SaveObject.
 Each `Constraint` corresponds to one entry in `SaveObject.constraints`. The
 `startObjectId` / `endObjectId` fields are **localId** references (not
 instanceId), matching how the real game serializes them.
+
+This module also provides `GateWireRegistry` for mechanic gate connections
+(signal wires between chip/entity gates). Gate wires share the same
+`SaveObject.constraints` list as physical ropes but carry a `mechCon` field
+and use `constraintId=13`.
 """
 from __future__ import annotations
 
@@ -290,4 +295,190 @@ class ConstraintRegistry:
                     limits=(float(lim.get("x", 0.0)), float(lim.get("y", 0.0))),
                     use_limits=bool(entry.get("useLimits", False)),
                 )
+            )
+
+
+# ---------------------------------------------------------------------------
+# Mechanic gate connections (signal wires between chip/entity gates)
+# ---------------------------------------------------------------------------
+
+MECHANIC_CONSTRAINT_ID = 13
+
+
+@dataclass
+class GateWire:
+    """A mechanic gate connection (signal wire).
+
+    Stores the gate-to-gate wiring between two containers. Unlike physical
+    `Constraint` ropes, gate wires carry a `mechCon` field with
+    ``outputID``/``inputID`` gate names and use ``constraintId=13``.
+    """
+    wire_id: int
+    main_guid: str
+    source_idx: int
+    target_idx: int
+    output_gate: str
+    input_gate: str
+    start_point: tuple[float, float, float]
+    end_point: tuple[float, float, float]
+    name: str
+    start_material: str
+    end_material: str
+
+
+class GateWireRegistry:
+    """Tracks mechanic gate connections (signal wires) for a live session.
+
+    Wires are keyed by an auto-incremented ``wire_id``. Each wire references
+    two **container indices** (positions in ``saveObjectContainers``), not
+    localIds or objectIds — this matches how the real device serializes
+    ``startObjectId``/``endObjectId`` in mechanic constraints.
+    """
+
+    def __init__(self):
+        self._wires: dict[int, GateWire] = {}
+        self._next_id: int = 1
+
+    def connect(
+        self,
+        source_idx: int,
+        output_gate: str,
+        target_idx: int,
+        input_gate: str,
+        *,
+        name: str = "",
+        start_point: tuple[float, float] = (0.0, 0.0),
+        end_point: tuple[float, float] = (0.0, 0.0),
+        start_material: str = "Paper",
+        end_material: str = "Metal",
+    ) -> int:
+        """Create a gate wire; return its auto-incremented ``wire_id``."""
+        wid = self._next_id
+        self._next_id += 1
+        w = GateWire(
+            wire_id=wid,
+            main_guid=_new_guid(),
+            source_idx=int(source_idx),
+            target_idx=int(target_idx),
+            output_gate=str(output_gate),
+            input_gate=str(input_gate),
+            start_point=(float(start_point[0]), float(start_point[1]), 0.0),
+            end_point=(float(end_point[0]), float(end_point[1]), 0.0),
+            name=str(name),
+            start_material=start_material,
+            end_material=end_material,
+        )
+        self._wires[wid] = w
+        return wid
+
+    def disconnect(self, wire_id: int) -> bool:
+        """Remove a wire by id. Returns True if it existed."""
+        return self._wires.pop(wire_id, None) is not None
+
+    def disconnect_matching(
+        self,
+        *,
+        source_idx: int | None = None,
+        target_idx: int | None = None,
+        output_gate: str | None = None,
+        input_gate: str | None = None,
+    ) -> int:
+        """Remove all wires matching the given filters. Returns count removed."""
+        to_remove: list[int] = []
+        for wid, w in self._wires.items():
+            if source_idx is not None and w.source_idx != source_idx:
+                continue
+            if target_idx is not None and w.target_idx != target_idx:
+                continue
+            if output_gate is not None and w.output_gate != output_gate:
+                continue
+            if input_gate is not None and w.input_gate != input_gate:
+                continue
+            to_remove.append(wid)
+        for wid in to_remove:
+            self._wires.pop(wid, None)
+        return len(to_remove)
+
+    def list_all(self) -> list[GateWire]:
+        """Return all wires sorted by wire_id."""
+        return [self._wires[k] for k in sorted(self._wires.keys())]
+
+    def list_for_container(self, container_idx: int) -> list[GateWire]:
+        """Return wires where the container is source or target."""
+        return [
+            w for w in self._wires.values()
+            if w.source_idx == container_idx or w.target_idx == container_idx
+        ]
+
+    def get(self, wire_id: int) -> GateWire | None:
+        return self._wires.get(wire_id)
+
+    def __len__(self) -> int:
+        return len(self._wires)
+
+    def to_constraint_dicts(self) -> list[dict]:
+        """Serialize wires to constraint dicts for ``SaveObject.constraints``.
+
+        Each dict carries the full 15-field structure matching real-device
+        mechanic constraints (``constraintId=13``, ``mechCon`` populated).
+        """
+        out: list[dict] = []
+        for w in self.list_all():
+            out.append({
+                "mainGuid": {"Value": w.main_guid, "IsEmpty": False},
+                "constraintId": MECHANIC_CONSTRAINT_ID,
+                "startPoint": {"x": w.start_point[0], "y": w.start_point[1], "z": w.start_point[2]},
+                "endPoint": {"x": w.end_point[0], "y": w.end_point[1], "z": w.end_point[2]},
+                "mechCon": {
+                    "inputID": w.input_gate,
+                    "outputID": w.output_gate,
+                    "inputGroup": "",
+                    "outputGroup": "",
+                },
+                "distance": 0.0,
+                "startObjectId": w.source_idx,
+                "endObjectId": w.target_idx,
+                "linkedRopeGuid": None,
+                "constraintName": w.name,
+                "isNameVisible": bool(w.name),
+                "startObjectConnectionMaterial": w.start_material,
+                "endObjectConnectionMaterial": w.end_material,
+                "customRope": None,
+            })
+        return out
+
+    def from_constraint_dicts(self, constraints_json: list) -> None:
+        """Load wires from parsed melsave ``constraints`` JSON.
+
+        Only entries with ``constraintId=13`` and non-null ``mechCon`` are
+        loaded as gate wires; physical ropes are ignored.
+        """
+        self._wires.clear()
+        self._next_id = 1
+        for entry in constraints_json or []:
+            if not isinstance(entry, dict):
+                continue
+            if entry.get("constraintId") != MECHANIC_CONSTRAINT_ID:
+                continue
+            mc = entry.get("mechCon")
+            if not mc:
+                continue
+            mg = entry.get("mainGuid") or {}
+            guid = mg.get("Value") if isinstance(mg, dict) else str(mg)
+            sp = entry.get("startPoint") or {}
+            ep = entry.get("endPoint") or {}
+            wid = self._next_id
+            self._next_id += 1
+            self._wires[wid] = GateWire(
+                wire_id=wid,
+                main_guid=str(guid or _new_guid()),
+                source_idx=int(entry.get("startObjectId", 0)),
+                target_idx=int(entry.get("endObjectId", 0)),
+                output_gate=str(mc.get("outputID", "")),
+                input_gate=str(mc.get("inputID", "")),
+                start_point=(float(sp.get("x", 0.0)), float(sp.get("y", 0.0)), float(sp.get("z", 0.0))),
+                end_point=(float(ep.get("x", 0.0)), float(ep.get("y", 0.0)), float(ep.get("z", 0.0))),
+                name=str(entry.get("constraintName", "") or ""),
+                start_material=str(entry.get("startObjectConnectionMaterial", "Paper") or "Paper"),
+                end_material=str(entry.get("endObjectConnectionMaterial", "Metal") or "Metal"),
             )

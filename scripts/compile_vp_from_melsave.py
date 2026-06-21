@@ -24,12 +24,16 @@ def load_graph(melsave: Path, instance_id: int) -> tuple[dict, dict]:
         if int(so.get("objectId", 0)) != 248:
             raise ValueError(f"instance {instance_id} is not VPchip (248)")
         tps = 20
+        chip_variables_str = ""
         for m in so.get("saveMetaDatas") or []:
             if m.get("key") == "chip_tps":
                 tps = int(m.get("intValue") or 20)
             if m.get("key") == "chip_graph":
                 g = json.loads(m["stringValue"])
-                return g, {"instanceId": instance_id, "tps": tps}
+            if m.get("key") == "chip_variables":
+                chip_variables_str = m.get("stringValue") or ""
+        return g, {"instanceId": instance_id, "tps": tps,
+                   "chip_variables": chip_variables_str}
     raise ValueError(f"instance {instance_id} not found in {melsave}")
 
 

@@ -7,7 +7,7 @@ from .runner import MelonScriptRunner
 from .preview import render_world
 from .world import WorldContext, CameraState, InputState
 from .entity import Entity
-from .constraints import ConstraintRegistry, Constraint
+from .constraints import ConstraintRegistry, Constraint, GateWireRegistry, GateWire
 from .catalog import (
     catalog_stats,
     get_profile_by_object_id,
@@ -18,7 +18,15 @@ from .catalog import (
 )
 from .melmod import load_melmod_pack, MelmodEntry, MelmodPart
 from .melsave import read_melsave, list_objects, MelsaveDocument, MelsaveObject
-from .melsave_writer import write_melsave, write_world_to_melsave, build_diff_from_world, WorldDiff
+from .melsave_writer import (
+    write_melsave,
+    write_world_to_melsave,
+    build_diff_from_world,
+    WorldDiff,
+    connect_gates,
+    disconnect_gates,
+    list_gate_connections,
+)
 from .session import MelsaveSession
 
 __version__ = "3.2.0"
@@ -32,6 +40,8 @@ __all__ = [
     "Entity",
     "ConstraintRegistry",
     "Constraint",
+    "GateWireRegistry",
+    "GateWire",
     "catalog_stats",
     "get_profile_by_object_id",
     "get_profile_by_name",
@@ -49,5 +59,8 @@ __all__ = [
     "write_world_to_melsave",
     "build_diff_from_world",
     "WorldDiff",
+    "connect_gates",
+    "disconnect_gates",
+    "list_gate_connections",
     "MelsaveSession",
 ]
