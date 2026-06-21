@@ -14,7 +14,7 @@ from pathlib import Path
 
 from .entity import Entity
 from . import catalog as _catalog
-from .constraints import ConstraintRegistry
+from .constraints import ConstraintRegistry, GateWireRegistry
 
 try:
     from Box2D import b2World, b2_dynamicBody, b2_kinematicBody, b2_staticBody
@@ -135,6 +135,9 @@ class WorldContext:
 
     # Rope / constraint data layer (serializes back to melsave)
     constraints: ConstraintRegistry = field(default_factory=ConstraintRegistry)
+
+    # Mechanic gate wire data layer (signal wires between chip/entity gates)
+    gate_wires: "GateWireRegistry" = field(default_factory=lambda: __import__("melon_lua.constraints", fromlist=["GateWireRegistry"]).GateWireRegistry())
 
     # Chip variables (variables.Set/Get) — type-locked per key
     chip_variables: dict[str, Any] = field(default_factory=dict)
