@@ -23,6 +23,8 @@ pip install -e .
 
 依赖：`lupa`（LuaJIT 绑定）、`Box2D`（pybox2d）。
 
+> 已发布到 PyPI：`pip install melon-lua`
+
 ## CLI 使用
 
 ```bash
