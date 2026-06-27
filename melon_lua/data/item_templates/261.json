@@ -1,0 +1,260 @@
+{
+  "objectId": 261,
+  "instanceId": -138614,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -4.30161667,
+    "y": 0.908323765,
+    "z": -0.05992705
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 359.95636
+  },
+  "scale": {
+    "x": -0.999999762,
+    "y": 0.3411648,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 31,
+  "sortingLayer": "Default",
+  "orderLayer": 0,
+  "gravity": true,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": false,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [
+    {
+      "activationInput": 0.0,
+      "floatParameters": [
+        0.0
+      ],
+      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"string\",\"DataType\":4,\"DataName\":\"text\",\"CanBeEdit\":true,\"GateData\":\"{\\\"IsMultiline\\\":false,\\\"Value\\\":\\\"0\\\",\\\"Default\\\":\\\"no connection\\\",\\\"MaxLength\\\":256}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"color\",\"DataType\":24,\"DataName\":\"color\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":{\\\"x\\\":1.0,\\\"y\\\":1.0,\\\"z\\\":1.0,\\\"w\\\":1.0,\\\"normalized\\\":{\\\"x\\\":0.5,\\\"y\\\":0.5,\\\"z\\\":0.5,\\\"w\\\":0.5,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.0},\\\"magnitude\\\":2.0,\\\"sqrMagnitude\\\":4.0},\\\"Default\\\":{\\\"x\\\":1.0,\\\"y\\\":1.0,\\\"z\\\":1.0,\\\"w\\\":1.0,\\\"normalized\\\":{\\\"x\\\":0.5,\\\"y\\\":0.5,\\\"z\\\":0.5,\\\"w\\\":0.5,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.0},\\\"magnitude\\\":2.0,\\\"sqrMagnitude\\\":4.0},\\\"MinVector\\\":{\\\"x\\\":-3.40282347E+38,\\\"y\\\":-3.40282347E+38,\\\"z\\\":-3.40282347E+38,\\\"w\\\":-3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"},\\\"MaxVector\\\":{\\\"x\\\":3.40282347E+38,\\\"y\\\":3.40282347E+38,\\\"z\\\":3.40282347E+38,\\\"w\\\":3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"}}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
+      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"string\",\"DataType\":4,\"DataName\":\"text\",\"CanBeEdit\":true,\"GateData\":\"{\\\"IsMultiline\\\":false,\\\"Value\\\":\\\"0\\\",\\\"Default\\\":\\\"no connection\\\",\\\"MaxLength\\\":256}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"color\",\"DataType\":24,\"DataName\":\"color\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":{\\\"x\\\":1.0,\\\"y\\\":1.0,\\\"z\\\":1.0,\\\"w\\\":1.0,\\\"normalized\\\":{\\\"x\\\":0.5,\\\"y\\\":0.5,\\\"z\\\":0.5,\\\"w\\\":0.5,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.0},\\\"magnitude\\\":2.0,\\\"sqrMagnitude\\\":4.0},\\\"Default\\\":{\\\"x\\\":1.0,\\\"y\\\":1.0,\\\"z\\\":1.0,\\\"w\\\":1.0,\\\"normalized\\\":{\\\"x\\\":0.5,\\\"y\\\":0.5,\\\"z\\\":0.5,\\\"w\\\":0.5,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.0},\\\"magnitude\\\":2.0,\\\"sqrMagnitude\\\":4.0},\\\"MinVector\\\":{\\\"x\\\":-3.40282347E+38,\\\"y\\\":-3.40282347E+38,\\\"z\\\":-3.40282347E+38,\\\"w\\\":-3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"},\\\"MaxVector\\\":{\\\"x\\\":3.40282347E+38,\\\"y\\\":3.40282347E+38,\\\"z\\\":3.40282347E+38,\\\"w\\\":3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"}}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
+    }
+  ],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [
+    {
+      "mainGuid": {
+        "Value": "0a49170c-70a4-4f71-9b77-df1499eea3f0",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.247306824,
+        "y": 0.1383362,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.196814969,
+        "y": -0.106387571,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 18,
+      "endObjectId": 512,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "10687043-14f3-4d06-942a-4bafb18ef0a8",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": 0.350273132,
+        "y": 0.137016788,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.1764963,
+        "y": -0.07782686,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 18,
+      "endObjectId": 512,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "65101e89-ba52-4006-838a-8398fc64bcaa",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": 0.3503342,
+        "y": 0.113410778,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.19885616,
+        "y": 0.123054519,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 18,
+      "endObjectId": 16,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "7d970a3d-d5f2-46dc-bc2a-4c7fdd408ef9",
+        "IsEmpty": false
+      },
+      "constraintId": 13,
+      "startPoint": {
+        "x": 0.305392772,
+        "y": -0.130377352,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.0204093531,
+        "y": -0.0145659894,
+        "z": 0.0
+      },
+      "mechCon": {
+        "inputID": "input_7ea8",
+        "outputID": "entity",
+        "inputGroup": "",
+        "outputGroup": ""
+      },
+      "distance": 0.0,
+      "startObjectId": 18,
+      "endObjectId": 177,
+      "linkedRopeGuid": null,
+      "constraintName": "entity Input ",
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "12026a38-65a9-43dc-9d6d-dc88d271c2f8",
+        "IsEmpty": false
+      },
+      "constraintId": 13,
+      "startPoint": {
+        "x": 0.305971444,
+        "y": -0.166215971,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.00294783874,
+        "y": -0.0587438643,
+        "z": 0.0
+      },
+      "mechCon": {
+        "inputID": "activation",
+        "outputID": "activation",
+        "inputGroup": "",
+        "outputGroup": ""
+      },
+      "distance": 0.0,
+      "startObjectId": 18,
+      "endObjectId": 177,
+      "linkedRopeGuid": null,
+      "constraintName": "Activation Activation ",
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    }
+  ],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

@@ -1,0 +1,365 @@
+{
+  "objectId": 507707712,
+  "instanceId": -44368,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -0.496744633,
+    "y": -0.0349388421,
+    "z": 0.0005
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 4.58143035e-09
+  },
+  "scale": {
+    "x": 1.0,
+    "y": 1.0,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 0,
+  "sortingLayer": "Default",
+  "orderLayer": 0,
+  "gravity": true,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": false,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [
+    {
+      "activationInput": 1.0,
+      "floatParameters": [
+        1.0
+      ],
+      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"target\",\"DataType\":1,\"DataName\":\"target\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
+      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"tick\",\"DataType\":2,\"DataName\":\"tick\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":771.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"status\",\"DataType\":4,\"DataName\":\"status\",\"CanBeEdit\":true,\"GateData\":\"{\\\"IsMultiline\\\":false,\\\"Value\\\":\\\"Cycling color. Current Hue: 0.38\\\",\\\"Default\\\":null,\\\"MaxLength\\\":2147483647}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
+    }
+  ],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [
+    {
+      "key": "lua_chip_id",
+      "boolValue": false,
+      "stringValue": "3b51473c-9b01-434e-a526-fbd77f70196e",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "lua_chip_source",
+      "boolValue": false,
+      "stringValue": "-- Lua Chip: Getting Started (runnable demo of all API modules)\n-- Code outside functions runs ONCE. OnTick() is REQUIRED.\n-- Local variables persist between ticks in the Lua VM.\n-- ============ Local state (not saved to disk) ============\nlocal tick = 0\nlocal hue = 0\n\n-- ============ Configuration ============\nlocal COLOR_SPEED = 0.5   -- Speed of color shifting (higher value = faster)\n\n-- ============ Lifecycle ============\n\nfunction OnInit()\n    tick = 0\n    hue = 0\n    print(\"Color cycler chip initialized.\")\nend\n\nfunction OnDestroy()\n    print(\"Color cycler chip destroyed.\")\nend\n\n-- ============ Main Tick ============\n\nfunction OnTick()\n    tick = tick + 1\n    local dt = env.deltaTime()\n\n    -- 1. Get the target entity from input connection\n    local targetId = inputs.entity.target\n\n    if targetId and targetId ~= 0 then\n        local ent = Entity(targetId)\n        \n        if ent:isValid() == 1 then\n            -- 2. Cycle hue value smoothly over time (keep it between 0 and 1)\n            hue = hue + dt * COLOR_SPEED\n            if hue > 1 then \n                hue = hue - 1 \n            end\n\n            -- 3. Convert Hue to RGB channels\n            local r = math.abs(hue * 6 - 3) - 1\n            local g = 2 - math.abs(hue * 6 - 2)\n            local b = 2 - math.abs(hue * 6 - 4)\n\n            -- Clamp RGB values strictly between 0.0 and 1.0\n            r = math.max(0, math.min(1, r))\n            g = math.max(0, math.min(1, g))\n            b = math.max(0, math.min(1, b))\n\n            -- 4. Apply the calculated color (Red, Green, Blue, Alpha)\n            ent:setColor(r, g, b, 1)\n            \n            outputs.string.status = \"Cycling color. Current Hue: \" .. string.format(\"%.2f\", hue)\n        else\n            outputs.string.status = \"Error: Connected target is invalid\"\n        end\n    else\n        outputs.string.status = \"Waiting: Connect an entity to 'target' input\"\n    end\n\n    -- 5. Standard Output\n    outputs.num.tick = tick\nend\n",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "lua_chip_inputs",
+      "boolValue": false,
+      "stringValue": "[{\"Name\":\"target\",\"Type\":1,\"LuaValue\":{\"Type\":6,\"NumberValue\":0.0,\"IntegerValue\":-71366,\"StringValue\":null,\"VectorValue\":{\"x\":0.0,\"y\":0.0,\"z\":0.0,\"w\":0.0,\"magnitude\":0.0,\"sqrMagnitude\":0.0},\"ArrayValue\":null},\"CanBeChanged\":false}]",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "lua_chip_outputs",
+      "boolValue": false,
+      "stringValue": "[{\"Name\":\"status\",\"Type\":4,\"LuaValue\":{\"Type\":3,\"NumberValue\":0.0,\"IntegerValue\":0,\"StringValue\":\"\",\"VectorValue\":{\"x\":0.0,\"y\":0.0,\"z\":0.0,\"w\":0.0,\"magnitude\":0.0,\"sqrMagnitude\":0.0},\"ArrayValue\":null},\"CanBeChanged\":true},{\"Name\":\"tick\",\"Type\":2,\"LuaValue\":{\"Type\":1,\"NumberValue\":0.0,\"IntegerValue\":0,\"StringValue\":null,\"VectorValue\":{\"x\":0.0,\"y\":0.0,\"z\":0.0,\"w\":0.0,\"magnitude\":0.0,\"sqrMagnitude\":0.0},\"ArrayValue\":null},\"CanBeChanged\":true}]",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "lua_chip_variables",
+      "boolValue": false,
+      "stringValue": "[]",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "lua_chip_tps",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 30,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "lua_chip_priority",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "lua_chip_instruction_cost",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 1000,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "lua_chip_visual_name",
+      "boolValue": false,
+      "stringValue": "{\"Title\":\"\",\"TitleVisibilityType\":4,\"TitleColor\":{\"x\":1.0,\"y\":1.0,\"z\":1.0,\"w\":1.0,\"normalized\":{\"x\":0.5,\"y\":0.5,\"z\":0.5,\"w\":0.5,\"magnitude\":1.0,\"sqrMagnitude\":1.0},\"magnitude\":2.0,\"sqrMagnitude\":4.0},\"TitleFontType\":0}",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "lua_chip_metadata",
+      "boolValue": false,
+      "stringValue": "{\"ApiVersion\":1,\"PreambleVersion\":1,\"BackendType\":\"LuaCSharp\",\"BackendVersion\":\"1.0.0\",\"AppVersion\":\"36.0\",\"SavedAtUnixSeconds\":1782558096,\"Extras\":{}}",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    }
+  ],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

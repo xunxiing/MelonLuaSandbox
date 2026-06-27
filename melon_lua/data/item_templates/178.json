@@ -1,0 +1,173 @@
+{
+  "objectId": 178,
+  "instanceId": -366682,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -1.47501755,
+    "y": 1.28139472,
+    "z": -0.0469560735
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "scale": {
+    "x": 0.1,
+    "y": 0.134654552,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 31,
+  "sortingLayer": "BackGroundItem",
+  "orderLayer": 0,
+  "gravity": true,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": true,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 1.0,
+      "g": 0.09411764,
+      "b": 0.0,
+      "a": 1.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 1.0,
+      "g": 0.09411764,
+      "b": 0.0,
+      "a": 1.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": {
+    "IsBroken": false,
+    "IsBreakable": true,
+    "<IsBroken>k__BackingField": false,
+    "<IsBreakable>k__BackingField": true
+  },
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [
+    {
+      "activationInput": 0.0,
+      "floatParameters": [
+        0.0
+      ],
+      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"color\",\"DataType\":24,\"DataName\":\"color\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":{\\\"x\\\":1.0,\\\"y\\\":0.09411764,\\\"z\\\":0.0,\\\"w\\\":1.0,\\\"normalized\\\":{\\\"x\\\":0.705546,\\\"y\\\":0.06640433,\\\"z\\\":0.0,\\\"w\\\":0.705546,\\\"normalized\\\":{\\\"x\\\":0.7055461,\\\"y\\\":0.0664043352,\\\"z\\\":0.0,\\\"w\\\":0.7055461,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.00000012},\\\"magnitude\\\":0.99999994,\\\"sqrMagnitude\\\":0.9999999},\\\"magnitude\\\":1.417342,\\\"sqrMagnitude\\\":2.0088582},\\\"Default\\\":{\\\"x\\\":1.0,\\\"y\\\":0.09411764,\\\"z\\\":0.0,\\\"w\\\":1.0,\\\"normalized\\\":{\\\"x\\\":0.705546,\\\"y\\\":0.06640433,\\\"z\\\":0.0,\\\"w\\\":0.705546,\\\"normalized\\\":{\\\"x\\\":0.7055461,\\\"y\\\":0.0664043352,\\\"z\\\":0.0,\\\"w\\\":0.7055461,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.00000012},\\\"magnitude\\\":0.99999994,\\\"sqrMagnitude\\\":0.9999999},\\\"magnitude\\\":1.417342,\\\"sqrMagnitude\\\":2.0088582},\\\"MinVector\\\":{\\\"x\\\":-3.40282347E+38,\\\"y\\\":-3.40282347E+38,\\\"z\\\":-3.40282347E+38,\\\"w\\\":-3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"},\\\"MaxVector\\\":{\\\"x\\\":3.40282347E+38,\\\"y\\\":3.40282347E+38,\\\"z\\\":3.40282347E+38,\\\"w\\\":3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"}}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
+      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"color\",\"DataType\":24,\"DataName\":\"color\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":{\\\"x\\\":1.0,\\\"y\\\":0.09411764,\\\"z\\\":0.0,\\\"w\\\":1.0,\\\"normalized\\\":{\\\"x\\\":0.705546,\\\"y\\\":0.06640433,\\\"z\\\":0.0,\\\"w\\\":0.705546,\\\"normalized\\\":{\\\"x\\\":0.7055461,\\\"y\\\":0.0664043352,\\\"z\\\":0.0,\\\"w\\\":0.7055461,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.00000012},\\\"magnitude\\\":0.99999994,\\\"sqrMagnitude\\\":0.9999999},\\\"magnitude\\\":1.417342,\\\"sqrMagnitude\\\":2.0088582},\\\"Default\\\":{\\\"x\\\":1.0,\\\"y\\\":0.733333349,\\\"z\\\":0.4509804,\\\"w\\\":1.0,\\\"normalized\\\":{\\\"x\\\":0.603994131,\\\"y\\\":0.442929029,\\\"z\\\":0.2723895,\\\"w\\\":0.603994131,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.0},\\\"magnitude\\\":1.65564525,\\\"sqrMagnitude\\\":2.741161},\\\"MinVector\\\":{\\\"x\\\":-3.40282347E+38,\\\"y\\\":-3.40282347E+38,\\\"z\\\":-3.40282347E+38,\\\"w\\\":-3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"},\\\"MaxVector\\\":{\\\"x\\\":3.40282347E+38,\\\"y\\\":3.40282347E+38,\\\"z\\\":3.40282347E+38,\\\"w\\\":3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"}}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
+    }
+  ],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [
+    {
+      "mainGuid": {
+        "Value": "80882fbe-6045-4b09-af66-83592d1c82a2",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": 0.266551971,
+        "y": -0.0341051854,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.009418488,
+        "y": 0.06344223,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 222,
+      "endObjectId": 184,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Paper",
+      "endObjectConnectionMaterial": "Concrete",
+      "customRope": null
+    }
+  ],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [
+    {
+      "key": "OutlineDisabled",
+      "boolValue": true,
+      "stringValue": null,
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    }
+  ],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

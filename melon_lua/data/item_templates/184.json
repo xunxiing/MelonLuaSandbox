@@ -1,0 +1,205 @@
+{
+  "objectId": 184,
+  "instanceId": -138870,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -2.28033447,
+    "y": 1.47964311,
+    "z": -0.0322595574
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 359.820374
+  },
+  "scale": {
+    "x": 0.9999991,
+    "y": 0.6461666,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 0,
+  "sortingLayer": "Default",
+  "orderLayer": 1,
+  "gravity": true,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": false,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [
+    {
+      "activationInput": 0.0,
+      "floatParameters": [
+        0.0,
+        1.0,
+        10.0,
+        0.0
+      ],
+      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"spawningDelay\",\"DataType\":2,\"DataName\":\"spawning delay\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":9999999.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"despawningDelay\",\"DataType\":2,\"DataName\":\"despawning delay\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":10.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":9999999.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"initialVelocityMultiplier\",\"DataType\":2,\"DataName\":\"initial velocity multiplier\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":9999999.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
+      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"spawningDelay\",\"DataType\":2,\"DataName\":\"spawning delay\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":0.01,\\\"Max\\\":9999999.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"despawningDelay\",\"DataType\":2,\"DataName\":\"despawning delay\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":10.0,\\\"Default\\\":0.0,\\\"Min\\\":0.01,\\\"Max\\\":9999999.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"initialVelocityMultiplier\",\"DataType\":2,\"DataName\":\"initial velocity multiplier\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":9999999.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
+    }
+  ],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [
+    {
+      "mainGuid": {
+        "Value": "b68e49f3-f294-4f49-be31-b06fafcf9111",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.008850098,
+        "y": -0.00161278644,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.00505828857,
+        "y": -0.106809124,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 22,
+      "endObjectId": 248,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "7f0bceee-ca18-4877-810c-9111d8c81e91",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": 0.0797812343,
+        "y": -0.03066164,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.5076411,
+        "y": 0.01524871,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 22,
+      "endObjectId": 591,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "78a445a6-fc57-4c4c-9185-f4d3c88024ce",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.128792718,
+        "y": -0.0344853923,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.494163662,
+        "y": 0.007360577,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 22,
+      "endObjectId": 591,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    }
+  ],
+  "collisionIgnores": [],
+  "addData": [
+    {
+      "type": "ContraptionSpawner",
+      "fieldName": "saveObjectContainers",
+      "fieldData": "{\"icon\":[],\"versionId\":0,\"appVersion\":\"\",\"mapName\":\"\",\"CustomMapChangesVersion\":0,\"seed\":0,\"iconSize\":{\"x\":0.0,\"y\":0.0},\"saveObjectContainers\":[],\"averagePosition\":{\"x\":0.0,\"y\":0.0,\"z\":0.0},\"metadata\":{\"ManifestId\":\"\",\"Name\":\"\"},\"autoLightData\":{\"isAutoLightEnabled\":false,\"timeProgress\":0.5,\"minutesInDay\":10},\"category\":\"\"}"
+    }
+  ],
+  "saveMetaDatas": [],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

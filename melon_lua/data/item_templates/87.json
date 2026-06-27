@@ -1,0 +1,191 @@
+{
+  "objectId": 87,
+  "instanceId": -363994,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -0.08715439,
+    "y": 0.7239948,
+    "z": -0.0504970662
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 88.0347443
+  },
+  "scale": {
+    "x": 1.00000024,
+    "y": 1.00000024,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 31,
+  "sortingLayer": "BackGroundItem",
+  "orderLayer": 0,
+  "gravity": false,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": true,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": {
+    "IsBroken": false,
+    "IsBreakable": true,
+    "<IsBroken>k__BackingField": false,
+    "<IsBreakable>k__BackingField": true
+  },
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [
+    {
+      "mainGuid": {
+        "Value": "9e36dca3-4206-4890-9cd5-36f9eaf6c576",
+        "IsEmpty": false
+      },
+      "constraintId": 10,
+      "startPoint": {
+        "x": 0.04,
+        "y": 0.01,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 187,
+      "endObjectId": 245,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Concrete",
+      "endObjectConnectionMaterial": "Concrete",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "2b3da050-b674-4079-9f5e-ec603f5a08ba",
+        "IsEmpty": false
+      },
+      "constraintId": 10,
+      "startPoint": {
+        "x": -0.09,
+        "y": 0.01,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.1,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 187,
+      "endObjectId": 245,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Concrete",
+      "endObjectConnectionMaterial": "Concrete",
+      "customRope": null
+    }
+  ],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [
+    {
+      "key": "OutlineDisabled",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    }
+  ],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

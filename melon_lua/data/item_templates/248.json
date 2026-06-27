@@ -1,0 +1,391 @@
+{
+  "objectId": 248,
+  "instanceId": -141078,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -10.6320953,
+    "y": -0.90983063,
+    "z": -0.0147873843
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.00639362633
+  },
+  "scale": {
+    "x": -1.0,
+    "y": 1.0,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 0,
+  "sortingLayer": "Default",
+  "orderLayer": 0,
+  "gravity": true,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": false,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [
+    {
+      "activationInput": 1.0,
+      "floatParameters": [
+        1.0,
+        0.0
+      ],
+      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":false,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"input 1\",\"DataType\":2,\"DataName\":\"#Input 1\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
+      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":false,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":false,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"input 2\",\"DataType\":2,\"DataName\":\"#Output 2\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
+    }
+  ],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [
+    {
+      "key": "chip_id",
+      "boolValue": false,
+      "stringValue": "fb854167-19a1-4618-9a38-9c2db7da2ff7",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_visual_name",
+      "boolValue": false,
+      "stringValue": "{\"Title\":\"VPchip(Clone)\",\"TitleVisibilityType\":4,\"TitleColor\":{\"x\":1.0,\"y\":1.0,\"z\":1.0,\"w\":1.0,\"normalized\":{\"x\":0.5,\"y\":0.5,\"z\":0.5,\"w\":0.5,\"magnitude\":1.0,\"sqrMagnitude\":1.0},\"magnitude\":2.0,\"sqrMagnitude\":4.0}}",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_tps",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 30,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_priority",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_period_name_index",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 3,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_inputs",
+      "boolValue": false,
+      "stringValue": "[{\"Key\":\"activation\",\"DataName\":\"activation\",\"SerializedValue\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"IsSaveBetweenSession\":false,\"GateDataType\":\"Number\"},{\"Key\":\"input 1\",\"DataName\":\"#Input 1\",\"SerializedValue\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"IsSaveBetweenSession\":false,\"GateDataType\":\"Number\"}]",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_outputs",
+      "boolValue": false,
+      "stringValue": "[{\"Key\":\"entity\",\"DataName\":\"entity\",\"SerializedValue\":null,\"IsSaveBetweenSession\":false,\"GateDataType\":\"Entity\"},{\"Key\":\"activation\",\"DataName\":\"activation\",\"SerializedValue\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"IsSaveBetweenSession\":false,\"GateDataType\":\"Number\"},{\"Key\":\"input 2\",\"DataName\":\"#Output 2\",\"SerializedValue\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"IsSaveBetweenSession\":false,\"GateDataType\":\"Number\"}]",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_variables",
+      "boolValue": false,
+      "stringValue": "[]",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_graph",
+      "boolValue": false,
+      "stringValue": "{\"ValidationState\":\"Valid\",\"Version\":1,\"Nodes\":[{\"Id\":\"RootNodeViewModel : 01f93460-b1bd-4ec9-8faf-cc8a20d1f758\",\"ModelVersion\":1,\"Version\":\"0.1\",\"OperationType\":\"Root\",\"Inputs\":[],\"Outputs\":[{\"Id\":\"RootNodeViewModel : 01f93460-b1bd-4ec9-8faf-cc8a20d1f758\\nOutput : Number 257a73a5-dfd7-4d09-a26a-6728f79d157e\",\"DataType\":\"Number\",\"ConnectedInputsIds\":[{\"Id\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\\nInput : Number 404faf46-36fc-4541-b1c1-2e474669efe1\",\"NodeId\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\"}]}],\"VisualPosition\":{\"x\":-780.0,\"y\":180.0},\"VisualCollapsed\":false,\"MechanicConnectionId\":\"input 1\",\"GateDataType\":\"Number\",\"SaveData\":null},{\"Id\":\"ConstantNodeViewModel : 7a66a8e2-10d2-4f29-9057-0c7ba2c688da\",\"ModelVersion\":1,\"Version\":\"0.1\",\"OperationType\":\"Constant\",\"Inputs\":[],\"Outputs\":[{\"Id\":\"ConstantNodeViewModel : 7a66a8e2-10d2-4f29-9057-0c7ba2c688da\\nOutput : Number 74955827-c395-4d61-9be7-639af6b030c2\",\"DataType\":\"Number\",\"ConnectedInputsIds\":[{\"Id\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\\nInput : Number b324240f-7cd1-4c75-baf0-cfd94aa75190\",\"NodeId\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\"}]}],\"VisualPosition\":{\"x\":-780.0,\"y\":-100.0},\"VisualCollapsed\":false,\"MechanicConnectionId\":null,\"GateDataType\":\"Number\",\"SaveData\":\"{\\n  \\\"DataValue\\\": \\\"45\\\",\\n  \\\"IsMultiline\\\": null\\n}\"},{\"Id\":\"ExitNodeViewModel : 7ec3fa57-3d17-43e7-b884-2c2ddd5dccfe\",\"ModelVersion\":1,\"Version\":\"0.1\",\"OperationType\":\"Exit\",\"Inputs\":[{\"Id\":\"ExitNodeViewModel : 7ec3fa57-3d17-43e7-b884-2c2ddd5dccfe\\nInput : Number f9abd640-91b1-42ef-87ed-d74d04bfa129\",\"DataType\":\"Number\",\"connectedOutputIdModel\":{\"Id\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\\nOutput : Number aedab793-75a1-4f5c-92c8-ba946213e43c\",\"NodeId\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\"}}],\"Outputs\":[],\"VisualPosition\":{\"x\":1000.0,\"y\":20.0},\"VisualCollapsed\":false,\"MechanicConnectionId\":\"input 2\",\"GateDataType\":\"Number\",\"SaveData\":null},{\"Id\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\",\"ModelVersion\":1,\"Version\":\"0.1\",\"OperationType\":\"LessOrEqual\",\"Inputs\":[{\"Id\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\\nInput : Number 404faf46-36fc-4541-b1c1-2e474669efe1\",\"DataType\":\"Number\",\"connectedOutputIdModel\":{\"Id\":\"RootNodeViewModel : 01f93460-b1bd-4ec9-8faf-cc8a20d1f758\\nOutput : Number 257a73a5-dfd7-4d09-a26a-6728f79d157e\",\"NodeId\":\"RootNodeViewModel : 01f93460-b1bd-4ec9-8faf-cc8a20d1f758\"}},{\"Id\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\\nInput : Number b324240f-7cd1-4c75-baf0-cfd94aa75190\",\"DataType\":\"Number\",\"connectedOutputIdModel\":{\"Id\":\"ConstantNodeViewModel : 7a66a8e2-10d2-4f29-9057-0c7ba2c688da\\nOutput : Number 74955827-c395-4d61-9be7-639af6b030c2\",\"NodeId\":\"ConstantNodeViewModel : 7a66a8e2-10d2-4f29-9057-0c7ba2c688da\"}}],\"Outputs\":[{\"Id\":\"LessOrEqualNodeViewModel : 0f19f200-de6e-4586-a5a3-3e7f7c2d87a3\\nOutput : Number aedab793-75a1-4f5c-92c8-ba946213e43c\",\"DataType\":\"Number\",\"ConnectedInputsIds\":[{\"Id\":\"ExitNodeViewModel : 7ec3fa57-3d17-43e7-b884-2c2ddd5dccfe\\nInput : Number f9abd640-91b1-42ef-87ed-d74d04bfa129\",\"NodeId\":\"ExitNodeViewModel : 7ec3fa57-3d17-43e7-b884-2c2ddd5dccfe\"}]}],\"VisualPosition\":{\"x\":80.0,\"y\":20.0},\"VisualCollapsed\":false,\"MechanicConnectionId\":null,\"GateDataType\":\"None\",\"SaveData\":null}]}",
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_editor_position",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 12.638442,
+        "y": -82.3047562
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    },
+    {
+      "key": "chip_editor_zoom",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 0,
+      "floatValue": 0.0,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.5894122,
+        "y": 0.5894122,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    }
+  ],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}
