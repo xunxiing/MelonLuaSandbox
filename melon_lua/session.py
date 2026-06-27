@@ -66,8 +66,23 @@ class MelsaveSession:
             world=self._world,
             quiet=self._quiet,
         )
+        # Load existing mechanic gate wires from the save's raw constraints
+        self._load_gate_wires_from_doc()
         self._loaded = True
         return self
+
+    def _load_gate_wires_from_doc(self) -> None:
+        """Populate ``world.gate_wires`` from the document's raw constraints."""
+        assert self._world is not None
+        assert self._doc is not None
+        first = True
+        for obj in self._doc.objects:
+            raw = getattr(obj, "raw", None) or {}
+            cs = raw.get("constraints")
+            if not isinstance(cs, list) or not cs:
+                continue
+            self._world.gate_wires.from_constraint_dicts(cs, append=not first)
+            first = False
 
     def close(self) -> None:
         """Release the Box2D world and Lua VM. Idempotent."""
@@ -225,6 +240,86 @@ class MelsaveSession:
                 "start_local_id": c.start_object_id,
                 "end_local_id": c.end_object_id,
                 "distance": c.distance,
+            })
+        return out
+
+    # ===== Mechanic gate wires (signal connections) =====
+
+    def wire_gate(
+        self,
+        source_idx: int,
+        output_gate: str,
+        target_idx: int,
+        input_gate: str,
+        *,
+        name: str = "",
+        start_point: tuple[float, float] = (0.0, 0.0),
+        end_point: tuple[float, float] = (0.0, 0.0),
+    ) -> int:
+        """Hot-wire a mechanic gate connection between two containers.
+
+        Adds a signal wire from ``output_gate`` on container ``source_idx``
+        to ``input_gate`` on container ``target_idx``. The wire lives in the
+        session's ``GateWireRegistry`` and is serialized on ``save_as()``.
+
+        Args:
+            source_idx: Container index of the source (output) object.
+            output_gate: Output gate name on the source object.
+            target_idx: Container index of the target (input) object.
+            input_gate: Input gate name on the target object.
+            name: Optional display name for the wire.
+            start_point: Visual offset of the source port (local space).
+            end_point: Visual offset of the target port (local space).
+
+        Returns:
+            The wire_id (auto-incremented).
+        """
+        self._require_loaded()
+        assert self._world is not None
+        return self._world.gate_wires.connect(
+            source_idx, output_gate, target_idx, input_gate,
+            name=name, start_point=start_point, end_point=end_point,
+        )
+
+    def unwire_gate(
+        self,
+        wire_id: int | None = None,
+        *,
+        source_idx: int | None = None,
+        target_idx: int | None = None,
+        output_gate: str | None = None,
+        input_gate: str | None = None,
+    ) -> int:
+        """Hot-disconnect gate wire(s).
+
+        If ``wire_id`` is given, removes that specific wire.
+        Otherwise removes all wires matching the filter combination.
+        Returns the number of wires removed.
+        """
+        self._require_loaded()
+        assert self._world is not None
+        if wire_id is not None:
+            return 1 if self._world.gate_wires.disconnect(wire_id) else 0
+        return self._world.gate_wires.disconnect_matching(
+            source_idx=source_idx,
+            target_idx=target_idx,
+            output_gate=output_gate,
+            input_gate=input_gate,
+        )
+
+    def wires(self) -> list[dict]:
+        """List all gate wires in the registry."""
+        self._require_loaded()
+        assert self._world is not None
+        out = []
+        for w in self._world.gate_wires.list_all():
+            out.append({
+                "wire_id": w.wire_id,
+                "source_idx": w.source_idx,
+                "target_idx": w.target_idx,
+                "output_gate": w.output_gate,
+                "input_gate": w.input_gate,
+                "name": w.name,
             })
         return out
 

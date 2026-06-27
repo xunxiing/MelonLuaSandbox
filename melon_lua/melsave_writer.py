@@ -667,7 +667,11 @@ def write_world_to_melsave(
     *,
     write_icon: bool = True,
 ) -> Path:
-    """Build a diff from world, patch original Data, and write a new .melsave."""
+    """Build a diff from world, patch original Data, and write a new .melsave.
+
+    Gate wires from ``world.gate_wires`` are merged into the patched
+    ``constraints`` lists (mechanic connections coexist with physical ropes).
+    """
     diff = build_diff_from_world(world, original_doc)
     original_path = original_doc.path
     original_data: dict[str, Any] = {}
@@ -678,6 +682,10 @@ def write_world_to_melsave(
     except Exception:
         original_data = {"saveObjectContainers": []}
     patched = patch_save_data(original_data, diff)
+    # Merge gate wires into the patched constraints lists.
+    gate_wires = getattr(world, "gate_wires", None)
+    if gate_wires is not None and len(gate_wires) > 0:
+        _merge_gate_wires_into_save(patched, gate_wires)
     meta = (
         copy.deepcopy(original_doc.metadata)
         if isinstance(original_doc.metadata, dict)
@@ -687,3 +695,44 @@ def write_world_to_melsave(
     if write_icon:
         icon = _read_icon_from_melsave(original_path)
     return write_melsave(out_path, patched, meta, icon)
+
+
+def _merge_gate_wires_into_save(save_data: dict, gate_wires: Any) -> None:
+    """Merge gate-wire constraints into save's ``constraints`` lists.
+
+    When the registry is non-empty, it is the **source of truth** for all
+    mechanic gate wires: for each source container that appears in the
+    registry, pre-existing mechanic constraints are stripped and replaced
+    with the registry's current wires. Physical ropes (constraintId=10,
+    mechCon null) are preserved untouched. Containers not referenced by any
+    wire in the registry keep their original constraints as-is.
+
+    When the registry is empty, no changes are made (original constraints
+    preserved verbatim).
+    """
+    wire_dicts = gate_wires.to_constraint_dicts()
+    if not wire_dicts:
+        return
+    containers = save_data.get("saveObjectContainers") or []
+    # Group wires by source container index
+    by_source: dict[int, list[dict]] = {}
+    for wd in wire_dicts:
+        si = int(wd.get("startObjectId", 0))
+        by_source.setdefault(si, []).append(wd)
+    # For containers that have wires in the registry, replace mechanic constraints
+    for si, wires in by_source.items():
+        if si < 0 or si >= len(containers):
+            continue
+        so = containers[si].get("saveObjects") or {}
+        existing = so.get("constraints")
+        if not isinstance(existing, list):
+            existing = []
+        # Keep only physical ropes (non-mechanic); drop ALL old mechanic wires
+        # since the registry is the source of truth for current wires.
+        kept_physical = [
+            c for c in existing
+            if isinstance(c, dict)
+            and (c.get("constraintId") != MECHANIC_CONSTRAINT_ID
+                 or c.get("mechCon") is None)
+        ]
+        so["constraints"] = kept_physical + wires

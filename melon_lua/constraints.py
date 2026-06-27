@@ -447,14 +447,19 @@ class GateWireRegistry:
             })
         return out
 
-    def from_constraint_dicts(self, constraints_json: list) -> None:
+    def from_constraint_dicts(self, constraints_json: list, *, append: bool = False) -> None:
         """Load wires from parsed melsave ``constraints`` JSON.
 
         Only entries with ``constraintId=13`` and non-null ``mechCon`` are
         loaded as gate wires; physical ropes are ignored.
+
+        Args:
+            append: If True, add to existing wires instead of replacing.
+                Use when loading from multiple containers' constraint lists.
         """
-        self._wires.clear()
-        self._next_id = 1
+        if not append:
+            self._wires.clear()
+            self._next_id = 1
         for entry in constraints_json or []:
             if not isinstance(entry, dict):
                 continue
