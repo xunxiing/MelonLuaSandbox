@@ -191,8 +191,10 @@ melon-lua --api-list
 
 ## 从零构建存档（MelsaveBuilder）
 
-`MelsaveBuilder` 用于从零程序化构建 .melsave：生成物品 + Lua 芯片 + 连线 +
-导出。所有字段结构基于真机验证的 `1132luaexample.melsave`。
+`MelsaveBuilder` 是 `MelsaveSession` 的轻量包装（v4.0.0+），用于从零程序化构建
+.melsave：生成物品 + Lua 芯片 + 连线 + 导出。所有字段结构基于真机验证的
+`1132luaexample.melsave`。新代码可以直接用 `MelsaveSession`（默认文档模式），
+`MelsaveBuilder` 仅作语义标记保留。
 
 ### 最小示例
 
@@ -277,18 +279,23 @@ b.save("output.melsave")
 这些对应 Lua 代码中的 `inputs.num.activation`、`outputs.entity.entity`、
 `outputs.num.tick`、`outputs.string.status`。用户只需声明额外的自定义门。
 
-### 与 MelsaveSession 的区别
+### 与 MelsaveSession 的关系
 
-| 特性 | MelsaveBuilder | MelsaveSession |
-|------|---------------|----------------|
-| 场景 | 从零构建存档（blueprint） | 修改/扩展存档（runtime + diff） |
-| 物理模拟 | 无（只构建 JSON） | 有（Box2D + Lua 运行） |
-| 物品生成 | `add_item()` | `spawn()` / world diff |
+**v4.0.0+：`MelsaveBuilder` 是 `MelsaveSession` 的轻量包装**（纯文档模式）。
+内部就是一个 `MelsaveSession` 实例，所有方法（`add_item`/`add_lua_chip`/
+`connect`/`save`）都是代理调用。保留这个类是为了语义清晰——表示"纯构造，
+不跑运行时"的意图。新代码可以直接用 `MelsaveSession`（默认就是文档模式）。
+
+| 特性 | MelsaveBuilder（旧） | MelsaveSession（统一） |
+|------|---------------------|----------------------|
+| 场景 | 从零构建存档（blueprint） | 加载/修改/从零构建 + 可选运行时 |
+| 物理模拟 | 无 | 可选（`.load()` 启动） |
+| 物品生成 | `add_item()` | `add_item()` |
 | 芯片持久化 | `add_lua_chip()` | `add_lua_chip()` + `run_chip()` |
 | 芯片执行 | 无 | `run_chip()` / `tick()` |
-| 连线 | `connect()` | `wire_gate()` / `unwire_gate()` |
+| 连线 | `connect()` | `connect()` / `disconnect()` |
 | 绳索 | 无 | `create_rope()` / `remove_rope()` |
-| 导出 | `save()` | `save_as()`（返回绝对路径） |
+| 导出 | `save()` | `save()` / `save_as()`（别名） |
 
 两者在芯片持久化上语义对齐：`add_lua_chip()` 都把源码写入 `lua_chip_source`
 元数据。MelsaveSession 额外支持运行时 `run_chip()` 编辑源码并自动同步回容器。
@@ -443,22 +450,23 @@ end
 
 ## melsave 全周期管理（MelsaveSession）
 
-`MelsaveSession` 把 .melsave 文件的读、改、写收拢到一个对象里。原始存档文档
-在内部持有，`save_as` 时自动 diff 当前 world 状态与原始存档，只 patch 改动
-字段，保留所有未触碰字段。支持物理绳索（`create_rope`）和门连线
-（`wire_gate`）的热创建/删除。
+`MelsaveSession` 是统一的存档抽象：一个 `.melsave` 文件 = 一个 session。
+构造即读取文档（document 模式），`load()` 或 `with` 启动运行时（runtime 模式）。
+两种模式下都能做容器增删、连线、save；运行时操作（run_chip/tick/spawn/
+create_rope/snapshot）需要先 load。
 
 ### 创建会话
 
 ```python
-# 从已有存档加载
-with MelsaveSession("input.melsave") as session:
-    ...
+# 从已有存档加载（构造即读取文档）
+session = MelsaveSession("input.melsave")
+session.save("copy.melsave")             # 文档模式直接导出
 
 # 从空白世界开始（无需现成存档）
 with MelsaveSession() as session:        # 或 MelsaveSession.create_empty()
-    session.spawn(202, 0, 0)             # 直接造物品
-    session.save_as("new_world.melsave")
+    session.add_item(202, 0, 0)          # 文档操作 + 运行时操作都可
+    session.run_chip(chip_src, ticks=10)
+    session.save("new_world.melsave")
 ```
 
 ### 最小示例（加载 + 芯片 + 连线）
@@ -467,62 +475,85 @@ with MelsaveSession() as session:        # 或 MelsaveSession.create_empty()
 from melon_lua import MelsaveSession
 
 with MelsaveSession("input.melsave") as session:
-    # 加载时自动读取现有门连线到 registry
+    # 构造即加载文档；with 启动运行时
     # 跑一个 Lua 芯片 100 tick
     session.run_chip(chip_source, ticks=100)
     # 拉一条物理绳索
     session.create_rope(from_id=1, to_id=2, kind="Simple", distance=1.5)
-    # 热连一条门连线：c0 的 "Dot worlds position" -> c7 的 "target"
-    session.wire_gate(0, "Dot worlds position", 7, "target")
+    # 连一条门连线：c0 的 "Dot worlds position" -> c7 的 "target"
+    session.connect(0, "Dot worlds position", 7, "target")
     # 看当前状态
     snap = session.snapshot()
     print(snap["entity_count"], snap["ropes"])
     # 写回新存档（门连线 + 持久化芯片 自动导出）
-    session.save_as("output.melsave")
+    session.save("output.melsave")
 ```
 
 ### 从零创建带芯片的存档（无需现有存档）
 
 ```python
+# 文档模式（不需要运行时，最轻量）
+s = MelsaveSession()
+s.add_lua_chip(lua_source, x=1, y=2, title="MyChip",
+               inputs=[{"name":"target","type":"entity"}],
+               outputs=[{"name":"out","type":"number"}])
+s.save("chip_only.melsave")
+
+# 或运行时验证模式
 with MelsaveSession() as s:
-    # 添加一个 Lua 芯片容器（会在 save_as 时持久化到存档）
-    s.add_lua_chip(lua_source, x=1, y=2, title="MyChip",
+    s.add_lua_chip(lua_source, x=1, y=2,
                    inputs=[{"name":"target","type":"entity"}],
                    outputs=[{"name":"out","type":"number"}])
-    # 编译 + 运行（源码自动同步回芯片容器）
-    s.run_chip(lua_source, ticks=10)
-    # 导出——真机直接可用
-    s.save_as("chip_only.melsave")
+    s.run_chip(lua_source, ticks=10)     # 编译 + 运行（源码同步到容器）
+    s.save("chip_only.melsave")
 ```
 
 ### 生命周期
 
 ```
-MelsaveSession(path)        # 创建（不读文件）；无参 = 空白世界
-    .load()                 # 读取 + spawn 到 world + 构建 runner + 加载现有门连线
-    [add_lua_chip]          # 添加持久化 Lua 芯片容器（save_as 时写入）
-    [run_chip / tick]       # 编译并运行 Lua 芯片（源码同步到芯片容器）
+MelsaveSession(path=None)   # 构造即读取文档（path=None 用空白世界）
+    .load()                 # 启动运行时（spawn 到 world + 构建 runner）
+[文档模式操作 - 不需要 load]
+    .add_item/add_lua_chip/add_ui_controller/add_container
+    .connect/disconnect/list_connections
+    .save()
+[运行时操作 - 需要 load 或 with]
+    [run_chip / tick]       # 编译并运行 Lua 芯片（源码同步到容器）
     [create_rope / remove]  # 管理物理绳索/关节
-    [wire_gate / unwire_gate]  # 热连线/断线（mechanic gate connections）
     [spawn / remove]        # 增删实体
     [snapshot / diff]       # 观察状态
-    .save_as(out_path)      # diff + 合并门连线 + 持久化芯片 + 写回 .melsave
     .close()                # 释放 Box2D world + Lua VM
 ```
 
-支持 `with` 上下文管理器（自动 load + close）。
+支持 `with` 上下文管理器（自动 load + close）。`save()` 在两种模式下都工作，
+`save_as` 是 `save` 的别名。
 
 ### API 一览
 
 **会话创建**
 
-- `MelsaveSession(path=None, *, tps=20.0, quiet=True)` — path 省略时用空白世界
+- `MelsaveSession(path=None, *, tps=20.0, quiet=True, app_version="36.0", map_name="Default")`
+  构造即读取文档；path=None 时用空白世界
 - `MelsaveSession.create_empty(**kw)` — 显式创建空白会话（等价 `MelsaveSession()`）
 
-**芯片持久化 + 执行**
+**容器 / 文档操作**（两种模式都能用，不要求 load）
 
+- `add_item(object_id, x, y, *, color, dynamic, freezed, template) -> int`
+  新增物品容器，返回容器索引
 - `add_lua_chip(source, *, x, y, inputs, outputs, variables, tps, priority, title) -> idx`
-  创建 Lua 芯片容器，标记为活跃芯片。save_as 时自动写入存档。
+  新增 Lua 芯片容器，标记为活跃芯片；save 时自动写入存档
+- `add_ui_controller(controller, x, y) -> int` — 新增 UI 控制器
+- `add_container(save_objects_dict) -> int` — 新增原始容器
+- `connect(src, out_gate, tgt, in_gate, *, name, start_point, end_point) -> dict`
+  连线：`src.out_gate` → `tgt.in_gate`（返回 constraint dict）
+- `disconnect(src, *, output_gate, target_idx, input_gate, wire_id) -> int`
+  断线，返回删除数
+- `list_connections(container_idx=None) -> list[dict]` — 列出连线
+- `containers() -> list[dict]` / `get_container(idx) -> dict` / `.container_count`
+- `set_meta(**kw)` / `set_icon(bytes)` / `load_icon_from(path)`
+
+**芯片执行**（运行时操作）
+
 - `run_chip(source, *, ticks=1, inputs=None, container_idx=None) -> {"error", "outputs"}`
   编译 + OnInit + 跑 N tick。源码自动同步回活跃芯片容器（除非显式指定 container_idx）。
 - `compile_only(source) -> bool` — 只编译不跑
@@ -548,42 +579,28 @@ Friction/Slider/Wheel/Relative/...）
 **门连线 / 信号线**（mechanic gate connections — 芯片/实体门之间的信号路由）
 
 门连线是 mechanic 约束（`constraintId=13`，带 `mechCon` 字段），与物理绳索
-（`constraintId=10`，`mechCon=null`）共存于 `constraints` 列表。沙盒内可热
-连线/断线，`save_as()` 时自动导出。
-
-- `wire_gate(source_idx, output_gate, target_idx, input_gate, *,
-  name="", start_point=(0,0), end_point=(0,0)) -> int`
-  热连线：source 容器的 `output_gate` → target 容器的 `input_gate`。返回
-  `wire_id`。
-- `unwire_gate(wire_id=None, *, source_idx=None, target_idx=None,
-  output_gate=None, input_gate=None) -> int`
-  热断线。传 `wire_id` 删单条；否则按过滤组合删所有匹配。返回删除数。
-- `wires() -> list[dict]` — 当前所有门连线（`wire_id`/`source_idx`/
-  `target_idx`/`output_gate`/`input_gate`/`name`）
+（`constraintId=10`，`mechCon=null`）共存于 `constraints` 列表。统一 API 用
+`connect/disconnect/list_connections` 操作；旧 API `wire_gate/unwire_gate/wires`
+保留为别名（向后兼容）。
 
 ```python
 with MelsaveSession("input.melsave") as s:
-    # 加载时自动读取现有门连线到 registry
+    # 连线：c7 的 "input 2" 门 -> c5 的 "force" 门
+    s.connect(7, "input 2", 5, "force",
+              name="left engine force",
+              start_point=(0.1, 0.0), end_point=(0.0, 0.1))
 
-    # 热连线：c7 的 "input 2" 门 -> c5 的 "force" 门
-    wid = s.wire_gate(7, "input 2", 5, "force",
-                      name="left engine force",
-                      start_point=(0.1, 0.0), end_point=(0.0, 0.1))
-
-    # 热断线：按 id 或过滤组合
-    s.unwire_gate(wire_id=wid)                    # 删单条
-    s.unwire_gate(source_idx=7, target_idx=5)     # 按 source+target 删
-    s.unwire_gate(output_gate="input 2")          # 按输出门名删
+    # 断线：按过滤组合
+    s.disconnect(7, output_gate="input 2")           # 按输出门名删
+    s.disconnect(7, target_idx=5)                    # 按 source+target 删
 
     # 列出当前连线
-    for w in s.wires():
+    for w in s.list_connections():
         print(f"c{w['source_idx']}.{w['output_gate']} -> "
               f"c{w['target_idx']}.{w['input_gate']}")
 
-    # 导出：registry 非空时它是 source of truth
-    # 每个 source container 的旧 mechanic 连线被替换为 registry 当前连线
-    # 物理约束（constraintId=10）保留不动
-    s.save_as("output.melsave")
+    # 导出
+    s.save("output.melsave")
 ```
 
 **门连线 SDK 契约**（逆向自真机 2297.melsave + xj11）：
@@ -603,13 +620,15 @@ with MelsaveSession("input.melsave") as s:
 
 - `snapshot() -> dict` — {tick, elapsed, entities, ropes, variables, entity_count}
 - `diff() -> dict` — 与原始存档的差异（modified/added/removed/constraints）
-- `save_as(out_path, *, write_icon=True) -> Path` — diff + 写回 .melsave
+- `save(out_path, *, write_icon=True) -> Path` — 写回 .melsave
+  文档模式直接序列化；运行时模式先应用 world diff 再写。
+  `save_as` 是 `save` 的别名（向后兼容）。
 
 **底层访问**
 
-- `.world` — WorldContext 对象
-- `.runner` — MelonScriptRunner 对象
-- `.document` — 原始 MelsaveDocument（只读）
+- `.world` — WorldContext 对象（要求 load）
+- `.runner` — MelonScriptRunner 对象（要求 load）
+- `.document` — 原始 MelsaveDocument
 
 ### 低层 API（不通过 Session）
 

@@ -500,9 +500,12 @@ def _minimal_chip_template() -> dict:
 # ---------------------------------------------------------------------------
 
 class MelsaveBuilder:
-    """Build a .melsave from scratch: items + Lua chips + gate connections.
+    """Thin wrapper around ``MelsaveSession`` for building saves from scratch.
 
-    Verified against 1132luaexample.melsave (real-device save with item + chip).
+    This is now a convenience class that delegates to ``MelsaveSession`` in
+    document mode. All methods behave identically to the corresponding
+    ``MelsaveSession`` methods. New code should prefer ``MelsaveSession``
+    directly; this class is kept for backward compatibility.
 
     Example::
 
@@ -516,232 +519,71 @@ class MelsaveBuilder:
     """
 
     def __init__(self, *, app_version: str = "36.0", map_name: str = "Default"):
-        self._containers: list[dict] = []
-        self._meta = copy.deepcopy(_DEFAULT_META)
-        self._meta["appVersion"] = app_version
-        self._meta["mapName"] = map_name
-        self._icon: bytes | None = None
+        from .session import MelsaveSession
+        self._session: MelsaveSession = MelsaveSession(
+            app_version=app_version, map_name=map_name
+        )
 
     # ------------------------------------------------------------------
-    # Add objects
+    # Add objects — delegate to session
     # ------------------------------------------------------------------
 
-    def add_item(
-        self,
-        object_id: int,
-        x: float = 0.0,
-        y: float = 0.0,
-        *,
-        z: float = -0.0005,
-        rotation: float = 0.0,
-        scale_x: float = 1.0,
-        scale_y: float = 1.0,
-        color: tuple[float, float, float, float] | None = None,
-        dynamic: bool = True,
-        freezed: bool = False,
-        template: dict | None = None,
-    ) -> int:
-        """Add a spawnable item (e.g. plastic, metal, engine, rocket body).
+    def add_item(self, *args, **kwargs) -> int:
+        return self._session.add_item(*args, **kwargs)
 
-        Args:
-            object_id: The melon objectId (e.g. 202 = ResizablePlastic,
-                132 = engine, 14 = rocket body).
-            x, y: World position.
-            color: RGBA tuple (0-1 range), or None for default.
-            dynamic: If True, gravity affects the object.
-            freezed: If True, object is frozen in place.
-            template: Optional raw saveObjects dict to clone instead of
-                loading from the template pool.
-
-        Returns:
-            Container index (use for connect/save_as references).
-        """
-        so = _build_item_save_objects(
-            object_id, x, y, z=z, rotation=rotation,
-            scale_x=scale_x, scale_y=scale_y,
-            color=color, dynamic=dynamic, freezed=freezed,
-            template=template,
-        )
-        idx = len(self._containers)
-        self._containers.append({
-            "saveObjects": so,
-            "saveObjectChildren": [],
-        })
-        return idx
-
-    def add_lua_chip(
-        self,
-        lua_source: str,
-        x: float = 0.0,
-        y: float = 0.0,
-        *,
-        z: float = 0.0005,
-        inputs: list[dict] | None = None,
-        outputs: list[dict] | None = None,
-        variables: list[dict] | None = None,
-        tps: int = 30,
-        priority: int = 0,
-        instruction_cost: int = 1000,
-        title: str = "",
-    ) -> int:
-        """Add a Lua chip.
-
-        Args:
-            lua_source: Lua source code (must define OnTick at minimum).
-            x, y: World position.
-            inputs: List of gate dicts, each with:
-                - "name": gate name (string, spaces OK)
-                - "type": "entity" | "number" | "string" | "vector" | "int"
-                - "value": optional initial value (number/string)
-            outputs: Same format as inputs.
-            variables: List of {"name": str, "value": float} for persistent
-                chip variables.
-            tps: Ticks per second (default 30).
-            title: Visual title shown on the chip.
-
-        Returns:
-            Container index.
-        """
-        so = _build_chip_save_objects(
-            lua_source, x, y, z=z,
-            inputs=inputs, outputs=outputs, variables=variables,
-            tps=tps, priority=priority, instruction_cost=instruction_cost,
-            title=title,
-        )
-        idx = len(self._containers)
-        self._containers.append({
-            "saveObjects": so,
-            "saveObjectChildren": [],
-        })
-        return idx
+    def add_lua_chip(self, *args, **kwargs) -> int:
+        return self._session.add_lua_chip(*args, **kwargs)
 
     def add_container(self, save_objects: dict) -> int:
-        """Add a raw container (pre-built saveObjects dict).
-
-        For advanced use when add_item/add_lua_chip don't fit.
-        """
-        idx = len(self._containers)
-        self._containers.append({
-            "saveObjects": save_objects,
-            "saveObjectChildren": [],
-        })
-        return idx
+        return self._session.add_container(save_objects)
 
     def add_ui_controller(self, controller, x: float = 0.0, y: float = 0.0) -> int:
-        """Add a UI controller (objectId=2046689600).
-
-        Args:
-            controller: A UIControllerBuilder with elements added.
-            x, y: World position.
-
-        Returns:
-            Container index.
-        """
-        so = controller.build_save_object(x=x, y=y)
-        return self.add_container(so)
+        return self._session.add_ui_controller(controller, x=x, y=y)
 
     # ------------------------------------------------------------------
-    # Wire gates
+    # Wire gates — delegate
     # ------------------------------------------------------------------
 
-    def connect(
-        self,
-        source_idx: int,
-        output_gate: str,
-        target_idx: int,
-        input_gate: str,
-        *,
-        name: str = "",
-        start_point: tuple[float, float] = (0.0, 0.0),
-        end_point: tuple[float, float] = (0.0, 0.0),
-    ) -> dict:
-        """Wire a mechanic gate connection: source.output → target.input.
-
-        The connection is stored on the **source** object's constraints list.
-        Every spawnable item has a built-in ``"entity"`` output gate that
-        provides the item's own entity id.
-
-        Args:
-            source_idx: Container index of the source (output) object.
-            output_gate: Output gate name on the source (e.g. "entity").
-            target_idx: Container index of the target (input) object.
-            input_gate: Input gate name on the target (e.g. "target").
-            name: Optional display name for the connection.
-        """
-        data = {"saveObjectContainers": self._containers}
-        return connect_gates(
-            data, source_idx, output_gate, target_idx, input_gate,
-            name=name, start_point=start_point, end_point=end_point,
-        )
+    def connect(self, *args, **kwargs) -> dict:
+        return self._session.connect(*args, **kwargs)
 
     # ------------------------------------------------------------------
-    # Introspection
+    # Introspection — delegate
     # ------------------------------------------------------------------
 
     @property
     def container_count(self) -> int:
-        return len(self._containers)
+        return self._session.container_count
 
     def containers(self) -> list[dict]:
-        """Return a list of (idx, objectId, type, position) tuples."""
-        out = []
-        for i, c in enumerate(self._containers):
-            so = c.get("saveObjects") or {}
-            oid = so.get("objectId", "?")
-            pos = so.get("position", {})
-            kind = "lua_chip" if oid == 507707712 else "item"
-            out.append({
-                "idx": i, "objectId": oid, "type": kind,
-                "x": pos.get("x", 0), "y": pos.get("y", 0),
-            })
-        return out
+        return self._session.containers()
 
     def get_container(self, idx: int) -> dict:
-        so = self._containers[idx].get("saveObjects")
-        return so if so is not None else {}
+        return self._session.get_container(idx)
 
     # ------------------------------------------------------------------
-    # MetaData / Icon
+    # MetaData / Icon — delegate
     # ------------------------------------------------------------------
 
     def set_meta(self, **kwargs) -> None:
-        """Override MetaData fields (appVersion, mapName, seed, etc.)."""
-        self._meta.update(kwargs)
+        self._session.set_meta(**kwargs)
 
     def set_icon(self, icon_bytes: bytes) -> None:
-        """Set the save icon (PNG bytes)."""
-        self._icon = icon_bytes
+        self._session.set_icon(icon_bytes)
 
     def load_icon_from(self, path: str | Path) -> None:
-        """Load icon from a .png file."""
-        self._icon = Path(path).read_bytes()
+        self._session.load_icon_from(path)
 
     # ------------------------------------------------------------------
-    # Export
+    # Export — delegate
     # ------------------------------------------------------------------
 
     def build_data(self) -> dict:
-        """Build the Data JSON dict (without writing to file)."""
-        return {"saveObjectContainers": copy.deepcopy(self._containers)}
+        """Return a deep copy of the Data JSON dict."""
+        return copy.deepcopy(self._session.document.raw_data)
 
     def save(self, out_path: str | Path, *, write_icon: bool = True) -> Path:
-        """Write the .melsave ZIP file.
-
-        Args:
-            out_path: Output file path (relative paths resolve against the
-                Python process CWD — pass an absolute path for predictability).
-            write_icon: If True and icon is set, include Icon entry.
-
-        Returns:
-            Resolved absolute path of the written file.
-        """
-        meta = copy.deepcopy(self._meta)
-        if not meta.get("UniqueId"):
-            meta["UniqueId"] = str(uuid.uuid4())
-        data = self.build_data()
-        icon = self._icon if write_icon else None
-        p = write_melsave(out_path, data, meta, icon)
-        return Path(p).resolve()
+        return self._session.save(out_path, write_icon=write_icon)
 
 
 # Re-export for convenience
