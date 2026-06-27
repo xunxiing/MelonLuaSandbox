@@ -29,6 +29,9 @@ from .melsave_writer import write_world_to_melsave, build_diff_from_world
 from .world import WorldContext
 from .runner import MelonScriptRunner
 
+# Packaged empty world template — minimal valid save with zero objects.
+_EMPTY_TEMPLATE = Path(__file__).parent / "data" / "empty.melsave"
+
 
 class MelsaveSession:
     """One session = one save file + one world + one chip runner.
@@ -39,11 +42,15 @@ class MelsaveSession:
 
     def __init__(
         self,
-        melsave_path: str | Path,
+        melsave_path: str | Path | None = None,
         *,
         tps: float = 20.0,
         quiet: bool = True,
     ):
+        if melsave_path is None:
+            # Bare constructor -> load the packaged empty world template so
+            # the "create session then operate" intuitive path works.
+            melsave_path = _EMPTY_TEMPLATE
         self.melsave_path = Path(melsave_path)
         self.tps = float(tps)
         self._quiet = bool(quiet)
@@ -51,6 +58,22 @@ class MelsaveSession:
         self._world: Optional[WorldContext] = None
         self._runner: Optional[MelonScriptRunner] = None
         self._loaded = False
+        # Chips added in-session that should persist on save_as(). Each entry
+        # is a raw saveObjects dict (Lua chip container). They are appended to
+        # the patched saveObjectContainers on write-back.
+        self._pending_chips: list[dict] = []
+        # Track which chip container (by index into _pending_chips) the last
+        # run_chip() compiled, so the source can be synced before save.
+        self._active_chip_idx: Optional[int] = None
+
+    @classmethod
+    def create_empty(cls, **kw: Any) -> "MelsaveSession":
+        """Create a session backed by an empty world.
+
+        Equivalent to ``MelsaveSession()`` (which now defaults to the packaged
+        empty template), but makes intent explicit at call sites.
+        """
+        return cls(None, **kw)
 
     # ===== Lifecycle =====
 
@@ -103,6 +126,42 @@ class MelsaveSession:
 
     # ===== Chip execution =====
 
+    def add_lua_chip(
+        self,
+        source: str,
+        *,
+        x: float = 0.0,
+        y: float = 0.0,
+        inputs: list[dict] | None = None,
+        outputs: list[dict] | None = None,
+        variables: list[dict] | None = None,
+        tps: int = 30,
+        priority: int = 0,
+        title: str = "",
+    ) -> int:
+        """Add a Lua chip container to the session (persisted on save_as).
+
+        Creates a saveObjects entry for a Lua chip (objectId=507707712) with
+        the given source and gates, and tracks it so ``save_as()`` includes it
+        in the exported melsave. Also marks it as the active chip so subsequent
+        ``run_chip()`` calls (without ``container_idx``) will sync source changes.
+
+        Returns the index of the chip in ``self._pending_chips`` (also the
+        container index it will occupy after existing containers).
+        """
+        self._require_loaded()
+        assert self._doc is not None
+        from .melsave_builder import _build_chip_save_objects
+        base = len(self._doc.objects)
+        so = _build_chip_save_objects(
+            source, x, y,
+            inputs=inputs, outputs=outputs, variables=variables,
+            tps=tps, priority=priority, title=title,
+        )
+        self._pending_chips.append(so)
+        self._active_chip_idx = len(self._pending_chips) - 1
+        return self._active_chip_idx
+
     def run_chip(
         self,
         source: str,
@@ -110,17 +169,28 @@ class MelsaveSession:
         ticks: int = 1,
         inputs: Optional[dict] = None,
         chunk_name: str = "@session_chip.lua",
+        container_idx: Optional[int] = None,
     ) -> dict:
         """Compile a Lua chip and run it for `ticks` ticks. Returns last tick result.
 
         If ticks == 0, only compiles + calls OnInit (no OnTick). If ticks >= 1,
         OnInit is called first, then OnTick runs `ticks` times.
+
+        Args:
+            container_idx: If given, sync the source back into that pending
+                chip container so it persists on save_as(). Chips created via
+                add_lua_chip() auto-sync; pass the index returned by it to
+                keep edits live.
         """
         self._require_loaded()
         r = self._runner
         assert r is not None
         if not r.compile(source, chunk_name=chunk_name):
             return {"error": r.last_error or "compile failed", "outputs": {}}
+        # Sync source into pending chip container for persistence
+        idx = container_idx if container_idx is not None else self._active_chip_idx
+        if idx is not None and 0 <= idx < len(self._pending_chips):
+            self._sync_chip_source(idx, source)
         r.call_on_init()
         if ticks <= 0:
             return {"error": None, "outputs": r.get_outputs()}
@@ -129,6 +199,14 @@ class MelsaveSession:
         provider = (lambda i: inputs) if inputs is not None else None
         r.run_loop(ticks=ticks, inputs_provider=provider)
         return {"error": r.last_error, "outputs": r.get_outputs()}
+
+    def _sync_chip_source(self, idx: int, source: str) -> None:
+        """Update the lua_chip_source metadata of a pending chip container."""
+        so = self._pending_chips[idx]
+        for sm in so.get("saveMetaDatas", []):
+            if sm.get("key") == "lua_chip_source":
+                sm["stringValue"] = source
+                return
 
     def compile_only(self, source: str, chunk_name: str = "@session_chip.lua") -> bool:
         """Compile a chip without running. Returns True on success."""
@@ -360,16 +438,26 @@ class MelsaveSession:
         *,
         write_icon: bool = True,
     ) -> Path:
-        """Diff the live world against the original save and write a new .melsave."""
+        """Diff the live world against the original save and write a new .melsave.
+
+        Lua chips added via ``add_lua_chip()`` are appended as new containers.
+        Source edits from ``run_chip()`` are synced back into the chip's
+        ``lua_chip_source`` metadata so the exported save is runnable on the
+        real device.
+
+        Returns the resolved absolute path of the written file.
+        """
         self._require_loaded()
         assert self._world is not None
         assert self._doc is not None
-        return write_world_to_melsave(
+        p = write_world_to_melsave(
             self._world,
             self._doc,
             out_path,
             write_icon=write_icon,
+            extra_containers=list(self._pending_chips) if self._pending_chips else None,
         )
+        return Path(p).resolve()
 
     # ===== Logs / errors =====
 

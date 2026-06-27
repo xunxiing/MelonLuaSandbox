@@ -666,11 +666,16 @@ def write_world_to_melsave(
     out_path: str | Path,
     *,
     write_icon: bool = True,
+    extra_containers: list[dict] | None = None,
 ) -> Path:
     """Build a diff from world, patch original Data, and write a new .melsave.
 
     Gate wires from ``world.gate_wires`` are merged into the patched
     ``constraints`` lists (mechanic connections coexist with physical ropes).
+
+    Args:
+        extra_containers: Raw saveObjects dicts to append as new containers
+            (e.g. Lua chips added via MelsaveSession.add_lua_chip()).
     """
     diff = build_diff_from_world(world, original_doc)
     original_path = original_doc.path
@@ -682,6 +687,11 @@ def write_world_to_melsave(
     except Exception:
         original_data = {"saveObjectContainers": []}
     patched = patch_save_data(original_data, diff)
+    # Append session-added chip containers (Lua chips added via add_lua_chip).
+    if extra_containers:
+        containers = patched.setdefault("saveObjectContainers", [])
+        for so in extra_containers:
+            containers.append({"saveObjects": so, "saveObjectChildren": []})
     # Merge gate wires into the patched constraints lists.
     gate_wires = getattr(world, "gate_wires", None)
     if gate_wires is not None and len(gate_wires) > 0:

@@ -202,6 +202,13 @@ def _load_item_template(object_id: int) -> dict | None:
               Path(__file__).parent.parent / "temp" / "objectid_templates"):
         p = d / f"{object_id}.json"
         if p.exists():
+            if d != _ITEM_TEMPLATE_DIR:
+                import warnings
+                warnings.warn(
+                    f"item template loaded from dev fallback {p}; "
+                    f"this path does not exist in pip-installed distributions",
+                    stacklevel=3,
+                )
             with open(p, "r", encoding="utf-8") as f:
                 return json.load(f)
     return None
@@ -721,15 +728,20 @@ class MelsaveBuilder:
         """Write the .melsave ZIP file.
 
         Args:
-            out_path: Output file path.
+            out_path: Output file path (relative paths resolve against the
+                Python process CWD — pass an absolute path for predictability).
             write_icon: If True and icon is set, include Icon entry.
+
+        Returns:
+            Resolved absolute path of the written file.
         """
         meta = copy.deepcopy(self._meta)
         if not meta.get("UniqueId"):
             meta["UniqueId"] = str(uuid.uuid4())
         data = self.build_data()
         icon = self._icon if write_icon else None
-        return write_melsave(out_path, data, meta, icon)
+        p = write_melsave(out_path, data, meta, icon)
+        return Path(p).resolve()
 
 
 # Re-export for convenience

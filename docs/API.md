@@ -281,13 +281,17 @@ b.save("output.melsave")
 
 | 特性 | MelsaveBuilder | MelsaveSession |
 |------|---------------|----------------|
-| 场景 | 从零构建存档 | 修改现有存档 |
+| 场景 | 从零构建存档（blueprint） | 修改/扩展存档（runtime + diff） |
 | 物理模拟 | 无（只构建 JSON） | 有（Box2D + Lua 运行） |
 | 物品生成 | `add_item()` | `spawn()` / world diff |
+| 芯片持久化 | `add_lua_chip()` | `add_lua_chip()` + `run_chip()` |
 | 芯片执行 | 无 | `run_chip()` / `tick()` |
 | 连线 | `connect()` | `wire_gate()` / `unwire_gate()` |
 | 绳索 | 无 | `create_rope()` / `remove_rope()` |
-| 导出 | `save()` | `save_as()` |
+| 导出 | `save()` | `save_as()`（返回绝对路径） |
+
+两者在芯片持久化上语义对齐：`add_lua_chip()` 都把源码写入 `lua_chip_source`
+元数据。MelsaveSession 额外支持运行时 `run_chip()` 编辑源码并自动同步回容器。
 
 ## UI 控制器构建（UIControllerBuilder）
 
@@ -444,7 +448,20 @@ end
 字段，保留所有未触碰字段。支持物理绳索（`create_rope`）和门连线
 （`wire_gate`）的热创建/删除。
 
-### 最小示例
+### 创建会话
+
+```python
+# 从已有存档加载
+with MelsaveSession("input.melsave") as session:
+    ...
+
+# 从空白世界开始（无需现成存档）
+with MelsaveSession() as session:        # 或 MelsaveSession.create_empty()
+    session.spawn(202, 0, 0)             # 直接造物品
+    session.save_as("new_world.melsave")
+```
+
+### 最小示例（加载 + 芯片 + 连线）
 
 ```python
 from melon_lua import MelsaveSession
@@ -460,21 +477,36 @@ with MelsaveSession("input.melsave") as session:
     # 看当前状态
     snap = session.snapshot()
     print(snap["entity_count"], snap["ropes"])
-    # 写回新存档（门连线自动导出）
+    # 写回新存档（门连线 + 持久化芯片 自动导出）
     session.save_as("output.melsave")
+```
+
+### 从零创建带芯片的存档（无需现有存档）
+
+```python
+with MelsaveSession() as s:
+    # 添加一个 Lua 芯片容器（会在 save_as 时持久化到存档）
+    s.add_lua_chip(lua_source, x=1, y=2, title="MyChip",
+                   inputs=[{"name":"target","type":"entity"}],
+                   outputs=[{"name":"out","type":"number"}])
+    # 编译 + 运行（源码自动同步回芯片容器）
+    s.run_chip(lua_source, ticks=10)
+    # 导出——真机直接可用
+    s.save_as("chip_only.melsave")
 ```
 
 ### 生命周期
 
 ```
-MelsaveSession(path)        # 创建（不读文件）
+MelsaveSession(path)        # 创建（不读文件）；无参 = 空白世界
     .load()                 # 读取 + spawn 到 world + 构建 runner + 加载现有门连线
-    [run_chip / tick]       # 编译并运行 Lua 芯片
+    [add_lua_chip]          # 添加持久化 Lua 芯片容器（save_as 时写入）
+    [run_chip / tick]       # 编译并运行 Lua 芯片（源码同步到芯片容器）
     [create_rope / remove]  # 管理物理绳索/关节
     [wire_gate / unwire_gate]  # 热连线/断线（mechanic gate connections）
     [spawn / remove]        # 增删实体
     [snapshot / diff]       # 观察状态
-    .save_as(out_path)      # diff + 合并门连线 + 写回 .melsave
+    .save_as(out_path)      # diff + 合并门连线 + 持久化芯片 + 写回 .melsave
     .close()                # 释放 Box2D world + Lua VM
 ```
 
@@ -482,10 +514,17 @@ MelsaveSession(path)        # 创建（不读文件）
 
 ### API 一览
 
-**芯片执行**
+**会话创建**
 
-- `run_chip(source, *, ticks=1, inputs=None) -> {"error", "outputs"}`
-  编译 + OnInit + 跑 N tick。ticks=0 只编译+OnInit。
+- `MelsaveSession(path=None, *, tps=20.0, quiet=True)` — path 省略时用空白世界
+- `MelsaveSession.create_empty(**kw)` — 显式创建空白会话（等价 `MelsaveSession()`）
+
+**芯片持久化 + 执行**
+
+- `add_lua_chip(source, *, x, y, inputs, outputs, variables, tps, priority, title) -> idx`
+  创建 Lua 芯片容器，标记为活跃芯片。save_as 时自动写入存档。
+- `run_chip(source, *, ticks=1, inputs=None, container_idx=None) -> {"error", "outputs"}`
+  编译 + OnInit + 跑 N tick。源码自动同步回活跃芯片容器（除非显式指定 container_idx）。
 - `compile_only(source) -> bool` — 只编译不跑
 - `tick(inputs=None) -> dict` — 单步 OnTick（需先 compile）
 - `.outputs` / `.logs` / `.last_error` — 当前输出/日志/错误
