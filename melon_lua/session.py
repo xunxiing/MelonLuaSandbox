@@ -354,7 +354,12 @@ class MelsaveSession:
             Container index.
         """
         so = controller.build_save_object(x=x, y=y)
-        return self.add_container(so)
+        idx = self.add_container(so)
+        # Bind all element handles to this container index so they can be
+        # passed directly to connect() without manual group_id lookup.
+        for handle in getattr(controller, "handles", []):
+            handle._bind_container(idx)
+        return idx
 
     # ==================================================================
     # Document mode: gate wires (unified API)
@@ -362,14 +367,16 @@ class MelsaveSession:
 
     def connect(
         self,
-        source_idx: int,
-        output_gate: str,
-        target_idx: int,
-        input_gate: str,
+        source,
+        output_gate_or_target: str | int,
+        target_or_input: str | int = "",
+        input_gate: str = "",
         *,
         name: str = "",
         start_point: tuple[float, float] = (0.0, 0.0),
         end_point: tuple[float, float] = (0.0, 0.0),
+        output_group: str = "",
+        input_group: str = "",
     ) -> dict:
         """Wire a mechanic gate connection: ``source.output`` → ``target.input``.
 
@@ -377,28 +384,84 @@ class MelsaveSession:
         Works in both document and runtime modes. In runtime mode, also
         registers the wire in the live ``GateWireRegistry``.
 
+        Two calling styles are supported:
+
+        *Legacy (explicit indices)::
+
+            session.connect(source_idx, output_gate, target_idx, input_gate, ...)
+
+        *ElementHandle (ergonomic)::
+
+            btn = ui.add_button(x=-100, y=0)
+            slider = ui.add_slider(x=100, y=0)
+            ui_idx = session.add_ui_controller(ui, x=2, y=0)
+            session.connect(btn, chip_idx, "fire")
+            session.connect(slider, chip_idx, "speed")
+
+        When the source is an ``ElementHandle`` returned by
+        ``UIControllerBuilder.add_*()``:
+
+        * ``output_gate`` is omitted; the element's primary output gate is used
+          (e.g. ``"Value"`` for a slider, ``"Button is down"`` for a button);
+        * ``output_group`` is auto-filled from the element's ``group_id`` so
+          same-name gates across elements route correctly.
+
         Args:
-            source_idx: Container index of the source (output) object.
-            output_gate: Output gate name on the source (e.g. "entity").
-            target_idx: Container index of the target (input) object.
-            input_gate: Input gate name on the target (e.g. "target").
+            source: Source container index (int) or ``ElementHandle``.
+            output_gate_or_target: In legacy mode, the output gate name on the
+                source. In ElementHandle mode, the target container index.
+            target_or_input: In legacy mode, the target container index. In
+                ElementHandle mode, the input gate name on the target.
+            input_gate: In legacy mode, the input gate name on the target.
+                Unused in ElementHandle mode.
             name: Optional display name for the connection.
             start_point: Visual offset of the source port (local space).
             end_point: Visual offset of the target port (local space).
+            output_group: Source element GroupId (GUID) — auto-filled when
+                ``source`` is an ElementHandle. In legacy mode this is the
+                value to pass for UI controller same-name gate routing.
+            input_group: Target element GroupId (GUID), same semantics.
 
         Returns:
             The constraint dict that was added.
         """
+        # Detect ElementHandle: it exposes group_id, container_idx and primary_output
+        if hasattr(source, "group_id") and hasattr(source, "container_idx"):
+            handle = source
+            if handle.container_idx is None:
+                raise RuntimeError(
+                    "ElementHandle not bound to a session yet; "
+                    "add the controller via session.add_ui_controller() first"
+                )
+            src_idx_resolved = handle.container_idx
+            gate_resolved = handle.primary_output
+            if not gate_resolved:
+                raise ValueError(
+                    "ElementHandle has no primary output gate; "
+                    "call session.connect(handle, target_idx, input_gate, output_gate='...')"
+                )
+            group_resolved = output_group or handle.group_id
+            target_idx = int(output_gate_or_target)
+            input_gate_resolved = str(target_or_input)
+        else:
+            src_idx_resolved = int(source)
+            gate_resolved = str(output_gate_or_target)
+            target_idx = int(target_or_input)
+            input_gate_resolved = str(input_gate)
+            group_resolved = output_group
+
         result = connect_gates(
-            self._doc.raw_data, source_idx, output_gate, target_idx, input_gate,
+            self._doc.raw_data, src_idx_resolved, gate_resolved, target_idx, input_gate_resolved,
             name=name, start_point=start_point, end_point=end_point,
+            output_group=group_resolved, input_group=input_group,
         )
         # If runtime is active, also register in the live registry so
         # save() picks it up via the registry-as-source-of-truth path.
         if self._runtime_active and self._world is not None:
             self._world.gate_wires.connect(
-                source_idx, output_gate, target_idx, input_gate,
+                src_idx_resolved, gate_resolved, target_idx, input_gate_resolved,
                 name=name, start_point=start_point, end_point=end_point,
+                output_group=group_resolved, input_group=input_group,
             )
         return result
 

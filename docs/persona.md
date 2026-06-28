@@ -191,11 +191,12 @@ chip = s.add_lua_chip(src, x=1, y=0,                    # Lua 芯片
                       inputs=[{"name":"target","type":"entity"},
                               {"name":"throttle","type":"number","value":0.5}],
                       outputs=[{"name":"out","type":"number"}])
-ui = s.add_ui_controller(
-    UIControllerBuilder().add_slider("throttle", value=0, mn=-1, mx=1), x=2, y=0)
-s.connect(item, "entity", chip, "target")               # 连线（output→input）
-s.connect(ui, "Value", chip, "throttle")
-s.save("out.melsave")                                   # 导出（save_as 是别名）
+ui_ctrl = UIControllerBuilder()
+slider = ui_ctrl.add_slider(value=0, mn=-1, mx=1)        # 返回元素句柄
+ui = s.add_ui_controller(ui_ctrl, x=2, y=0)
+s.connect(item, "entity", chip, "target")                # 连线（output→input）
+s.connect(slider, chip, "throttle")                      # 句柄自动填门名 + output_group
+s.save("out.melsave")                                    # 导出（save_as 是别名）
 
 # 运行时模式：编译/跑芯片验证逻辑
 with MelsaveSession("out.melsave") as s:
@@ -230,18 +231,20 @@ with MelsaveSession("out.melsave") as s:
 
 **`add_item` 常用参数**：`color=(r,g,b,a)` 0-1 RGBA 元组；`dynamic=True` 受重力；`freezed=True` 冻结。
 
-**UIControllerBuilder 工厂签名**（链式，返回 self）：
-- `.add_slider(name, value=0, mn=0, mx=1)`
-- `.add_button(name, text="")`
-- `.add_joystick(name, multiplier=1.0)`
-- `.add_toggle(name, active=False)`
+**UIControllerBuilder 工厂签名**（`add_*` 返回 ElementHandle，不再返回 self）：
+- `.add_slider(value=0, mn=0, mx=1)` / `.add_button(text="")` / `.add_joystick(multiplier=1.0)` / `.add_toggle(active=False)`
 - 其余：`add_pedal/add_indicator/add_rotation_wheel/add_input_field/add_pointer/add_screen/add_custom_icon`
+- **ElementHandle**：`.group_id`（GUID）/ `.primary_output`（主输出门名，如 Slider→`"Value"`）/ `.gate(name)`（返回 `(gate_name, group_id)`）
+- 句柄直接传 `connect(handle, target_idx, input_gate)`，SDK 自动解析门名 + `output_group`
+- 多输出元素（Joystick）用 `s.connect(ui_idx, "Joystick Angle", chip, "angle", output_group=joy.group_id)` 指定非主输出
+- `.element_group_id(索引或名称)`：旧式 API，返回元素 GUID（仍兼容）
 - `element_schema()` 无参返回 `{"available_types":[{"type","outputs"},...]}`；`element_schema("slider")` 返回单类型完整 schema（输入门/输出门/默认值/工厂签名）
 
 **门连线规则**（mechanic gate connections）：
 - `constraintId=13`（物理绳索是 10），存 source 端对象的 `constraints` 列表
 - `startObjectId`/`endObjectId` 是容器索引（0-based），非 objectId
 - 门名保留空格（`"input 2"` 不转下划线）
+- **UI 控制器元素同名门**（多个 Slider 都叫 `"Value"`）必须用 ElementHandle 或 `output_group=ctrl.element_group_id(索引)` 指定具体元素，否则真机无法路由
 
 ## MelonLuaSandbox 插件使用规范
 

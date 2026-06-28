@@ -324,6 +324,8 @@ class GateWire:
     name: str
     start_material: str
     end_material: str
+    output_group: str = ""
+    input_group: str = ""
 
 
 class GateWireRegistry:
@@ -351,6 +353,8 @@ class GateWireRegistry:
         end_point: tuple[float, float] = (0.0, 0.0),
         start_material: str = "Paper",
         end_material: str = "Metal",
+        output_group: str = "",
+        input_group: str = "",
     ) -> int:
         """Create a gate wire; return its auto-incremented ``wire_id``."""
         wid = self._next_id
@@ -367,6 +371,8 @@ class GateWireRegistry:
             name=str(name),
             start_material=start_material,
             end_material=end_material,
+            output_group=output_group,
+            input_group=input_group,
         )
         self._wires[wid] = w
         return wid
@@ -432,8 +438,8 @@ class GateWireRegistry:
                 "mechCon": {
                     "inputID": w.input_gate,
                     "outputID": w.output_gate,
-                    "inputGroup": "",
-                    "outputGroup": "",
+                    "inputGroup": w.input_group,
+                    "outputGroup": w.output_group,
                 },
                 "distance": 0.0,
                 "startObjectId": w.source_idx,
@@ -486,4 +492,6 @@ class GateWireRegistry:
                 name=str(entry.get("constraintName", "") or ""),
                 start_material=str(entry.get("startObjectConnectionMaterial", "Paper") or "Paper"),
                 end_material=str(entry.get("endObjectConnectionMaterial", "Metal") or "Metal"),
+                output_group=str(mc.get("outputGroup", "") or ""),
+                input_group=str(mc.get("inputGroup", "") or ""),
             )

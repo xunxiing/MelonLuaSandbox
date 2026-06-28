@@ -30,12 +30,12 @@ from .melsave_writer import (
 from .session import MelsaveSession
 from .melsave_builder import MelsaveBuilder
 from .uicontrol_builder import (
-    UIControllerBuilder, UIElement, element_schema,
+    UIControllerBuilder, UIElement, ElementHandle, element_schema,
     BUTTON, PEDAL, SLIDER, INPUT_FIELD, STEERING_WHEEL,
     POINTER, TOGGLE, SCREEN, CUSTOM_ICON, JOYSTICK,
 )
 
-__version__ = "4.0.0"
+__version__ = "5.0.0"
 
 __all__ = [
     "MelonScriptRunner",
@@ -72,6 +72,7 @@ __all__ = [
     "MelsaveBuilder",
     "UIControllerBuilder",
     "UIElement",
+    "ElementHandle",
     "element_schema",
     "BUTTON", "PEDAL", "SLIDER", "INPUT_FIELD", "STEERING_WHEEL",
     "POINTER", "TOGGLE", "SCREEN", "CUSTOM_ICON", "JOYSTICK",

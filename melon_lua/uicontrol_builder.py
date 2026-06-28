@@ -383,6 +383,29 @@ def _entity_gate_value() -> str:
 # UIElement
 # ---------------------------------------------------------------------------
 
+# Primary output gate per element type — the single "default" output an agent
+# most likely wants to wire. Used by ElementHandle when no explicit gate given.
+_PRIMARY_OUTPUT: dict[int, str] = {
+    BUTTON: "Button is down",
+    PEDAL: "Button is down",
+    PEDAL_ALT: "Button is down",
+    SLIDER: "Value",
+    SLIDER_ALT: "Value",
+    SLIDER_ALT2: "Value",
+    TOGGLE: "Value",
+    JOYSTICK: "Joystick Direction",
+    STEERING_WHEEL: "Angle Value",
+    INPUT_FIELD: "Field Value",
+    POINTER: "Dot worlds position",
+    SCREEN: "active",
+    CUSTOM_ICON: "",  # display-only, no signal output
+}
+
+# Maps the Slider family (Type=5) used by labels/indicators back to "Value".
+for _t in (SLIDER, SLIDER_ALT, SLIDER_ALT2):
+    _PRIMARY_OUTPUT.setdefault(_t, "Value")
+
+
 @dataclass
 class UIElement:
     """A single UI element on a UI controller panel.
@@ -406,6 +429,9 @@ class UIElement:
     interactible: bool = True
     # Type-specific overrides for input gate values
     values: dict[str, Any] = field(default_factory=dict)
+    # Stable GUID used for GroupId in mechanic gates and mechCon.outputGroup.
+    # Generated once at construction so wires can reference it before build.
+    group_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
     # ---- Factory methods ----
 
@@ -508,11 +534,14 @@ class UIElement:
     def to_dict(self, order: int, prototypes: dict[int, dict]) -> dict:
         """Build the full element dict matching uicontrol_elements schema."""
         proto = copy.deepcopy(prototypes[self.type])
-        el_id = str(uuid.uuid4())
-        proto["Id"] = el_id
-        proto["Name"] = self.name or proto.get("DefaultName", _TYPE_NAMES.get(self.type, ""))
-        proto["IsUserChangedName"] = bool(self.name)
-        proto["Order"] = order
+        proto["Id"] = self.group_id
+        default_name = proto.get("DefaultName", _TYPE_NAMES.get(self.type, ""))
+        proto["Name"] = self.name or default_name
+        # Real device: IsUserChangedName is False when name matches DefaultName,
+        # True only when user gave a custom name different from default.
+        proto["IsUserChangedName"] = bool(self.name) and (self.name != default_name)
+        # Real device: Order and Key are always 0 for every element (not index).
+        proto["Order"] = 0
         proto["Show"] = self.show
         proto["ShowTitle"] = self.show_title
         proto["Interactible"] = self.interactible
@@ -522,7 +551,7 @@ class UIElement:
             "b": int(self.color[2] * 255),
             "a": int(self.color[3] * 255),
         }
-        proto["Key"] = order
+        proto["Key"] = 0
         # Apply user value overrides on Inputs
         for inp in proto["Inputs"]:
             gate_key = inp["Key"]
@@ -530,10 +559,13 @@ class UIElement:
                 new_val = self.values[gate_key]
                 inp["SerializedValue"] = _build_serialized_value(
                     inp.get("GateDataType", _DT_NUMBER), gate_key, new_val, inp.get("SerializedValue", ""))
-        # Update RectTransformData
-        proto["RectTransformData"] = _build_rect_transform(
-            self.x, self.y, self.width, self.height,
-            self.anchor_min, self.anchor_max, self.pivot, self.sorting_order)
+        # RectTransformData: keep the prototype's structure (correct SizeDelta,
+        # Rotation as float, RotationQuaternion, Position, etc.) and only
+        # override AnchoredPosition with the user's x/y. The prototype is
+        # extracted from real-device saves so its RectTransformData is correct.
+        rt = copy.deepcopy(proto.get("RectTransformData", {}))
+        rt["AnchoredPosition"] = _vec2(self.x, self.y)
+        proto["RectTransformData"] = rt
         return proto
 
 
@@ -571,16 +603,30 @@ def _build_serialized_value(data_type: int, gate_key: str, value: Any,
 def _build_rect_transform(x: float, y: float, w: float, h: float,
                           anchor_min: tuple, anchor_max: tuple,
                           pivot: tuple, sorting_order: int) -> dict:
-    """Build a RectTransformData dict."""
+    """Build a RectTransformData dict.
+
+    Matches real-device structure (verified against 6762.melsave):
+    - Rotation is a float (Euler angle), NOT a Vector2
+    - RotationQuaternion is a Vector4 (x,y,z,w + eulerAngles)
+    - Position is a Vector2 (absolute screen position)
+    - SortingOrder is NOT in RectTransformData (lives in element-level gate)
+    """
     return {
         "AnchoredPosition": _vec2(x, y),
         "AnchorMin": _vec2(anchor_min[0], anchor_min[1]),
         "AnchorMax": _vec2(anchor_max[0], anchor_max[1]),
         "Pivot": _vec2(pivot[0], pivot[1]),
         "SizeDelta": _vec2(w, h),
-        "Rotation": _vec2(0.0, 0.0),
+        "Position": _vec2(0.0, 0.0),
+        "Rotation": 0.0,
+        "RotationQuaternion": {
+            "x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0,
+            "eulerAngles": {
+                "x": 0.0, "y": 0.0, "z": 0.0,
+                "magnitude": 0.0, "sqrMagnitude": 0.0,
+            },
+        },
         "Scale": _vec2(1.0, 1.0),
-        "SortingOrder": sorting_order,
     }
 
 
@@ -593,15 +639,31 @@ def _float_max() -> float:
 
 
 def _build_mech_gate(key: str, data_type: int, gate_data: str | None,
-                     can_edit: bool = True, data_name: str | None = None) -> dict:
-    """Build a mechanicSerializedInputs/Outputs gate entry."""
-    return {
+                     can_edit: bool = True, data_name: str | None = None,
+                     group_id: str | None = None, group: int = 0,
+                     group_name: str | None = None) -> dict:
+    """Build a mechanicSerializedInputs/Outputs gate entry.
+
+    For element gates (not system gates), pass group_id/group/group_name so the
+    game can distinguish same-name gates across elements (e.g. multiple "Value"
+    outputs). The game routes wires via outputGroup = element's GroupId (GUID).
+    """
+    gate: dict = {
         "Key": key,
+        "DataType": data_type,
         "DataName": data_name or key,
-        "CanBeEdited": can_edit,
+        "CanBeEdit": can_edit,
         "GateData": gate_data,
-        "GateDataType": data_type,
     }
+    if group_id is not None:
+        gate["GroupId"] = group_id
+        gate["Group"] = group or 0
+        gate["GroupName"] = group_name
+    else:
+        gate["GroupId"] = None
+        gate["Group"] = 0
+        gate["GroupName"] = None
+    return gate
 
 
 def _gate_data_default(data_type: int, value: Any = None) -> str:
@@ -622,6 +684,74 @@ def _gate_data_default(data_type: int, value: Any = None) -> str:
     return "{}"
 
 
+class ElementHandle:
+    """Lightweight reference to a UI element added via ``add_*``.
+
+    Returned by ``UIControllerBuilder.add_button`` / ``add_slider`` / etc.
+    Carries the element's ``group_id`` (GUID) and primary output gate name,
+    so callers can wire it without remembering gate names or calling
+    ``element_group_id(idx)`` separately.
+
+    ``handle.gate("Value")`` returns a tuple ``(gate_name, group_id)`` that
+    can be passed to ``connect``. The bare handle is also accepted by
+    ``MelsaveSession.connect`` as the source — in that case the element's
+    primary output gate is used automatically.
+
+    The handle resolves its container index lazily: it holds a back-reference
+    to its ``UIControllerBuilder`` and is bound to a container index the first
+    time the controller is added to a session (via
+    ``MelsaveSession.add_ui_controller``).
+    """
+
+    __slots__ = ("_element", "_controller", "_container_idx")
+
+    def __init__(self, element: "UIElement", controller: "UIControllerBuilder"):
+        self._element = element
+        self._controller = controller
+        # Resolved by MelsaveSession.add_ui_controller via _bind_container().
+        self._container_idx: int | None = None
+
+    @property
+    def group_id(self) -> str:
+        """Element's stable GroupId (GUID) — pass to connect(output_group=...)."""
+        return self._element.group_id
+
+    @property
+    def name(self) -> str:
+        return self._element.name
+
+    @property
+    def type(self) -> int:
+        return self._element.type
+
+    @property
+    def primary_output(self) -> str:
+        """The default output gate name for this element type."""
+        return _PRIMARY_OUTPUT.get(self._element.type, "")
+
+    @property
+    def container_idx(self) -> int | None:
+        """Container index once the controller is added to a session, else None."""
+        return self._container_idx
+
+    def _bind_container(self, idx: int) -> None:
+        """Called by MelsaveSession.add_ui_controller to resolve lazy binding."""
+        self._container_idx = idx
+
+    def gate(self, gate_name: str = "") -> tuple[str, str]:
+        """Return ``(gate_name, group_id)`` for use with connect.
+
+        If ``gate_name`` is empty, the element's primary output gate is used.
+        """
+        gn = gate_name or self.primary_output
+        if not gn:
+            raise ValueError(
+                f"Element type {self._element.type} has no primary output gate; "
+                f"specify gate_name explicitly"
+            )
+        return (gn, self._element.group_id)
+
+
 class UIControllerBuilder:
     """Build a UI controller (objectId=2046689600) save object.
 
@@ -640,36 +770,92 @@ class UIControllerBuilder:
 
     def __init__(self):
         self._elements: list[UIElement] = []
+        self._handles: list[ElementHandle] = []
         self._prototypes = _load_prototypes()
 
-    def add(self, element: UIElement) -> "UIControllerBuilder":
-        """Add a UI element. Returns self for chaining."""
+    def add(self, element: UIElement) -> "ElementHandle":
+        """Add a UI element. Returns an ElementHandle for the added element."""
         self._elements.append(element)
-        return self
+        h = ElementHandle(element, self)
+        self._handles.append(h)
+        return h
+
+    @property
+    def handles(self) -> list["ElementHandle"]:
+        """All element handles (bound to a container idx after add_ui_controller)."""
+        return list(self._handles)
 
     def add_button(self, name: str = "Button", x: float = 0, y: float = 0,
-                   text: str = "", **kw) -> "UIControllerBuilder":
+                   text: str = "", **kw) -> "ElementHandle":
         return self.add(UIElement.button(name, x, y, text=text, **kw))
 
     def add_slider(self, name: str = "Slider", x: float = 0, y: float = 0,
-                   value: float = 0.0, mn: float = 0.0, mx: float = 1.0, **kw) -> "UIControllerBuilder":
+                   value: float = 0.0, mn: float = 0.0, mx: float = 1.0, **kw) -> "ElementHandle":
         return self.add(UIElement.slider(name, x, y, value=value, mn=mn, mx=mx, **kw))
 
     def add_joystick(self, name: str = "Joystick", x: float = 0, y: float = 0,
-                     multiplier: float = 1.0, **kw) -> "UIControllerBuilder":
+                     multiplier: float = 1.0, **kw) -> "ElementHandle":
         return self.add(UIElement.joystick(name, x, y, multiplier=multiplier, **kw))
 
     def add_toggle(self, name: str = "Toggle", x: float = 0, y: float = 0,
-                   active: bool = False, **kw) -> "UIControllerBuilder":
+                   active: bool = False, **kw) -> "ElementHandle":
         return self.add(UIElement.toggle(name, x, y, active=active, **kw))
 
     def add_label(self, name: str = "Label", x: float = 0, y: float = 0,
-                  value: float = 0.0, **kw) -> "UIControllerBuilder":
+                  value: float = 0.0, **kw) -> "ElementHandle":
         return self.add(UIElement.label(name, x, y, value=value, **kw))
+
+    def add_pedal(self, name: str = "Pedal", x: float = 0, y: float = 0,
+                  text: str = "", **kw) -> "ElementHandle":
+        return self.add(UIElement.pedal(name, x, y, text=text, **kw))
+
+    def add_rotation_wheel(self, name: str = "SteeringWheel", x: float = 0, y: float = 0,
+                           value: float = 0.0, limit: float = 360.0, **kw) -> "ElementHandle":
+        return self.add(UIElement.rotation_wheel(name, x, y, value=value, limit=limit, **kw))
+
+    def add_input_field(self, name: str = "InputField", x: float = 0, y: float = 0, **kw) -> "ElementHandle":
+        return self.add(UIElement.input_field(name, x, y, **kw))
+
+    def add_pointer(self, name: str = "Pointer", x: float = 0, y: float = 0, **kw) -> "ElementHandle":
+        return self.add(UIElement.pointer(name, x, y, **kw))
+
+    def add_screen(self, name: str = "Screen", x: float = 0, y: float = 0,
+                   active: bool = True, **kw) -> "ElementHandle":
+        return self.add(UIElement.screen(name, x, y, active=active, **kw))
+
+    def add_custom_icon(self, name: str = "CustomIcon", x: float = 0, y: float = 0, **kw) -> "ElementHandle":
+        return self.add(UIElement.custom_icon(name, x, y, **kw))
+
+    def add_indicator(self, name: str = "Indicator1", x: float = 0, y: float = 0,
+                      value: float = 0.0, mn: float = 0.0, mx: float = 1.0, **kw) -> "ElementHandle":
+        return self.add(UIElement.indicator(name, x, y, value=value, mn=mn, mx=mx, **kw))
+
+    def add_steering_wheel(self, name: str = "SteeringWheel", x: float = 0, y: float = 0, **kw) -> "ElementHandle":
+        return self.add(UIElement.steering_wheel(name, x, y, **kw))
 
     @property
     def element_count(self) -> int:
         return len(self._elements)
+
+    def element_group_id(self, name_or_index: str | int) -> str:
+        """Return the stable GroupId (GUID) of an element.
+
+        Pass this as ``connect(..., output_group=...)`` when wiring UI controller
+        gates that share output names across elements (e.g. multiple "Value"
+        outputs). Resolves by element name (first match) or 0-based index.
+
+        Args:
+            name_or_index: Element name or 0-based element index.
+
+        Raises:
+            KeyError: If name not found. IndexError: If index out of range.
+        """
+        if isinstance(name_or_index, int):
+            return self._elements[name_or_index].group_id
+        for el in self._elements:
+            if el.name == name_or_index:
+                return el.group_id
+        raise KeyError(f"no UI element named {name_or_index!r}")
 
     def build_uicontrol_elements(self) -> dict:
         """Build the uicontrol_elements metadata value."""
@@ -681,52 +867,49 @@ class UIControllerBuilder:
         """Build the mechanicData entry (mechanicSerializedInputs/Outputs).
 
         Each element's Inputs/Outputs are flattened into the controller's
-        global gate list. Gate names may repeat across elements (e.g. multiple
-        "Color" gates), which is normal — the game distinguishes them by order.
+        global gate list. Element gates carry GroupId/Group/GroupName so the
+        game can distinguish same-name gates across elements (e.g. multiple
+        "Value" outputs) — wires route via outputGroup = element GroupId.
         """
         mech_inputs: list[dict] = []
         mech_outputs: list[dict] = []
 
-        # System gates
+        # System gates (no group). Real-device mechanic gates use CanBeEdit=true
+        # even for system gates (matches 12356test.melsave reference).
         mech_inputs.append(_build_mech_gate("activation", _DT_NUMBER,
-            _gate_data_default(_DT_NUMBER, 1.0), can_edit=False))
-        mech_outputs.append(_build_mech_gate("entity", _DT_ENTITY, None, can_edit=False))
+            _gate_data_default(_DT_NUMBER, 1.0), can_edit=True))
+        # "Override sorting" is a controller-level system input present on real
+        # device UI controllers (see UIControlMechanic.OVERRIDE_SORTING const).
+        mech_inputs.append(_build_mech_gate("Override sorting", _DT_NUMBER,
+            json.dumps({"Value": 0.0, "Default": 0.0, "Min": 0.0, "Max": 1.0,
+                        "IsCheckbox": True}, separators=(",", ":")),
+            can_edit=True))
+        mech_outputs.append(_build_mech_gate("entity", _DT_ENTITY, None, can_edit=True))
         mech_outputs.append(_build_mech_gate("activation", _DT_NUMBER,
-            _gate_data_default(_DT_NUMBER), can_edit=False))
+            _gate_data_default(_DT_NUMBER), can_edit=True))
 
-        # Flatten element gates
+        # Flatten element gates with group identity
         for el_idx, el in enumerate(self._elements):
             proto = el.to_dict(el_idx, self._prototypes)
+            gid = proto.get("Id") or ""
+            gnum = proto.get("Group", 0)
+            gname = proto.get("Name", "")
             for inp in proto["Inputs"]:
-                sv = inp.get("SerializedValue", "")
-                gd = None
-                if sv:
-                    try:
-                        parsed = json.loads(sv)
-                        if "Value" in parsed:
-                            gd = json.dumps({"Value": parsed["Value"]},
-                                           separators=(",", ":"))
-                    except (json.JSONDecodeError, TypeError):
-                        pass
+                # SerializedValue from the prototype IS the GateData payload —
+                # pass through verbatim (real device keeps Default/Min/Max etc).
+                gd = inp.get("SerializedValue") or None
                 mech_inputs.append(_build_mech_gate(
                     inp["Key"], inp.get("GateDataType", _DT_NUMBER),
                     gd, can_edit=inp.get("CanBeEdited", True),
-                    data_name=inp.get("DataName", inp["Key"])))
+                    data_name=inp.get("DataName", inp["Key"]),
+                    group_id=gid, group=gnum, group_name=gname))
             for out in proto["Outputs"]:
-                sv = out.get("SerializedValue", "")
-                gd = None
-                if sv:
-                    try:
-                        parsed = json.loads(sv)
-                        if "Value" in parsed:
-                            gd = json.dumps({"Value": parsed["Value"]},
-                                           separators=(",", ":"))
-                    except (json.JSONDecodeError, TypeError):
-                        pass
+                gd = out.get("SerializedValue") or None
                 mech_outputs.append(_build_mech_gate(
                     out["Key"], out.get("GateDataType", _DT_NUMBER),
                     gd, can_edit=out.get("CanBeEdited", True),
-                    data_name=out.get("DataName", out["Key"])))
+                    data_name=out.get("DataName", out["Key"]),
+                    group_id=gid, group=gnum, group_name=gname))
 
         return {
             "activationInput": 0.0,
@@ -779,22 +962,24 @@ class UIControllerBuilder:
                 "texture2DValue": None,
             })
 
-        # Update uicontrol_inputs / uicontrol_outputs metadata
-        msi = json.loads(so["mechanicData"][0]["mechanicSerializedInputs"])
-        mso = json.loads(so["mechanicData"][0]["mechanicSerializedOutputs"])
-        for sm in so["saveMetaDatas"]:
-            if sm["key"] == "uicontrol_inputs":
-                sm["stringValue"] = json.dumps(msi, ensure_ascii=False,
-                                                separators=(",", ":"))
-            elif sm["key"] == "uicontrol_outputs":
-                sm["stringValue"] = json.dumps(mso, ensure_ascii=False,
-                                                separators=(",", ":"))
+        # uicontrol_inputs / uicontrol_outputs describe the controller's own
+        # SYSTEM gates (activation/entity/Override sorting) — NOT the flattened
+        # element gates. The template already carries them in the correct
+        # format (field name "SerializedValue", not "GateData"), so we leave
+        # them untouched. Element gates live only in mechanicData.
+
+        # Strip leftover custom_icon_* entries from the template (each
+        # CustomIcon element adds its own; rebuilding means old ones are stale)
+        so["saveMetaDatas"] = [
+            sm for sm in so["saveMetaDatas"]
+            if not sm.get("key", "").startswith("custom_icon_")
+        ]
 
         return so
 
 
 __all__ = [
-    "UIControllerBuilder", "UIElement", "element_schema",
+    "UIControllerBuilder", "UIElement", "ElementHandle", "element_schema",
     # Type constants
     "BUTTON", "PEDAL", "PEDAL_ALT", "SLIDER", "SLIDER_ALT", "SLIDER_ALT2",
     "INPUT_FIELD", "STEERING_WHEEL", "POINTER", "TOGGLE", "SCREEN",

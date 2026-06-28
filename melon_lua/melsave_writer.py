@@ -87,6 +87,8 @@ def connect_gates(
     name: str = "",
     start_point: tuple[float, float] = (0.0, 0.0),
     end_point: tuple[float, float] = (0.0, 0.0),
+    output_group: str = "",
+    input_group: str = "",
 ) -> dict:
     """Wire a mechanic gate connection between two containers in a save's Data JSON.
 
@@ -128,8 +130,8 @@ def connect_gates(
         "mechCon": {
             "inputID": input_gate,
             "outputID": output_gate,
-            "inputGroup": "",
-            "outputGroup": "",
+            "inputGroup": input_group,
+            "outputGroup": output_group,
         },
         "distance": 0.0,
         "startObjectId": source_idx,
