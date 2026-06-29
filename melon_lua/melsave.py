@@ -50,6 +50,10 @@ class MelsaveDocument:
     objects: list[MelsaveObject]
     metadata: dict[str, Any]
     data_extras: dict[str, Any]
+    # The complete parsed Data JSON dict (saveObjectContainers + extras).
+    # Kept so MelsaveSession can mutate the save in place and write it back
+    # without re-reading the original .melsave file.
+    raw_data: dict[str, Any] = field(default_factory=dict, repr=False)
 
 
 def _vec3(d: Any, key: str, default: float = 0.0) -> tuple[float, float, float]:
@@ -170,6 +174,7 @@ def read_melsave(path: str | Path) -> MelsaveDocument:
             "averagePosition": data.get("averagePosition"),
             "autoLightData": data.get("autoLightData"),
         },
+        raw_data=data,
     )
 
 

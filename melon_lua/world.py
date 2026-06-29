@@ -137,7 +137,7 @@ class WorldContext:
     constraints: ConstraintRegistry = field(default_factory=ConstraintRegistry)
 
     # Mechanic gate wire data layer (signal wires between chip/entity gates)
-    gate_wires: "GateWireRegistry" = field(default_factory=lambda: __import__("melon_lua.constraints", fromlist=["GateWireRegistry"]).GateWireRegistry())
+    gate_wires: GateWireRegistry = field(default_factory=GateWireRegistry)
 
     # Chip variables (variables.Set/Get) — type-locked per key
     chip_variables: dict[str, Any] = field(default_factory=dict)

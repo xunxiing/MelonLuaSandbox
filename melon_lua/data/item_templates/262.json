@@ -1,0 +1,172 @@
+{
+  "objectId": 262,
+  "instanceId": -138946,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -21.8757439,
+    "y": -0.16584003,
+    "z": -0.0320168361
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 359.931335
+  },
+  "scale": {
+    "x": -0.405178934,
+    "y": 0.405178934,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 8,
+  "sortingLayer": "Default",
+  "orderLayer": 1,
+  "gravity": true,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": false,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [
+    {
+      "activationInput": 0.0,
+      "floatParameters": [
+        0.0,
+        1.0,
+        100.0,
+        3.0
+      ],
+      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"wave type\",\"DataType\":32,\"DataName\":\"wave type\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":3.0,\\\"DropdownOptions\\\":[\\\"Sine\\\",\\\"Square\\\",\\\"Triangle\\\",\\\"Noise\\\"],\\\"DropdownOptionsLocalizationKey\\\":\\\"game/mechanic/wave-type/{0}-title\\\"}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"volume\",\"DataType\":2,\"DataName\":\"volume\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":100.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":100.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"pitch\",\"DataType\":2,\"DataName\":\"pitch\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":3.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":3.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"music note\",\"DataType\":4,\"DataName\":\"music note\",\"CanBeEdit\":true,\"GateData\":\"{\\\"IsMultiline\\\":false,\\\"Value\\\":\\\"B6\\\",\\\"Default\\\":\\\"\\\",\\\"MaxLength\\\":2147483647}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
+      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"volume\",\"DataType\":2,\"DataName\":\"volume\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":100.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":100.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"pitch\",\"DataType\":2,\"DataName\":\"pitch\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":3.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":3.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
+    }
+  ],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [
+    {
+      "mainGuid": {
+        "Value": "effeec96-f969-4f68-a143-738b99f9c2a1",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": 0.0289563127,
+        "y": -0.1071442,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.0245038848,
+        "y": 0.08803665,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 24,
+      "endObjectId": 306,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Paper",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "4ba18403-5ff9-4a54-8426-3f3752c9daab",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": 0.017722087,
+        "y": 0.109949633,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.13994509,
+        "y": -0.108051278,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 24,
+      "endObjectId": 323,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Paper",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    }
+  ],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

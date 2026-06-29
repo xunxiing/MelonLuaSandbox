@@ -1,0 +1,144 @@
+{
+  "objectId": 897581376,
+  "instanceId": -146502,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -17.40261,
+    "y": -1.08101726,
+    "z": -0.0019002
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0266999453
+  },
+  "scale": {
+    "x": 0.566652358,
+    "y": 0.566652358,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 31,
+  "sortingLayer": "FrontGroundItem",
+  "orderLayer": 0,
+  "gravity": false,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": false,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [
+    {
+      "activationInput": 0.0,
+      "floatParameters": [
+        0.0,
+        100.0,
+        0.0,
+        90.0,
+        10.0
+      ],
+      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"speed\",\"DataType\":2,\"DataName\":\"speed\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":100.0,\\\"Default\\\":0.0,\\\"Min\\\":-100000.0,\\\"Max\\\":100000.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"min angle\",\"DataType\":2,\"DataName\":\"min angle\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"max angle\",\"DataType\":2,\"DataName\":\"max angle\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":90.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"mass\",\"DataType\":2,\"DataName\":\"mass\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":10.0,\\\"Default\\\":0.0,\\\"Min\\\":1.0,\\\"Max\\\":1000.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
+      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"angle\",\"DataType\":2,\"DataName\":\"angle\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":-2.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
+    }
+  ],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [
+    {
+      "key": "servo",
+      "boolValue": false,
+      "stringValue": null,
+      "intValue": 0,
+      "floatValue": -1.99578178,
+      "vector2Value": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "vector3Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "vector4Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0,
+        "magnitude": 0.0,
+        "sqrMagnitude": 0.0
+      },
+      "texture2DValue": null
+    }
+  ],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

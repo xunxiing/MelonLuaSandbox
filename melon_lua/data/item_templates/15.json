@@ -1,0 +1,322 @@
+{
+  "objectId": 15,
+  "instanceId": -161100,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -18.1024628,
+    "y": -1.081421,
+    "z": 0.00254783966
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 180.045349
+  },
+  "scale": {
+    "x": 1.4490248,
+    "y": 1.67502964,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 31,
+  "sortingLayer": "Default",
+  "orderLayer": 0,
+  "gravity": false,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": false,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [
+    {
+      "mainGuid": {
+        "Value": "e1cd3533-6431-4cac-845c-57ac1edf58d3",
+        "IsEmpty": false
+      },
+      "constraintId": 10,
+      "startPoint": {
+        "x": -0.399999976,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.4,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 375,
+      "endObjectId": 143,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "3e85121d-b5b5-482f-8844-2885a9b3a571",
+        "IsEmpty": false
+      },
+      "constraintId": 10,
+      "startPoint": {
+        "x": -0.599999964,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.6,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 375,
+      "endObjectId": 143,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "816ee00f-ea66-45d5-a420-3541ea523f70",
+        "IsEmpty": false
+      },
+      "constraintId": 10,
+      "startPoint": {
+        "x": 0.599999964,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.6,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 375,
+      "endObjectId": 145,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "fbdf86c7-2347-4f81-9414-a99b1f07d065",
+        "IsEmpty": false
+      },
+      "constraintId": 10,
+      "startPoint": {
+        "x": 0.399999976,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.4,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 375,
+      "endObjectId": 145,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "44a250a9-6eb7-4155-b5c4-04348d7ba33b",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": 0.1322888,
+        "y": -0.0226459429,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.480210125,
+        "y": 0.0214309823,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 375,
+      "endObjectId": 589,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "a9f5b22a-aa1c-4e16-acd2-718415d8c983",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.1494745,
+        "y": -0.0235091,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.4557966,
+        "y": 0.0399338938,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 375,
+      "endObjectId": 589,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "c7e6f5e7-74a2-4a9d-b85e-8efa44938efc",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.159457371,
+        "y": -0.02091969,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.4360978,
+        "y": 0.00821499247,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 375,
+      "endObjectId": 589,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "ebbb8e67-e2aa-47ab-9788-13fdf4a9b94f",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": 0.1394811,
+        "y": -0.0209196676,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.499396682,
+        "y": 0.0135019114,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 375,
+      "endObjectId": 589,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    }
+  ],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

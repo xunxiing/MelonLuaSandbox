@@ -1,0 +1,89 @@
+{
+  "$type": "FilesManagement.Saves.SaveObject.Data.Binary.SaveObjectChild, Assembly-CSharp",
+  "childName": "WoodenStick(Clone)",
+  "childIndex": [
+    2
+  ],
+  "objectId": 125,
+  "instanceId": -372216,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": 272,
+  "position": {
+    "x": 0.06002021,
+    "y": -0.1790365,
+    "z": -0.1577549
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 73.3335
+  },
+  "scale": {
+    "x": 0.3290356,
+    "y": 0.194602311,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 31,
+  "sortingLayer": "BackGroundItem",
+  "orderLayer": 5,
+  "gravity": true,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": false,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": null,
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": null,
+  "mechanicData": [],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

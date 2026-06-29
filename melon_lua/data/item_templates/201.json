@@ -1,0 +1,268 @@
+{
+  "objectId": 201,
+  "instanceId": -173080,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -21.6026649,
+    "y": -0.582992554,
+    "z": 0.0057833
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.05369054
+  },
+  "scale": {
+    "x": 5.94869328,
+    "y": 0.769762754,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.329411775,
+    "g": 0.3137255,
+    "b": 0.3019608,
+    "a": 1.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.329411775,
+    "g": 0.3137255,
+    "b": 0.3019608,
+    "a": 1.0
+  },
+  "isGradientActive": false,
+  "layer": 8,
+  "sortingLayer": "Default",
+  "orderLayer": 0,
+  "gravity": true,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": false,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [
+    {
+      "mainGuid": {
+        "Value": "fb61fba0-f47d-4eea-bf99-6737fad02422",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.1831104,
+        "y": -0.105742477,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.00612879638,
+        "y": 0.12723349,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 588,
+      "endObjectId": 529,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Concrete",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "cf590824-6502-4f84-bdea-d438952e1aaa",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.189637423,
+        "y": -0.0411997,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.0168444216,
+        "y": 0.123848058,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 588,
+      "endObjectId": 529,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Concrete",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "15074f83-f8d3-4e92-9971-5e678dceb0da",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.1856735,
+        "y": -0.06507014,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.00442862371,
+        "y": 0.111913919,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 588,
+      "endObjectId": 529,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Concrete",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "3480f4ac-a80c-4a7d-bb7c-193b29ad7fd2",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.1769888,
+        "y": 0.1273351,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.02034702,
+        "y": 0.153279454,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 588,
+      "endObjectId": 343,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Concrete",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "2f616c7a-d6d2-4ea3-a3ee-cd701b9db1a7",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.18177411,
+        "y": 0.116463363,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.01427753,
+        "y": 0.148461953,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 588,
+      "endObjectId": 343,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Concrete",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "64cf2788-c108-4f28-9ed2-409e72f358cd",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.196494192,
+        "y": 0.09059302,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.0214016363,
+        "y": 0.133220732,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 588,
+      "endObjectId": 343,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Concrete",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    }
+  ],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

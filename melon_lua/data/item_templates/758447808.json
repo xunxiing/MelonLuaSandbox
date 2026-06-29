@@ -1,0 +1,193 @@
+{
+  "objectId": 758447808,
+  "instanceId": -416048,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -2.60385513,
+    "y": 0.31401068,
+    "z": 0.00485419249
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "scale": {
+    "x": 0.1,
+    "y": 0.1,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 8,
+  "sortingLayer": "BackGroundItem",
+  "orderLayer": -10,
+  "gravity": false,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": false,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": true,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [
+    {
+      "mainGuid": {
+        "Value": "9257bb8e-8423-410a-a41e-6309a91f473f",
+        "IsEmpty": false
+      },
+      "constraintId": 24,
+      "startPoint": {
+        "x": -1.64077163,
+        "y": -0.102548227,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 849,
+      "endObjectId": 563,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Glass",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "7d7242c9-b328-4d55-bd40-bcc0881eef6d",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -1.89,
+        "y": -0.07,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.6,
+        "y": -0.02,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 849,
+      "endObjectId": 1443,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "None",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "441fee1c-ac4e-494e-921d-d7e4e20d8a63",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": 1.99,
+        "y": 0.01,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.59,
+        "y": -0.42,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 849,
+      "endObjectId": 1443,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "None",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    }
+  ],
+  "collisionIgnores": [],
+  "addData": [
+    {
+      "type": "Game.SaveSystem.LiquidMechanicData",
+      "fieldName": "LiquidMechanicData",
+      "fieldData": "{\"LiquidDatas\":[{\"LiquidType\":10,\"EffectType\":0,\"BloodType\":0,\"Color\":{\"r\":0.3686274588108063,\"g\":0.3019607961177826,\"b\":0.18039216101169587,\"a\":1.0},\"LiquidAmount\":14998.3349609375}]}"
+    }
+  ],
+  "saveMetaDatas": [],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

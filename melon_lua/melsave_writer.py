@@ -87,6 +87,8 @@ def connect_gates(
     name: str = "",
     start_point: tuple[float, float] = (0.0, 0.0),
     end_point: tuple[float, float] = (0.0, 0.0),
+    output_group: str = "",
+    input_group: str = "",
 ) -> dict:
     """Wire a mechanic gate connection between two containers in a save's Data JSON.
 
@@ -128,8 +130,8 @@ def connect_gates(
         "mechCon": {
             "inputID": input_gate,
             "outputID": output_gate,
-            "inputGroup": "",
-            "outputGroup": "",
+            "inputGroup": input_group,
+            "outputGroup": output_group,
         },
         "distance": 0.0,
         "startObjectId": source_idx,
@@ -375,7 +377,34 @@ def patch_save_data(original_data: dict, diff: "WorldDiff") -> dict:
         keep.append(container)
 
     for added in diff.added_objects:
-        keep.append({"saveObjects": copy.deepcopy(added), "saveObjectChildren": []})
+        so = copy.deepcopy(added)
+        # Apply modified_constraints to added objects too (e.g. ropes on
+        # runtime-spawned entities). Their localId is assigned by
+        # build_diff_from_world as max_local_id + 1.
+        added_lid = int(so.get("localId", 0))
+        if added_lid and added_lid in diff.modified_constraints:
+            mc = diff.modified_constraints[added_lid]
+            if "constraints" in mc:
+                existing = so.get("constraints")
+                if isinstance(existing, list) and existing:
+                    seen_guids = {
+                        (c.get("mainGuid") or {}).get("Value")
+                        for c in mc["constraints"]
+                        if isinstance(c, dict)
+                    }
+                    preserved = [
+                        c for c in existing
+                        if isinstance(c, dict)
+                        and ((c.get("mainGuid") or {}).get("Value") or None) not in seen_guids
+                    ]
+                    so["constraints"] = preserved + copy.deepcopy(mc["constraints"])
+                else:
+                    so["constraints"] = copy.deepcopy(mc["constraints"])
+            if "distJoints" in mc:
+                so["distJoints"] = copy.deepcopy(mc["distJoints"])
+            if "hingeJoints" in mc:
+                so["hingeJoints"] = copy.deepcopy(mc["hingeJoints"])
+        keep.append({"saveObjects": so, "saveObjectChildren": []})
 
     data["saveObjectContainers"] = keep
     return data
@@ -666,18 +695,42 @@ def write_world_to_melsave(
     out_path: str | Path,
     *,
     write_icon: bool = True,
+    extra_containers: list[dict] | None = None,
 ) -> Path:
-    """Build a diff from world, patch original Data, and write a new .melsave."""
+    """Build a diff from world, patch original Data, and write a new .melsave.
+
+    Gate wires from ``world.gate_wires`` are merged into the patched
+    ``constraints`` lists (mechanic connections coexist with physical ropes).
+
+    Args:
+        extra_containers: Raw saveObjects dicts to append as new containers
+            (e.g. Lua chips added via MelsaveSession.add_lua_chip()).
+    """
     diff = build_diff_from_world(world, original_doc)
-    original_path = original_doc.path
+    # Use the in-memory document as source of truth (SDK v4+ dict-as-source-of-truth).
+    # Fallback to reading from disk only if raw_data is empty (legacy docs).
     original_data: dict[str, Any] = {}
-    try:
-        with zipfile.ZipFile(original_path, "r") as zf:
-            if "Data" in zf.namelist():
-                original_data = json.loads(zf.read("Data").decode("utf-8"))
-    except Exception:
-        original_data = {"saveObjectContainers": []}
+    raw = getattr(original_doc, "raw_data", None)
+    if isinstance(raw, dict) and raw:
+        original_data = copy.deepcopy(raw)
+    else:
+        original_path = original_doc.path
+        try:
+            with zipfile.ZipFile(original_path, "r") as zf:
+                if "Data" in zf.namelist():
+                    original_data = json.loads(zf.read("Data").decode("utf-8"))
+        except Exception:
+            original_data = {"saveObjectContainers": []}
     patched = patch_save_data(original_data, diff)
+    # Append session-added chip containers (Lua chips added via add_lua_chip).
+    if extra_containers:
+        containers = patched.setdefault("saveObjectContainers", [])
+        for so in extra_containers:
+            containers.append({"saveObjects": so, "saveObjectChildren": []})
+    # Merge gate wires into the patched constraints lists.
+    gate_wires = getattr(world, "gate_wires", None)
+    if gate_wires is not None and len(gate_wires) > 0:
+        _merge_gate_wires_into_save(patched, gate_wires)
     meta = (
         copy.deepcopy(original_doc.metadata)
         if isinstance(original_doc.metadata, dict)
@@ -685,5 +738,46 @@ def write_world_to_melsave(
     )
     icon: bytes | None = None
     if write_icon:
-        icon = _read_icon_from_melsave(original_path)
+        icon = _read_icon_from_melsave(original_doc.path)
     return write_melsave(out_path, patched, meta, icon)
+
+
+def _merge_gate_wires_into_save(save_data: dict, gate_wires: Any) -> None:
+    """Merge gate-wire constraints into save's ``constraints`` lists.
+
+    When the registry is non-empty, it is the **source of truth** for all
+    mechanic gate wires: for each source container that appears in the
+    registry, pre-existing mechanic constraints are stripped and replaced
+    with the registry's current wires. Physical ropes (constraintId=10,
+    mechCon null) are preserved untouched. Containers not referenced by any
+    wire in the registry keep their original constraints as-is.
+
+    When the registry is empty, no changes are made (original constraints
+    preserved verbatim).
+    """
+    wire_dicts = gate_wires.to_constraint_dicts()
+    if not wire_dicts:
+        return
+    containers = save_data.get("saveObjectContainers") or []
+    # Group wires by source container index
+    by_source: dict[int, list[dict]] = {}
+    for wd in wire_dicts:
+        si = int(wd.get("startObjectId", 0))
+        by_source.setdefault(si, []).append(wd)
+    # For containers that have wires in the registry, replace mechanic constraints
+    for si, wires in by_source.items():
+        if si < 0 or si >= len(containers):
+            continue
+        so = containers[si].get("saveObjects") or {}
+        existing = so.get("constraints")
+        if not isinstance(existing, list):
+            existing = []
+        # Keep only physical ropes (non-mechanic); drop ALL old mechanic wires
+        # since the registry is the source of truth for current wires.
+        kept_physical = [
+            c for c in existing
+            if isinstance(c, dict)
+            and (c.get("constraintId") != MECHANIC_CONSTRAINT_ID
+                 or c.get("mechCon") is None)
+        ]
+        so["constraints"] = kept_physical + wires

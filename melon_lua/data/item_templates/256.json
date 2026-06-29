@@ -1,0 +1,266 @@
+{
+  "objectId": 256,
+  "instanceId": -142148,
+  "modedObjectId": "",
+  "localId": 0,
+  "originLocalId": 0,
+  "parentId": -1,
+  "position": {
+    "x": -5.07784271,
+    "y": 1.49607968,
+    "z": -0.0112026315
+  },
+  "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.00108402735
+  },
+  "scale": {
+    "x": 0.99999994,
+    "y": 0.6219649,
+    "z": 1.0
+  },
+  "color": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "intensity": 0.0,
+  "bottomColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isGradientActive": false,
+  "layer": 31,
+  "sortingLayer": "Default",
+  "orderLayer": 0,
+  "gravity": true,
+  "freezed": false,
+  "ballooned": false,
+  "glued": false,
+  "rotationFrozen": true,
+  "notBreakable": false,
+  "isVisible": false,
+  "isMeltable": false,
+  "isHuman": false,
+  "isMutationPart": false,
+  "isActivationForced": false,
+  "prohibitDrag": false,
+  "prohibitBrokeByWater": false,
+  "interactionType": "Physic",
+  "hasInvisible": true,
+  "fluorescentIntensity": 0.0,
+  "fluorescentColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "TreeBranch": null,
+  "LightSaveData": {
+    "IsActive": false,
+    "ColorIsChanged": true,
+    "Color": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "IsBrokenByWater": false,
+    "ChildrenSaveData": null,
+    "<IsActive>k__BackingField": false,
+    "<ColorIsChanged>k__BackingField": true,
+    "<Color>k__BackingField": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "<IsBrokenByWater>k__BackingField": false,
+    "<ChildrenSaveData>k__BackingField": null
+  },
+  "BreakableSaveData": null,
+  "SpikeComponentData": null,
+  "TakenObjectData": null,
+  "humanData": [],
+  "mechanicData": [
+    {
+      "activationInput": 0.0,
+      "floatParameters": [
+        0.0,
+        2.0
+      ],
+      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"camera size\",\"DataType\":2,\"DataName\":\"camera size\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":2.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
+      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
+    }
+  ],
+  "brokenJoints": [],
+  "hingeJoints": [],
+  "distJoints": [],
+  "constraints": [
+    {
+      "mainGuid": {
+        "Value": "f24d809f-d1f1-4a0e-bbc7-f894e51ec7fd",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.0114936829,
+        "y": -0.0173231214,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.0358734131,
+        "y": -0.136200175,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 81,
+      "endObjectId": 78,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "70f37b89-2bdb-4a70-b3ed-f6075941eafa",
+        "IsEmpty": false
+      },
+      "constraintId": 6,
+      "startPoint": {
+        "x": -0.22759825,
+        "y": -0.0458639972,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.0025324726,
+        "y": -0.07537645,
+        "z": 0.0
+      },
+      "mechCon": null,
+      "distance": 0.0,
+      "startObjectId": 81,
+      "endObjectId": 454,
+      "linkedRopeGuid": null,
+      "constraintName": null,
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "8582560c-9432-46ac-8a02-fe642463a460",
+        "IsEmpty": false
+      },
+      "constraintId": 13,
+      "startPoint": {
+        "x": -0.06323675,
+        "y": -0.1011101,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": 0.0320382044,
+        "y": -0.0745461658,
+        "z": 0.0
+      },
+      "mechCon": {
+        "inputID": "camera1",
+        "outputID": "entity",
+        "inputGroup": "",
+        "outputGroup": ""
+      },
+      "distance": 0.0,
+      "startObjectId": 81,
+      "endObjectId": 75,
+      "linkedRopeGuid": null,
+      "constraintName": "entity Camera_1 ",
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "baef9a65-526e-4502-aee8-96b1135e7877",
+        "IsEmpty": false
+      },
+      "constraintId": 13,
+      "startPoint": {
+        "x": 0.223909214,
+        "y": -0.05712661,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.0380721875,
+        "y": 0.00384519622,
+        "z": 0.0
+      },
+      "mechCon": {
+        "inputID": "activation",
+        "outputID": "activation",
+        "inputGroup": "",
+        "outputGroup": ""
+      },
+      "distance": 0.0,
+      "startObjectId": 81,
+      "endObjectId": 198,
+      "linkedRopeGuid": null,
+      "constraintName": "Activation Activation ",
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Metal",
+      "customRope": null
+    },
+    {
+      "mainGuid": {
+        "Value": "1f88efc7-5d5f-47db-af53-71495df652e5",
+        "IsEmpty": false
+      },
+      "constraintId": 13,
+      "startPoint": {
+        "x": 0.0320806429,
+        "y": -0.08165667,
+        "z": 0.0
+      },
+      "endPoint": {
+        "x": -0.004563228,
+        "y": 0.07251203,
+        "z": 0.0
+      },
+      "mechCon": {
+        "inputID": "camera",
+        "outputID": "entity",
+        "inputGroup": "e45359d1-c566-4710-8865-811054190339",
+        "outputGroup": ""
+      },
+      "distance": 0.0,
+      "startObjectId": 81,
+      "endObjectId": 14,
+      "linkedRopeGuid": null,
+      "constraintName": "entity Camera ASP C CCTV",
+      "isNameVisible": false,
+      "startObjectConnectionMaterial": "Metal",
+      "endObjectConnectionMaterial": "Paper",
+      "customRope": null
+    }
+  ],
+  "collisionIgnores": [],
+  "addData": [],
+  "saveMetaDatas": [],
+  "ContextMenuActionsRestrictionSaveData": null,
+  "pixelTargetColor": {
+    "r": 0.0,
+    "g": 0.0,
+    "b": 0.0,
+    "a": 0.0
+  },
+  "isPixelTextureWasChanged": false
+}

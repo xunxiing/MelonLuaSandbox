@@ -28,8 +28,14 @@ from .melsave_writer import (
     list_gate_connections,
 )
 from .session import MelsaveSession
+from .melsave_builder import MelsaveBuilder
+from .uicontrol_builder import (
+    UIControllerBuilder, UIElement, ElementHandle, element_schema,
+    BUTTON, PEDAL, SLIDER, INPUT_FIELD, STEERING_WHEEL,
+    POINTER, TOGGLE, SCREEN, CUSTOM_ICON, JOYSTICK,
+)
 
-__version__ = "3.2.0"
+__version__ = "5.0.1"
 
 __all__ = [
     "MelonScriptRunner",
@@ -63,4 +69,11 @@ __all__ = [
     "disconnect_gates",
     "list_gate_connections",
     "MelsaveSession",
+    "MelsaveBuilder",
+    "UIControllerBuilder",
+    "UIElement",
+    "ElementHandle",
+    "element_schema",
+    "BUTTON", "PEDAL", "SLIDER", "INPUT_FIELD", "STEERING_WHEEL",
+    "POINTER", "TOGGLE", "SCREEN", "CUSTOM_ICON", "JOYSTICK",
 ]
