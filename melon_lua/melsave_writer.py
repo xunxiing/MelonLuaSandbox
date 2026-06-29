@@ -377,7 +377,34 @@ def patch_save_data(original_data: dict, diff: "WorldDiff") -> dict:
         keep.append(container)
 
     for added in diff.added_objects:
-        keep.append({"saveObjects": copy.deepcopy(added), "saveObjectChildren": []})
+        so = copy.deepcopy(added)
+        # Apply modified_constraints to added objects too (e.g. ropes on
+        # runtime-spawned entities). Their localId is assigned by
+        # build_diff_from_world as max_local_id + 1.
+        added_lid = int(so.get("localId", 0))
+        if added_lid and added_lid in diff.modified_constraints:
+            mc = diff.modified_constraints[added_lid]
+            if "constraints" in mc:
+                existing = so.get("constraints")
+                if isinstance(existing, list) and existing:
+                    seen_guids = {
+                        (c.get("mainGuid") or {}).get("Value")
+                        for c in mc["constraints"]
+                        if isinstance(c, dict)
+                    }
+                    preserved = [
+                        c for c in existing
+                        if isinstance(c, dict)
+                        and ((c.get("mainGuid") or {}).get("Value") or None) not in seen_guids
+                    ]
+                    so["constraints"] = preserved + copy.deepcopy(mc["constraints"])
+                else:
+                    so["constraints"] = copy.deepcopy(mc["constraints"])
+            if "distJoints" in mc:
+                so["distJoints"] = copy.deepcopy(mc["distJoints"])
+            if "hingeJoints" in mc:
+                so["hingeJoints"] = copy.deepcopy(mc["hingeJoints"])
+        keep.append({"saveObjects": so, "saveObjectChildren": []})
 
     data["saveObjectContainers"] = keep
     return data
@@ -680,14 +707,20 @@ def write_world_to_melsave(
             (e.g. Lua chips added via MelsaveSession.add_lua_chip()).
     """
     diff = build_diff_from_world(world, original_doc)
-    original_path = original_doc.path
+    # Use the in-memory document as source of truth (SDK v4+ dict-as-source-of-truth).
+    # Fallback to reading from disk only if raw_data is empty (legacy docs).
     original_data: dict[str, Any] = {}
-    try:
-        with zipfile.ZipFile(original_path, "r") as zf:
-            if "Data" in zf.namelist():
-                original_data = json.loads(zf.read("Data").decode("utf-8"))
-    except Exception:
-        original_data = {"saveObjectContainers": []}
+    raw = getattr(original_doc, "raw_data", None)
+    if isinstance(raw, dict) and raw:
+        original_data = copy.deepcopy(raw)
+    else:
+        original_path = original_doc.path
+        try:
+            with zipfile.ZipFile(original_path, "r") as zf:
+                if "Data" in zf.namelist():
+                    original_data = json.loads(zf.read("Data").decode("utf-8"))
+        except Exception:
+            original_data = {"saveObjectContainers": []}
     patched = patch_save_data(original_data, diff)
     # Append session-added chip containers (Lua chips added via add_lua_chip).
     if extra_containers:
@@ -705,7 +738,7 @@ def write_world_to_melsave(
     )
     icon: bytes | None = None
     if write_icon:
-        icon = _read_icon_from_melsave(original_path)
+        icon = _read_icon_from_melsave(original_doc.path)
     return write_melsave(out_path, patched, meta, icon)
 
 
