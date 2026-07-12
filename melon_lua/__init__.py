@@ -35,7 +35,7 @@ from .uicontrol_builder import (
     POINTER, TOGGLE, SCREEN, CUSTOM_ICON, JOYSTICK,
 )
 
-__version__ = "5.0.1"
+__version__ = "5.1.0"
 
 __all__ = [
     "MelonScriptRunner",
