@@ -40,6 +40,7 @@ GATE_ENTITY = 1
 GATE_NUMBER = 2
 GATE_STRING = 4
 GATE_VECTOR = 8
+GATE_ENTITY_ARRAY = 1024
 
 # lua_chip_inputs/outputs Type (same as gate DataType for most)
 # lua_chip_inputs/outputs LuaValue.Type (different enum)
@@ -61,6 +62,7 @@ _TYPE_MAP: dict[str, tuple[int, int]] = {
     "vec": (GATE_VECTOR, LUAVAL_VECTOR),
     "int": (GATE_NUMBER, LUAVAL_INTEGER),
     "integer": (GATE_NUMBER, LUAVAL_INTEGER),
+    "array_entity": (GATE_ENTITY_ARRAY, LUAVAL_ENTITY),
 }
 
 # System gates that every chip has (auto-added)
