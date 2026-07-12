@@ -170,7 +170,7 @@ melon-lua --api-list
 ## 输入输出与生命周期
 
 与真实甜瓜一致：
-- `inputs.*` / `outputs.*`（num/string/vec/entity/color/array_*）
+- `inputs.*` / `outputs.*`（num/string/vec/entity/color/array_num/array_string/array_vec/array_entity）
 - `OnInit` / `OnTick` / `OnSpawned(requestId, entities)` / `OnActivated` / `OnDeactivated` / `OnDestroy`
 
 ## 线程安全与性能
@@ -233,7 +233,7 @@ b.save("output.melsave")
 - `add_lua_chip(lua_source, x, y, *, inputs, outputs, variables, tps, title) -> int`
   生成一个 Lua 芯片。返回容器索引。
   - `inputs`/`outputs`：gate dict 列表，每个含 `name`/`type`/`value`(可选)
-  - type 别名：`"entity"` | `"number"` | `"string"` | `"vector"` | `"int"`
+  - type 别名：`"entity"` | `"number"` | `"string"` | `"vector"` | `"int"` | `"array_entity"`
   - `variables`：`{"name": str, "value": float}` 列表（持久芯片变量）
   - `tps`：ticks per second（默认 30）
   - `instruction_cost`：每 tick 最大指令数（默认 1000）
@@ -267,6 +267,7 @@ b.save("output.melsave")
 | `int`/`integer` | 2 | 2 | 整数 |
 | `string`/`str` | 4 | 3 | 字符串 |
 | `vector`/`vec` | 8 | 4 | 向量 |
+| `array_entity` | 1024 | 6 | 实体数组（雷达等 mod 物件输出） |
 
 ### 芯片系统门
 
@@ -278,6 +279,49 @@ b.save("output.melsave")
 
 这些对应 Lua 代码中的 `inputs.num.activation`、`outputs.entity.entity`、
 `outputs.num.tick`、`outputs.string.status`。用户只需声明额外的自定义门。
+
+### 雷达物件与 array_entity
+
+**雷达**（objectId=892993856，catalog 名 `"Radar"`）是内置 mod 物件，扫描范围内实体。
+默认开启（模板 `isActivationForced=True`）。
+
+输出门：
+
+| 门名 | DataType | 说明 |
+|------|----------|------|
+| `entity` | 1 | 最近实体 |
+| `activation` | 2 | 开关状态 |
+| `trigger` | 2 | 实体进入时触发 |
+| `entity array` | 1024 | 范围内全部实体（数组） |
+
+`entity array` 输出对应芯片的 `array_entity` 类型输入。连线后，Lua 侧通过
+`inputs.array_entity.<input_name>` 访问实体列表：
+
+```python
+from melon_lua import MelsaveSession
+
+LUA = r"""
+function OnTick()
+    local arr = inputs.array_entity.targets
+    if not arr then return end
+    for i = 1, #arr do
+        local ent = arr[i]
+        if ent and ent:isValid() then
+            ent:setVelocity(0, 0)
+            ent:setAngularVelocity(0)
+        end
+    end
+end
+"""
+
+with MelsaveSession() as s:
+    radar = s.add_item(892993856, x=0, y=0)
+    chip = s.add_lua_chip(LUA, x=2, y=0,
+        inputs=[{"name": "targets", "type": "array_entity"}],
+        outputs=[{"name": "frozen_count", "type": "number"}])
+    s.connect(radar, "entity array", chip, "targets")
+    s.save("radar_freeze.melsave")
+```
 
 ### 与 MelsaveSession 的关系
 

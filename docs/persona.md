@@ -160,7 +160,7 @@ render_world(
 
 与真实甜瓜一致：
 
-- `inputs.*` / `outputs.*`（num/string/vec/entity/color/array_*）
+- `inputs.*` / `outputs.*`（num/string/vec/entity/color/array_num/array_string/array_vec/array_entity）
 - `OnInit` / `OnTick` / `OnSpawned(requestId, entities)` / `OnActivated` / `OnDeactivated` / `OnDestroy`
 - 推荐 `run_loop(ticks=...)` 而不是手动循环
 
@@ -211,9 +211,9 @@ with MelsaveSession("out.melsave") as s:
 
 **inputs/outputs gate dict 字段**：
 - `"name"`：门名（字符串，可含空格）
-- `"type"`：`entity` | `number` | `int` | `string` | `vector`（别名：`num`/`str`/`vec`/`integer`）
-- `"value"`（可选）：初始值。number→float、string→str、entity/int 无（连线提供）
-- Lua 侧按类型分桶访问：`inputs.num.speed` / `inputs.entity.target` / `outputs.string.status`
+- `"type"`：`entity` | `number` | `int` | `string` | `vector` | `array_entity`（别名：`num`/`str`/`vec`/`integer`）
+- `"value"`（可选）：初始值。number→float、string→str、entity/int/array_entity 无（连线提供）
+- Lua 侧按类型分桶访问：`inputs.num.speed` / `inputs.entity.target` / `inputs.array_entity.targets` / `outputs.string.status`
 
 **核心方法速查**（完整签名见 `docs/API.md`）
 
@@ -230,6 +230,13 @@ with MelsaveSession("out.melsave") as s:
 | 底层 | `.world` / `.runner` / `.document` | 运行时 / 任意 |
 
 **`add_item` 常用参数**：`color=(r,g,b,a)` 0-1 RGBA 元组；`dynamic=True` 受重力；`freezed=True` 冻结。
+
+**内置 mod 物件**：
+- **雷达**（objectId=892993856，catalog 名 `"Radar"`）：扫描范围内实体。默认开启（`isActivationForced=True`）。
+  - 输出：`entity`（最近实体）/ `activation` / `trigger`（进入时触发）/ `entity array`（范围内全部实体，DataType=1024）
+  - 输入：`activation` / `shift x` / `shift y` / `hide` / `width` / `height`
+  - 连线 `entity array` 到芯片 `array_entity` 类型输入：`s.connect(radar, "entity array", chip, "targets")`
+  - Lua 侧遍历：`for i=1,#inputs.array_entity.targets do ... end`
 
 **UIControllerBuilder 工厂签名**（`add_*` 返回 ElementHandle，不再返回 self）：
 - `.add_slider(value=0, mn=0, mx=1)` / `.add_button(text="")` / `.add_joystick(multiplier=1.0)` / `.add_toggle(active=False)`
