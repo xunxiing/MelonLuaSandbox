@@ -295,7 +295,8 @@ b.save("output.melsave")
 | `entity array` | 1024 | 范围内全部实体（数组） |
 
 `entity array` 输出对应芯片的 `array_entity` 类型输入。连线后，Lua 侧通过
-`inputs.array_entity.<input_name>` 访问实体列表：
+`inputs.array_entity.<input_name>` 访问实体 ID 列表（数组元素是 entity ID 数字，
+**必须用 `Entity(id)` 包装**才能调用实体方法）：
 
 ```python
 from melon_lua import MelsaveSession
@@ -305,10 +306,13 @@ function OnTick()
     local arr = inputs.array_entity.targets
     if not arr then return end
     for i = 1, #arr do
-        local ent = arr[i]
-        if ent and ent:isValid() then
-            ent:setVelocity(0, 0)
-            ent:setAngularVelocity(0)
+        local id = arr[i]
+        if id and id ~= 0 then
+            local ent = Entity(id)
+            if ent:isValid() then
+                ent:setVelocity(0, 0)
+                ent:setAngularVelocity(0)
+            end
         end
     end
 end

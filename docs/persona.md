@@ -236,7 +236,7 @@ with MelsaveSession("out.melsave") as s:
   - 输出：`entity`（最近实体）/ `activation` / `trigger`（进入时触发）/ `entity array`（范围内全部实体，DataType=1024）
   - 输入：`activation` / `shift x` / `shift y` / `hide` / `width` / `height`
   - 连线 `entity array` 到芯片 `array_entity` 类型输入：`s.connect(radar, "entity array", chip, "targets")`
-  - Lua 侧遍历：`for i=1,#inputs.array_entity.targets do ... end`
+  - Lua 侧遍历：`for i=1,#inputs.array_entity.targets do local ent=Entity(arr[i]) ... end`（数组元素是 entity ID 数字，**必须 `Entity(id)` 包装**）
 
 **UIControllerBuilder 工厂签名**（`add_*` 返回 ElementHandle，不再返回 self）：
 - `.add_slider(value=0, mn=0, mx=1)` / `.add_button(text="")` / `.add_joystick(multiplier=1.0)` / `.add_toggle(active=False)`
