@@ -26,6 +26,7 @@ from .melsave_writer import (
     connect_gates,
     disconnect_gates,
     list_gate_connections,
+    resolve_gate_key,
 )
 from .session import MelsaveSession
 from .melsave_builder import MelsaveBuilder
@@ -35,7 +36,7 @@ from .uicontrol_builder import (
     POINTER, TOGGLE, SCREEN, CUSTOM_ICON, JOYSTICK,
 )
 
-__version__ = "5.1.1"
+__version__ = "5.2.0"
 
 __all__ = [
     "MelonScriptRunner",
@@ -68,6 +69,7 @@ __all__ = [
     "connect_gates",
     "disconnect_gates",
     "list_gate_connections",
+    "resolve_gate_key",
     "MelsaveSession",
     "MelsaveBuilder",
     "UIControllerBuilder",

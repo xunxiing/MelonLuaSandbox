@@ -40,6 +40,10 @@ GATE_ENTITY = 1
 GATE_NUMBER = 2
 GATE_STRING = 4
 GATE_VECTOR = 8
+GATE_INTEGER = 32
+GATE_ARRAY_NUMBER = 128
+GATE_ARRAY_STRING = 256
+GATE_ARRAY_VECTOR = 512
 GATE_ENTITY_ARRAY = 1024
 
 # lua_chip_inputs/outputs Type (same as gate DataType for most)
@@ -50,6 +54,7 @@ LUAVAL_STRING = 3
 LUAVAL_VECTOR = 4
 LUAVAL_COLOR = 5
 LUAVAL_ENTITY = 6
+LUAVAL_ARRAY = 7
 
 # String alias → (GateDataType, LuaValue.Type)
 _TYPE_MAP: dict[str, tuple[int, int]] = {
@@ -60,9 +65,15 @@ _TYPE_MAP: dict[str, tuple[int, int]] = {
     "str": (GATE_STRING, LUAVAL_STRING),
     "vector": (GATE_VECTOR, LUAVAL_VECTOR),
     "vec": (GATE_VECTOR, LUAVAL_VECTOR),
-    "int": (GATE_NUMBER, LUAVAL_INTEGER),
-    "integer": (GATE_NUMBER, LUAVAL_INTEGER),
-    "array_entity": (GATE_ENTITY_ARRAY, LUAVAL_ENTITY),
+    "int": (GATE_INTEGER, LUAVAL_INTEGER),
+    "integer": (GATE_INTEGER, LUAVAL_INTEGER),
+    "array_num": (GATE_ARRAY_NUMBER, LUAVAL_ARRAY),
+    "array_number": (GATE_ARRAY_NUMBER, LUAVAL_ARRAY),
+    "array_string": (GATE_ARRAY_STRING, LUAVAL_ARRAY),
+    "array_str": (GATE_ARRAY_STRING, LUAVAL_ARRAY),
+    "array_vec": (GATE_ARRAY_VECTOR, LUAVAL_ARRAY),
+    "array_vector": (GATE_ARRAY_VECTOR, LUAVAL_ARRAY),
+    "array_entity": (GATE_ENTITY_ARRAY, LUAVAL_ARRAY),
 }
 
 # System gates that every chip has (auto-added)
@@ -144,6 +155,22 @@ def _number_gate_data(value: float = 0.0) -> str:
     }, separators=(",", ":"))
 
 
+def _integer_gate_data(value: int = 32, min_v: float = 1.0,
+                       max_v: float = 256.0) -> str:
+    """IntegerNumber gate (matches real LED width/height GateData)."""
+    v = float(value)
+    return json.dumps({
+        "Value": v, "Default": v,
+        "Min": min_v, "Max": max_v,
+        "DropdownOptions": None,
+        "DropdownOptionsLocalizationKey": None,
+    }, separators=(",", ":"))
+
+
+def _array_gate_data() -> str:
+    return json.dumps({"Value": None, "Default": None}, separators=(",", ":"))
+
+
 def _string_gate_data(value: str = "") -> str:
     return json.dumps({
         "IsMultiline": False, "Value": value,
@@ -176,15 +203,41 @@ def _resolve_type(type_alias: str) -> tuple[int, int]:
     return _TYPE_MAP[key]
 
 
-def _gate_data_for(type_alias: str, value: Any) -> str | None:
-    """Build GateData JSON string for a gate with an initial value."""
+def _gate_data_for(type_alias: str, value: Any = None) -> str | None:
+    """Build GateData JSON string for a gate type."""
     key = type_alias.lower().strip()
-    if key in ("number", "num", "int", "integer"):
+    if key in ("int", "integer"):
+        return _integer_gate_data(int(value) if value is not None else 32)
+    if key in ("number", "num"):
         return _number_gate_data(float(value) if value is not None else 0.0)
     if key in ("string", "str"):
         return _string_gate_data(str(value) if value is not None else "")
+    if key in (
+        "array_num", "array_number", "array_string", "array_str",
+        "array_vec", "array_vector", "array_entity",
+    ):
+        return _array_gate_data()
     # Entity, Vector, Color → no GateData (connected via wire)
     return None
+
+
+def _lua_value_for(type_alias: str, value: Any = None) -> dict:
+    """Build LuaValue for chip meta, with sensible defaults."""
+    gate_type, lv_type = _resolve_type(type_alias)
+    key = type_alias.lower().strip()
+    if key in ("int", "integer"):
+        return _make_lua_value(
+            lv_type, integer_value=int(value) if value is not None else 32
+        )
+    if key in ("number", "num"):
+        return _make_lua_value(
+            lv_type, number_value=float(value) if value is not None else 0.0
+        )
+    if key in ("string", "str"):
+        return _make_lua_value(
+            lv_type, string_value=str(value) if value is not None else ""
+        )
+    return _make_lua_value(lv_type)
 
 
 # ---------------------------------------------------------------------------
@@ -324,22 +377,22 @@ def _build_chip_save_objects(
     # --- lua_chip_inputs/outputs (saveMetaDatas) ---
     chip_inputs: list[dict] = []
     for inp in inputs:
-        gate_type, lv_type = _resolve_type(inp["type"])
+        gate_type, _ = _resolve_type(inp["type"])
         is_entity = gate_type == GATE_ENTITY
         chip_inputs.append({
             "Name": inp["name"],
             "Type": gate_type,
-            "LuaValue": _make_lua_value(lv_type),
+            "LuaValue": _lua_value_for(inp["type"], inp.get("value")),
             "CanBeChanged": not is_entity,  # entity inputs are wire-connected
         })
 
     chip_outputs: list[dict] = []
     for out in outputs:
-        gate_type, lv_type = _resolve_type(out["type"])
+        gate_type, _ = _resolve_type(out["type"])
         chip_outputs.append({
             "Name": out["name"],
             "Type": gate_type,
-            "LuaValue": _make_lua_value(lv_type),
+            "LuaValue": _lua_value_for(out["type"], out.get("value")),
             "CanBeChanged": True,
         })
 
@@ -348,8 +401,7 @@ def _build_chip_save_objects(
                                     _number_gate_data(1.0))]
     for inp in inputs:
         gate_type, _ = _resolve_type(inp["type"])
-        value = inp.get("value")
-        gd = _gate_data_for(inp["type"], value) if value is not None else None
+        gd = _gate_data_for(inp["type"], inp.get("value"))
         mech_inputs.append(_make_mech_gate(inp["name"], gate_type, gd))
 
     # System outputs: entity, activation, tick, status
@@ -361,8 +413,7 @@ def _build_chip_save_objects(
     ]
     for out in outputs:
         gate_type, _ = _resolve_type(out["type"])
-        value = out.get("value")
-        gd = _gate_data_for(out["type"], value) if value is not None else None
+        gd = _gate_data_for(out["type"], out.get("value"))
         # Skip if name collides with system gate
         if out["name"] not in ("entity", "activation", "tick", "status"):
             mech_outputs.append(_make_mech_gate(out["name"], gate_type, gd))
@@ -597,4 +648,9 @@ __all__ = [
     "GATE_NUMBER",
     "GATE_STRING",
     "GATE_VECTOR",
+    "GATE_INTEGER",
+    "GATE_ARRAY_NUMBER",
+    "GATE_ARRAY_STRING",
+    "GATE_ARRAY_VECTOR",
+    "GATE_ENTITY_ARRAY",
 ]

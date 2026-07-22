@@ -21,6 +21,8 @@ if TYPE_CHECKING:
     from .melsave import MelsaveDocument, MelsaveObject
 
 _TEMPLATE_DIR = Path(__file__).parent.parent / "temp" / "objectid_templates"
+# Fallback: SDK-bundled templates (ships with pip installs where temp/ doesn't exist)
+_PKG_TEMPLATE_DIR = Path(__file__).parent / "data" / "item_templates"
 
 _CHILD_INDEX_OFFSET = 100000
 
@@ -77,6 +79,81 @@ def write_melsave(
 MECHANIC_CONSTRAINT_ID = 13
 
 
+def _parse_mechanic_gates(so: dict, side: str) -> list[dict]:
+    """Return mechanicSerializedInputs/Outputs list for a saveObjects dict."""
+    md = so.get("mechanicData")
+    if not isinstance(md, list) or not md:
+        return []
+    key = (
+        "mechanicSerializedInputs"
+        if side == "input"
+        else "mechanicSerializedOutputs"
+    )
+    raw = md[0].get(key, "")
+    if isinstance(raw, str):
+        if not raw:
+            return []
+        try:
+            parsed = json.loads(raw)
+        except (json.JSONDecodeError, TypeError):
+            return []
+        return parsed if isinstance(parsed, list) else []
+    return raw if isinstance(raw, list) else []
+
+
+def resolve_gate_key(so: dict, gate_name: str, *, side: str) -> str:
+    """Map a human/UI gate name to the real-device wire Key.
+
+    Real-device ``mechCon.inputID`` / ``outputID`` store the gate **Key**, not
+    ``DataName``.  For most gates Key == DataName, but some (e.g. ScreenTextDevice
+    oid=261 text input: Key=``string``, DataName=``text``; UI Button:
+    Key=``Button is down``, DataName=``Is down``) differ.
+
+    Resolution order:
+      1. Exact Key match
+      2. Exact DataName match → return that gate's Key
+      3. Case-insensitive Key / DataName match
+      4. Fallback: return *gate_name* unchanged (chip/custom gates may not be
+         present yet, or caller already has the raw Key)
+
+    Args:
+        so: ``saveObjects`` dict of the container that owns the gate.
+        gate_name: Name supplied by the caller (Key or DataName).
+        side: ``"input"`` or ``"output"``.
+    """
+    name = str(gate_name)
+    gates = _parse_mechanic_gates(so, side)
+    if not gates:
+        return name
+
+    # 1. Exact Key
+    for g in gates:
+        if g.get("Key") == name:
+            return name
+
+    # 2. Exact DataName → Key
+    for g in gates:
+        if g.get("DataName") == name:
+            key = g.get("Key")
+            if key is not None and key != "":
+                return str(key)
+
+    # 3. Case-insensitive
+    lower = name.lower()
+    for g in gates:
+        key = g.get("Key")
+        if isinstance(key, str) and key.lower() == lower:
+            return key
+    for g in gates:
+        dn = g.get("DataName")
+        if isinstance(dn, str) and dn.lower() == lower:
+            key = g.get("Key")
+            if key is not None and key != "":
+                return str(key)
+
+    return name
+
+
 def connect_gates(
     data_json: dict,
     source_idx: int,
@@ -94,15 +171,18 @@ def connect_gates(
 
     Adds a constraint entry to the **source** container's ``constraints`` list
     (the real device stores mechanic connections on the output/source side only).
-    Gate names are used verbatim (spaces preserved, e.g. ``"input 2"``,
+
+    Gate names may be either the real-device **Key** or the UI **DataName**;
+    both are resolved to Key before writing ``mechCon`` (e.g. screen ``"text"``
+    → ``"string"``). Spaces are preserved (e.g. ``"input 2"``,
     ``"Dot worlds position"``).
 
-    SDK contract (reverse-engineered from real-device saves 2297.melsave + xj11):
+    SDK contract (reverse-engineered from real-device saves 2297.melsave + xj11
+    + 6762 UI + 7681 ScreenTextDevice):
 
     - ``constraintId`` is always 13 for mechanic gate connections
       (10 = physics rope, mechCon is None for those)
-    - ``mechCon.outputID`` = source object's output gate name
-    - ``mechCon.inputID``  = target object's input gate name
+    - ``mechCon.outputID`` / ``inputID`` = gate **Key** (not DataName)
     - ``startObjectId``/``endObjectId`` are **container indices** (0-based array
       positions in saveObjectContainers), NOT objectId or localId
     - ``startPoint``/``endPoint`` are visual port offsets in object-local space
@@ -112,24 +192,35 @@ def connect_gates(
     Args:
         data_json: The parsed Data dict (mutated in place).
         source_idx: Container index of the source (output) object.
-        output_gate: Output gate name on the source object.
+        output_gate: Output gate Key or DataName on the source object.
         target_idx: Container index of the target (input) object.
-        input_gate: Input gate name on the target object.
+        input_gate: Input gate Key or DataName on the target object.
         name: Optional constraint display name.
         start_point: Visual offset of the source port (local space).
         end_point: Visual offset of the target port (local space).
 
     Returns:
-        The constraint dict that was added.
+        The constraint dict that was added (with resolved Key IDs).
     """
+    containers = data_json.get("saveObjectContainers") or []
+    if source_idx < 0 or source_idx >= len(containers):
+        raise IndexError(f"source_idx {source_idx} out of range ({len(containers)} containers)")
+    if target_idx < 0 or target_idx >= len(containers):
+        raise IndexError(f"target_idx {target_idx} out of range ({len(containers)} containers)")
+
+    src_so = containers[source_idx].get("saveObjects") or {}
+    tgt_so = containers[target_idx].get("saveObjects") or {}
+    resolved_out = resolve_gate_key(src_so, output_gate, side="output")
+    resolved_in = resolve_gate_key(tgt_so, input_gate, side="input")
+
     constraint = {
         "mainGuid": {"Value": str(__import__("uuid").uuid4()), "IsEmpty": False},
         "constraintId": MECHANIC_CONSTRAINT_ID,
         "startPoint": {"x": float(start_point[0]), "y": float(start_point[1]), "z": 0.0},
         "endPoint": {"x": float(end_point[0]), "y": float(end_point[1]), "z": 0.0},
         "mechCon": {
-            "inputID": input_gate,
-            "outputID": output_gate,
+            "inputID": resolved_in,
+            "outputID": resolved_out,
             "inputGroup": input_group,
             "outputGroup": output_group,
         },
@@ -143,16 +234,10 @@ def connect_gates(
         "endObjectConnectionMaterial": "Metal",
         "customRope": None,
     }
-    containers = data_json.get("saveObjectContainers") or []
-    if source_idx < 0 or source_idx >= len(containers):
-        raise IndexError(f"source_idx {source_idx} out of range ({len(containers)} containers)")
-    if target_idx < 0 or target_idx >= len(containers):
-        raise IndexError(f"target_idx {target_idx} out of range ({len(containers)} containers)")
-    so = containers[source_idx].get("saveObjects") or {}
-    cs = so.get("constraints")
+    cs = src_so.get("constraints")
     if not isinstance(cs, list):
         cs = []
-        so["constraints"] = cs
+        src_so["constraints"] = cs
     cs.append(constraint)
     return constraint
 
@@ -167,7 +252,9 @@ def disconnect_gates(
     """Remove mechanic gate connections from a source container.
 
     Filters by any combination of output_gate / target_idx / input_gate.
-    Only removes mechanic connections (constraintId=13); physics ropes are kept.
+    Gate names are resolved Key-or-DataName → Key (same as ``connect_gates``)
+    so either form matches. Only removes mechanic connections (constraintId=13);
+    physics ropes are kept.
 
     Returns the number of constraints removed.
     """
@@ -178,6 +265,23 @@ def disconnect_gates(
     cs = so.get("constraints")
     if not isinstance(cs, list) or not cs:
         return 0
+
+    resolved_out: str | None = None
+    if output_gate is not None:
+        resolved_out = resolve_gate_key(so, output_gate, side="output")
+
+    resolved_in: str | None = None
+    if input_gate is not None and target_idx is not None:
+        if 0 <= target_idx < len(containers):
+            tgt_so = containers[target_idx].get("saveObjects") or {}
+            resolved_in = resolve_gate_key(tgt_so, input_gate, side="input")
+        else:
+            resolved_in = str(input_gate)
+    elif input_gate is not None:
+        # No target: accept both raw and any Key that matches DataName on
+        # any container that this source wires to (checked per-wire below).
+        resolved_in = str(input_gate)
+
     keep: list[dict] = []
     removed = 0
     for c in cs:
@@ -186,12 +290,26 @@ def disconnect_gates(
             continue
         mc = c.get("mechCon") or {}
         match = True
-        if output_gate is not None and mc.get("outputID") != output_gate:
-            match = False
+        if resolved_out is not None and mc.get("outputID") != resolved_out:
+            # Also accept exact raw match (pre-resolve wires / unknown gates)
+            if mc.get("outputID") != output_gate:
+                match = False
         if target_idx is not None and c.get("endObjectId") != target_idx:
             match = False
-        if input_gate is not None and mc.get("inputID") != input_gate:
-            match = False
+        if input_gate is not None:
+            stored = mc.get("inputID")
+            if resolved_in is not None and target_idx is not None:
+                if stored != resolved_in and stored != input_gate:
+                    match = False
+            else:
+                # Resolve against the wire's actual target container
+                end = c.get("endObjectId")
+                ok = stored == input_gate
+                if not ok and isinstance(end, int) and 0 <= end < len(containers):
+                    tgt = containers[end].get("saveObjects") or {}
+                    ok = stored == resolve_gate_key(tgt, input_gate, side="input")
+                if not ok:
+                    match = False
         if match:
             removed += 1
         else:
@@ -237,15 +355,23 @@ def clone_object_template(
     local_id: int = 0,
     parent_id: int = -1,
 ) -> dict | None:
-    """Clone a template SaveObject from temp/objectid_templates/<objectId>.json with overrides."""
-    tpl_path = _TEMPLATE_DIR / f"{object_id}.json"
-    if not tpl_path.exists():
+    """Clone a template SaveObject with overrides.
+
+    Looks in temp/objectid_templates first (dev convenience), then falls back
+    to the SDK-bundled melon_lua/data/item_templates directory.
+    """
+    tpl_path = None
+    for d in (_TEMPLATE_DIR, _PKG_TEMPLATE_DIR):
+        p = d / f"{object_id}.json"
+        if p.exists():
+            tpl_path = p
+            break
+    if tpl_path is None:
         return None
     try:
         obj = json.loads(tpl_path.read_text(encoding="utf-8"))
     except Exception:
         return None
-    obj = json.loads(json.dumps(obj))
     obj = copy.deepcopy(obj)
     if position is not None:
         obj["position"] = {"x": float(position[0]), "y": float(position[1]), "z": 0.0}

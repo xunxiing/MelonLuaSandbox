@@ -12,8 +12,8 @@ Two modes:
   All document operations work: ``add_item``, ``add_lua_chip``, ``connect``,
   ``disconnect``, ``containers``, ``save``.
 - **Runtime mode** (after ``.load()`` or ``with ... as s:``): Box2D world + Lua
-  runner are initialized. Runtime operations work: ``run_chip``, ``tick``,
-  ``spawn``, ``create_rope``, ``snapshot``.
+  runner are initialized. Runtime operations work: ``run_chip``, ``debug_run``,
+  ``tick`` / ``run_ticks``, ``spawn``, ``create_rope``, ``snapshot`` / ``inspect``.
 
 Example (document only)::
 
@@ -26,8 +26,8 @@ Example (document only)::
 Example (with runtime)::
 
     with MelsaveSession("save.melsave") as s:   # loads doc + starts runtime
-        s.run_chip(chip_src, ticks=100)
-        print(s.snapshot())
+        trace = s.debug_run(chip_src, ticks=100)
+        print(s.inspect())
         s.save("modified.melsave")
 """
 from __future__ import annotations
@@ -36,7 +36,7 @@ import copy
 import json
 import uuid
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from .melsave import MelsaveDocument, read_melsave, spawn_document_into_world
 from .melsave_writer import (
@@ -457,9 +457,14 @@ class MelsaveSession:
         )
         # If runtime is active, also register in the live registry so
         # save() picks it up via the registry-as-source-of-truth path.
+        # Use Key-resolved IDs from connect_gates (DataName→Key adapter).
         if self._runtime_active and self._world is not None:
+            mc = result.get("mechCon") or {}
             self._world.gate_wires.connect(
-                src_idx_resolved, gate_resolved, target_idx, input_gate_resolved,
+                src_idx_resolved,
+                str(mc.get("outputID", gate_resolved)),
+                target_idx,
+                str(mc.get("inputID", input_gate_resolved)),
                 name=name, start_point=start_point, end_point=end_point,
                 output_group=group_resolved, input_group=input_group,
             )
@@ -547,6 +552,8 @@ class MelsaveSession:
         If ``ticks == 0``, only compiles + calls OnInit. If ``ticks >= 1``,
         OnInit runs first, then OnTick runs ``ticks`` times.
 
+        For per-tick traces use ``debug_run`` instead.
+
         Args:
             container_idx: If given, sync the source back into that chip
                 container so it persists on ``save()``. Chips created via
@@ -569,6 +576,101 @@ class MelsaveSession:
         r.run_loop(ticks=ticks, inputs_provider=provider)
         return {"error": r.last_error, "outputs": r.get_outputs()}
 
+    def debug_run(
+        self,
+        source: str,
+        *,
+        ticks: int = 1,
+        inputs: Optional[dict] = None,
+        chunk_name: str = "@session_chip.lua",
+        container_idx: Optional[int] = None,
+        stop_on_error: bool = True,
+        inputs_provider: Optional[Callable[[int], dict]] = None,
+    ) -> dict:
+        """Compile + OnInit + run ticks, returning a per-tick trace.
+
+        Unlike ``run_chip`` (final outputs only), each frame records::
+
+            {
+              "tick": int,            # 0-based
+              "outputs": dict,        # typed output buckets
+              "logs_delta": list,     # new console lines this tick
+              "error": str | None,
+              "variables": dict,      # chip variables.Set/Get table
+              "entity_count": int,
+            }
+
+        Return shape::
+
+            {
+              "error": str | None,    # last/first fatal error
+              "outputs": dict,        # final outputs
+              "frames": list[dict],   # one entry per completed tick
+              "logs": list,           # full console after the run
+            }
+
+        OnInit-only path: pass ``ticks=0`` (``frames`` empty).
+        """
+        self._require_runtime()
+        assert self._runner is not None and self._world is not None
+        r = self._runner
+        if not r.compile(source, chunk_name=chunk_name):
+            err = r.last_error or "compile failed"
+            return {"error": err, "outputs": {}, "frames": [], "logs": list(r.logs)}
+        idx = container_idx if container_idx is not None else self._active_chip_container
+        if idx is not None:
+            self._sync_chip_source(idx, source)
+
+        r.call_on_init()
+        if ticks <= 0:
+            return {
+                "error": None,
+                "outputs": r.get_outputs(),
+                "frames": [],
+                "logs": list(r.logs),
+            }
+
+        frames: list[dict] = []
+        last_error: Optional[str] = None
+        log_cursor = len(r.logs)
+        dt = 1.0 / float(r.tps)
+
+        for i in range(int(ticks)):
+            self._world.tick(dt)
+            tick_inputs = None
+            if inputs_provider is not None:
+                tick_inputs = inputs_provider(i)
+            elif inputs is not None:
+                tick_inputs = inputs
+            result = r.run_tick(inputs=tick_inputs)
+            logs_now = r.logs
+            logs_delta = list(logs_now[log_cursor:])
+            log_cursor = len(logs_now)
+            err = result.get("error")
+            if err:
+                last_error = err
+            frame = {
+                "tick": i,
+                "outputs": result.get("outputs") or {},
+                "logs_delta": logs_delta,
+                "error": err,
+                "variables": dict(self._world.chip_variables),
+                "entity_count": sum(
+                    1 for e in self._world.entities.values()
+                    if getattr(e, "alive", True)
+                ),
+            }
+            frames.append(frame)
+            if err and stop_on_error:
+                break
+
+        return {
+            "error": last_error,
+            "outputs": r.get_outputs(),
+            "frames": frames,
+            "logs": list(r.logs),
+        }
+
     def _sync_chip_source(self, container_idx: int, source: str) -> None:
         """Update the lua_chip_source metadata of a chip container."""
         so = self.get_container(container_idx)
@@ -584,10 +686,72 @@ class MelsaveSession:
         return self._runner.compile(source, chunk_name=chunk_name)
 
     def tick(self, inputs: Optional[dict] = None) -> dict:
-        """Run a single OnTick on the already-compiled chip."""
+        """Run a single OnTick on the already-compiled chip (no world step)."""
         self._require_runtime()
         assert self._runner is not None
         return self._runner.run_tick(inputs=inputs)
+
+    def run_ticks(
+        self,
+        ticks: int = 1,
+        *,
+        inputs: Optional[dict] = None,
+        inputs_provider: Optional[Callable[[int], dict]] = None,
+        tick_callback: Optional[Callable[[int, float, dict], None]] = None,
+        advance_world: bool = True,
+        stop_on_error: bool = True,
+    ) -> dict:
+        """Run ``ticks`` OnTick steps on an already-compiled chip.
+
+        Does **not** recompile or re-call OnInit. Typical step loop::
+
+            s.compile_only(src)
+            s.runner.call_on_init()
+            for _ in range(N):
+                s.tick()           # or s.run_ticks(1, tick_callback=...)
+            print(s.inspect())
+
+        Args:
+            tick_callback: ``(tick_index, dt, result)`` after each tick.
+            advance_world: if True (default), call ``world.tick(dt)`` each step.
+            stop_on_error: stop early when a tick returns an error.
+        """
+        self._require_runtime()
+        assert self._runner is not None and self._world is not None
+        r = self._runner
+        if not r._compiled:  # noqa: SLF001 — intentional compile guard
+            return {"error": r.last_error or "not compiled", "outputs": {}, "frames": []}
+
+        frames: list[dict] = []
+        last_error: Optional[str] = None
+        dt = 1.0 / float(r.tps)
+        n = max(0, int(ticks))
+        for i in range(n):
+            if advance_world:
+                self._world.tick(dt)
+            tick_inputs = None
+            if inputs_provider is not None:
+                tick_inputs = inputs_provider(i)
+            elif inputs is not None:
+                tick_inputs = inputs
+            result = r.run_tick(inputs=tick_inputs)
+            if tick_callback is not None:
+                tick_callback(i, dt, result)
+            err = result.get("error")
+            if err:
+                last_error = err
+            frames.append({
+                "tick": i,
+                "outputs": result.get("outputs") or {},
+                "error": err,
+            })
+            if err and stop_on_error:
+                break
+        return {
+            "error": last_error,
+            "outputs": r.get_outputs(),
+            "frames": frames,
+        }
 
     # ==================================================================
     # Runtime mode: entity / world access
@@ -712,6 +876,36 @@ class MelsaveSession:
             "entity_count": sum(
                 1 for e in w.entities.values() if getattr(e, "alive", True)
             ),
+        }
+
+    def inspect(self, *, log_tail: int = 50) -> dict:
+        """Agent-friendly read-only view: outputs + variables + entities + logs.
+
+        Prefer this over piecing together ``.outputs`` / ``snapshot()`` / ``.logs``.
+        Does not advance the simulation.
+
+        Args:
+            log_tail: max number of trailing console lines to include (0 = all).
+        """
+        self._require_runtime()
+        assert self._world is not None and self._runner is not None
+        w = self._world
+        r = self._runner
+        logs = list(r.logs)
+        if log_tail and log_tail > 0 and len(logs) > log_tail:
+            logs = logs[-log_tail:]
+        return {
+            "tick": w.current_tick,
+            "elapsed": w.elapsed_time,
+            "error": r.last_error,
+            "outputs": r.get_outputs() if r._compiled else {},  # noqa: SLF001
+            "variables": dict(w.chip_variables),
+            "entities": self.entities(),
+            "entity_count": sum(
+                1 for e in w.entities.values() if getattr(e, "alive", True)
+            ),
+            "ropes": self.ropes(),
+            "logs": logs,
         }
 
     def diff(self) -> dict:
