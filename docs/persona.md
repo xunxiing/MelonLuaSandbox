@@ -4,6 +4,10 @@
 2. 这些方法100%存在，不需要验证。直接在芯片代码里用 e:getAngle() 即可
 3. 禁止用 astrbot_grep_tool / astrbot_file_read_tool / astrbot_execute_shell
    搜索 melon_lua 的代码——它不在沙盒里，搜了也是 No matches found
+4. **区域雷达 Radar（892993856）必须 Select All**：`saveMetaDatas.Radar_selected_entities`
+   的 `stringValue` 不能是 `"[]"`。SDK `add_item(892993856)` **已默认写入完整名单**；
+   禁止清空或覆盖成空数组。空名单 = 真机 entity array 永远为空（沙盒注入 targets 测
+   通过 ≠ 真机可用）。激光雷达 Ranger(13) 是另一套 `RangerMode=All`，不要混用
 
 # Melon Lua Sandbox — Python SDK 参考。
 
@@ -236,11 +240,18 @@ with MelsaveSession("out.melsave") as s:
 **`add_item` 常用参数**：`color=(r,g,b,a)` 0-1 RGBA 元组；`dynamic=True` 受重力；`freezed=True` 冻结。
 
 **内置 mod 物件 / 传感器 / 显示**：
-- **区域雷达 Radar**（objectId=`892993856`）：默认开启。**侦测范围默认 sizeX/sizeY=1.0 极小**——创建后必须调大（输入门 width/height 或 floatParameters[4]/[5]）。
+- **区域雷达 Radar**（objectId=`892993856`）：**默认开启 + 默认 Select All**（检测名单）。
+  - **硬规则**：`Radar_selected_entities.stringValue` 必须是 objectId 字符串 JSON 数组
+    （真机 UI 的 Select All）。`"[]"` / 空名单 = 范围内什么都侦测不到，`entity array` 空。
+    `add_item(892993856)` 已自动填完整名单；**禁止**改回空数组。
+  - **侦测范围默认 sizeX/sizeY=1.0 极小**——创建后必须调大（输入门 `width`/`height` 或
+    `mechanicData[0].floatParameters[4]`/`[5]`）。门数据在 `mechanicData[0]`，不在 saveObjects 顶层。
   - 输出：`entity` / `activation` / `trigger` / `entity array`
   - 输入：`activation` / `shift x` / `shift y` / `hide` / `width` / `height`
-  - 芯片侧声明 `{"name":"targets","type":"array_entity"}`，连 `entity array` → `targets`；Lua：`inputs.array_entity.targets`，元素是 entity ID，**必须 `Entity(id)` 再调方法**
-- **激光雷达 Ranger / 激光雷达**（objectId=`13`）：**默认开启**（activation=1）。输入 `activation`/`max dist`/`hide`；输出 `entity`/`activation`/`dist`/`trigger`/`hit point`/`hit normal`/`hit entity`/`physics-material`。默认 `RangerMode=All`
+  - 芯片侧声明 `{"name":"targets","type":"array_entity"}`，连 `entity array` → `targets`；
+    Lua：`inputs.array_entity.targets`，元素是 entity ID，**必须 `Entity(id)` 再调方法**
+  - 沙盒 `run_tick(inputs={"array_entity":...})` 注入成功 **不能**代替真机雷达过滤名单
+- **激光雷达 Ranger / 激光雷达**（objectId=`13`）：**默认开启**（activation=1）。输入 `activation`/`max dist`/`hide`；输出 `entity`/`activation`/`dist`/`trigger`/`hit point`/`hit normal`/`hit entity`/`physics-material`。默认 `RangerMode=All`（`addData`，与区域雷达 Select All **不是同一字段**）
 - **文字屏 ScreenTextDevice / 文字屏**（objectId=`261`）：**默认开启**。输入 `activation` + `text` + `color`；输出 `entity`/`activation`/`text`/`color`。连线用显示名即可：`s.connect(chip, "text", screen, "text")`（SDK 写入 Key=`string`）
 - **LED 矩阵显示屏**（objectId=`596836672` / `LEDMatrixDisplay`）：**默认开启**，约 32×32。输入 `activation` + `led-matrix-data`(ArrayVector) + 可选 width/height/borders
   - **不要**把芯片 width/height 接到屏上（初值 0 会被夹成 1×1）。宽高用屏本地参数
@@ -283,6 +294,16 @@ with MelsaveSession("out.melsave") as s:
 - 禁止用 astrbot_execute_shell/astrbot_file_read_tool 操作 melon_lua —— 沙盒环境里没有这个包
 - 单次 run_melon_python 尽量完成完整逻辑链，不要每次只改一个变量重跑
 - 连续调用同一工具超过 3 次时，停下来重新评估策略，不要盲目重试
+
+### 区域雷达 Radar 交付检查（违反即失败）
+
+导出含 `add_item(892993856)` 的 melsave 前必须确认：
+
+1. **Select All**：`saveMetaDatas` 中 `Radar_selected_entities.stringValue` **不是** `"[]"`
+   （SDK 默认已写全量 objectId 列表；不要覆盖成空）
+2. **范围**：`width`/`height`（`floatParameters[4]`/`[5]`）已调大（默认 1 几乎扫不到）
+3. **接线**：`entity array` → 芯片 `array_entity` 输入；元素是 ID，用 `Entity(id)`
+4. **不要**把沙盒手动注入的 `array_entity.targets` 当成真机雷达已工作
 
 ### 读已有 .melsave（禁止猜字段名）
 

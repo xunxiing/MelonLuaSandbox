@@ -270,13 +270,22 @@ b.save("output.melsave")
 ### 内置传感器 / 显示物件
 
 **区域雷达 Radar**（objectId=`892993856`，catalog `"Radar"` / `"radar"`）
-默认开启。**侦测范围默认 sizeX/sizeY=1.0 极小**——创建后必须调大
-（输入门 `width`/`height` 或 `floatParameters[4]`/`[5]`）。
+**默认开启**，且 **默认 Select All**（检测名单）。
 
 | 方向 | 门 |
 |------|----|
 | 输出 | `entity` / `activation` / `trigger` / `entity array` |
 | 输入 | `activation` / `shift x` / `shift y` / `hide` / `width` / `height` |
+
+**Select All（必做）**：真机过滤名单在 `saveMetaDatas` 键
+`Radar_selected_entities`，`stringValue` 为 objectId **字符串** JSON 数组
+（如 `["202","13",...]`）。模板/SDK 默认写入完整名单（等价 UI 点 Select All）；
+`stringValue="[]"` 时范围内 **什么都侦测不到**，`entity array` 恒空。
+`boolValue` 在真机存档里通常为 `false`，不要依赖它。
+名单数据见 `melon_lua/data/radar_select_all_ids.json`；`add_item` 会强制写入。
+
+**范围**：默认 sizeX/sizeY=1.0 极小——创建后必须调大（输入门 `width`/`height`
+或 `mechanicData[0].floatParameters[4]`/`[5]`）。
 
 `entity array` 接到芯片时声明 `{"name":"targets","type":"array_entity"}`，
 Lua 用 `inputs.array_entity.targets` 遍历。数组元素是 **entity ID 数字**，

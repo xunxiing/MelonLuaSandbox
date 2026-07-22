@@ -278,6 +278,34 @@ _DEFAULT_ACTIVATION_ON_IDS = frozenset({
     892993856,   # Radar / 区域雷达
 })
 
+_RADAR_OBJECT_ID = 892993856
+_RADAR_SELECTED_META_KEY = "Radar_selected_entities"
+_RADAR_SELECT_ALL_IDS: list[str] | None = None
+
+
+def _radar_select_all_ids() -> list[str]:
+    """ObjectId strings for Radar filter Select-All (game save format)."""
+    global _RADAR_SELECT_ALL_IDS
+    if _RADAR_SELECT_ALL_IDS is not None:
+        return _RADAR_SELECT_ALL_IDS
+    path = Path(__file__).parent / "data" / "radar_select_all_ids.json"
+    if path.exists():
+        with open(path, "r", encoding="utf-8") as f:
+            raw = json.load(f)
+        if isinstance(raw, list) and raw:
+            _RADAR_SELECT_ALL_IDS = [str(x) for x in raw]
+            return _RADAR_SELECT_ALL_IDS
+    # Fallback: physics catalog keys only (still better than empty []).
+    phys = Path(__file__).parent / "data" / "object_physics_by_id.json"
+    ids: list[str] = []
+    if phys.exists():
+        with open(phys, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        by = data.get("byObjectId") or {}
+        ids = [str(k) for k in by.keys()]
+    _RADAR_SELECT_ALL_IDS = ids
+    return _RADAR_SELECT_ALL_IDS
+
 
 def _set_mechanic_activation(so: dict, value: float = 1.0) -> None:
     """Set mechanic activationInput + input-gate Value (in-place)."""
@@ -319,6 +347,44 @@ def _set_mechanic_activation(so: dict, value: float = 1.0) -> None:
                 if isinstance(raw, str)
                 else gates
             )
+
+
+def _set_radar_select_all(so: dict) -> None:
+    """Write Radar_selected_entities as full Select-All objectId list.
+
+    Real device: empty stringValue \"[]\" filters out every object. UI Select All
+    fills stringValue with a JSON array of objectId strings (boolValue stays
+    false). Without this, entity array is always empty on device.
+    """
+    ids = _radar_select_all_ids()
+    payload = json.dumps(ids, ensure_ascii=False, separators=(",", ":"))
+    entry = {
+        "key": _RADAR_SELECTED_META_KEY,
+        "boolValue": False,
+        "stringValue": payload,
+        "intValue": 0,
+        "floatValue": 0.0,
+        "vector2Value": {"x": 0.0, "y": 0.0},
+        "vector3Value": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "vector4Value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 0.0,
+            "magnitude": 0.0,
+            "sqrMagnitude": 0.0,
+        },
+        "texture2DValue": None,
+    }
+    metas = so.get("saveMetaDatas")
+    if not isinstance(metas, list):
+        so["saveMetaDatas"] = [entry]
+        return
+    for i, md in enumerate(metas):
+        if isinstance(md, dict) and md.get("key") == _RADAR_SELECTED_META_KEY:
+            metas[i] = entry
+            return
+    metas.append(entry)
 
 
 def _build_item_save_objects(
@@ -364,6 +430,8 @@ def _build_item_save_objects(
     so["distJoints"] = []
     if object_id in _DEFAULT_ACTIVATION_ON_IDS:
         _set_mechanic_activation(so, 1.0)
+    if object_id == _RADAR_OBJECT_ID:
+        _set_radar_select_all(so)
     return so
 
 
