@@ -1,23 +1,23 @@
 {
   "objectId": 13,
-  "instanceId": -139118,
+  "instanceId": -38480,
   "modedObjectId": "",
   "localId": 0,
   "originLocalId": 0,
   "parentId": -1,
   "position": {
-    "x": 0.00305175781,
-    "y": -1.079721,
-    "z": -0.0302582122
+    "x": -0.357949972,
+    "y": -0.09769252,
+    "z": 0.001
   },
   "rotation": {
     "x": 0.0,
     "y": 0.0,
-    "z": -0.003361387
+    "z": 0.02032717
   },
   "scale": {
-    "x": 0.99999994,
-    "y": 0.99999994,
+    "x": 1.0,
+    "y": 1.0,
     "z": 1.0
   },
   "color": {
@@ -34,7 +34,7 @@
     "a": 0.0
   },
   "isGradientActive": false,
-  "layer": 31,
+  "layer": 0,
   "sortingLayer": "Default",
   "orderLayer": 0,
   "gravity": true,
@@ -88,107 +88,20 @@
   "humanData": [],
   "mechanicData": [
     {
-      "activationInput": 1.0,
+      "activationInput": 0.0,
       "floatParameters": [
+        0.0,
         1.0,
-        12.0,
-        1.0
+        0.0
       ],
-      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"maxDist\",\"DataType\":2,\"DataName\":\"max dist\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":12.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":1000.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"hide\",\"DataType\":2,\"DataName\":\"hide\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":1.0,\\\"IsCheckbox\\\":true}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
-      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"dist\",\"DataType\":2,\"DataName\":\"dist\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.343070984,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":1000.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"trigger\",\"DataType\":2,\"DataName\":\"trigger\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"hit point\",\"DataType\":8,\"DataName\":\"hit point\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":{\\\"x\\\":59.8396034,\\\"y\\\":0.3499502,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"normalized\\\":{\\\"x\\\":0.9999829,\\\"y\\\":0.005848037,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.0},\\\"magnitude\\\":59.8406258,\\\"sqrMagnitude\\\":3580.90063},\\\"Default\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"MinVector\\\":{\\\"x\\\":-3.40282347E+38,\\\"y\\\":-3.40282347E+38,\\\"z\\\":-3.40282347E+38,\\\"w\\\":-3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"},\\\"MaxVector\\\":{\\\"x\\\":3.40282347E+38,\\\"y\\\":3.40282347E+38,\\\"z\\\":3.40282347E+38,\\\"w\\\":3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"}}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"hit normal\",\"DataType\":8,\"DataName\":\"hit normal\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":{\\\"x\\\":-0.9999983,\\\"y\\\":0.00185799226,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":1.0,\\\"sqrMagnitude\\\":1.0},\\\"Default\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"MinVector\\\":{\\\"x\\\":-3.40282347E+38,\\\"y\\\":-3.40282347E+38,\\\"z\\\":-3.40282347E+38,\\\"w\\\":-3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"},\\\"MaxVector\\\":{\\\"x\\\":3.40282347E+38,\\\"y\\\":3.40282347E+38,\\\"z\\\":3.40282347E+38,\\\"w\\\":3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"}}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"hit entity\",\"DataType\":1,\"DataName\":\"hit entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"physics-material\",\"DataType\":4,\"DataName\":\"physics-material\",\"CanBeEdit\":true,\"GateData\":\"{\\\"IsMultiline\\\":false,\\\"Value\\\":\\\"Metal\\\",\\\"Default\\\":\\\"\\\",\\\"MaxLength\\\":2147483647}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
+      "mechanicSerializedInputs": "[{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"maxDist\",\"DataType\":2,\"DataName\":\"max dist\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":1.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":1000.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"hide\",\"DataType\":2,\"DataName\":\"hide\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":1.0,\\\"IsCheckbox\\\":true}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]",
+      "mechanicSerializedOutputs": "[{\"Key\":\"entity\",\"DataType\":1,\"DataName\":\"entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"activation\",\"DataType\":2,\"DataName\":\"activation\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"dist\",\"DataType\":2,\"DataName\":\"dist\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":0.0,\\\"Max\\\":1000.0,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"trigger\",\"DataType\":2,\"DataName\":\"trigger\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":0.0,\\\"Default\\\":0.0,\\\"Min\\\":-3.40282347E+38,\\\"Max\\\":3.40282347E+38,\\\"IsCheckbox\\\":false}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"hit point\",\"DataType\":8,\"DataName\":\"hit point\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"Default\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"MinVector\\\":{\\\"x\\\":-3.40282347E+38,\\\"y\\\":-3.40282347E+38,\\\"z\\\":-3.40282347E+38,\\\"w\\\":-3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"},\\\"MaxVector\\\":{\\\"x\\\":3.40282347E+38,\\\"y\\\":3.40282347E+38,\\\"z\\\":3.40282347E+38,\\\"w\\\":3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"}}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"hit normal\",\"DataType\":8,\"DataName\":\"hit normal\",\"CanBeEdit\":true,\"GateData\":\"{\\\"Value\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"Default\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"MinVector\\\":{\\\"x\\\":-3.40282347E+38,\\\"y\\\":-3.40282347E+38,\\\"z\\\":-3.40282347E+38,\\\"w\\\":-3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"},\\\"MaxVector\\\":{\\\"x\\\":3.40282347E+38,\\\"y\\\":3.40282347E+38,\\\"z\\\":3.40282347E+38,\\\"w\\\":3.40282347E+38,\\\"normalized\\\":{\\\"x\\\":0.0,\\\"y\\\":0.0,\\\"z\\\":0.0,\\\"w\\\":0.0,\\\"magnitude\\\":0.0,\\\"sqrMagnitude\\\":0.0},\\\"magnitude\\\":\\\"Infinity\\\",\\\"sqrMagnitude\\\":\\\"Infinity\\\"}}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"hit entity\",\"DataType\":1,\"DataName\":\"hit entity\",\"CanBeEdit\":true,\"GateData\":null,\"GroupId\":null,\"Group\":0,\"GroupName\":null},{\"Key\":\"physics-material\",\"DataType\":4,\"DataName\":\"physics-material\",\"CanBeEdit\":true,\"GateData\":\"{\\\"IsMultiline\\\":false,\\\"Value\\\":\\\"\\\",\\\"Default\\\":null,\\\"MaxLength\\\":2147483647}\",\"GroupId\":null,\"Group\":0,\"GroupName\":null}]"
     }
   ],
   "brokenJoints": [],
   "hingeJoints": [],
   "distJoints": [],
-  "constraints": [
-    {
-      "mainGuid": {
-        "Value": "28b5219b-9daf-4f7e-98e6-a73e555b5702",
-        "IsEmpty": false
-      },
-      "constraintId": 6,
-      "startPoint": {
-        "x": -0.0208740234,
-        "y": 0.00701141357,
-        "z": 0.0
-      },
-      "endPoint": {
-        "x": 0.09204188,
-        "y": -0.0355519131,
-        "z": 0.0
-      },
-      "mechCon": null,
-      "distance": 0.0,
-      "startObjectId": 26,
-      "endObjectId": 691,
-      "linkedRopeGuid": null,
-      "constraintName": null,
-      "isNameVisible": false,
-      "startObjectConnectionMaterial": "Metal",
-      "endObjectConnectionMaterial": "Metal",
-      "customRope": null
-    },
-    {
-      "mainGuid": {
-        "Value": "081bdaa0-4b34-4a19-bf3c-60982269eed2",
-        "IsEmpty": false
-      },
-      "constraintId": 6,
-      "startPoint": {
-        "x": -0.0213546753,
-        "y": 0.000755310059,
-        "z": 0.0
-      },
-      "endPoint": {
-        "x": -0.240615427,
-        "y": 0.00429353025,
-        "z": 0.0
-      },
-      "mechCon": null,
-      "distance": 0.0,
-      "startObjectId": 26,
-      "endObjectId": 610,
-      "linkedRopeGuid": null,
-      "constraintName": null,
-      "isNameVisible": false,
-      "startObjectConnectionMaterial": "Metal",
-      "endObjectConnectionMaterial": "Metal",
-      "customRope": null
-    },
-    {
-      "mainGuid": {
-        "Value": "b12c7ec6-5c47-43a6-80f7-b2c9b3716289",
-        "IsEmpty": false
-      },
-      "constraintId": 13,
-      "startPoint": {
-        "x": 0.0166942738,
-        "y": -0.003028282,
-        "z": 0.0
-      },
-      "endPoint": {
-        "x": 0.125434682,
-        "y": -0.0533197373,
-        "z": 0.0
-      },
-      "mechCon": {
-        "inputID": "activation",
-        "outputID": "activation",
-        "inputGroup": "",
-        "outputGroup": ""
-      },
-      "distance": 0.0,
-      "startObjectId": 26,
-      "endObjectId": 611,
-      "linkedRopeGuid": null,
-      "constraintName": "Activation Activation ",
-      "isNameVisible": false,
-      "startObjectConnectionMaterial": "Metal",
-      "endObjectConnectionMaterial": "Metal",
-      "customRope": null
-    }
-  ],
+  "constraints": [],
   "collisionIgnores": [],
   "addData": [
     {
