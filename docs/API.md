@@ -295,17 +295,19 @@ end
 ```
 
 **激光雷达 Ranger**（objectId=`13`，catalog `"Ranger"` / `"激光雷达"`）
-输入 `activation` / `max dist` / `hide`；输出 `entity` / `activation` /
-`dist` / `trigger` / `hit point` / `hit normal` / `hit entity` /
-`physics-material`。默认 `RangerMode=All`。
+**默认开启**（`activation=1`）。输入 `activation` / `max dist` / `hide`；
+输出 `entity` / `activation` / `dist` / `trigger` / `hit point` /
+`hit normal` / `hit entity` / `physics-material`。默认 `RangerMode=All`。
 
 **文字屏 ScreenTextDevice**（objectId=`261`，catalog `"ScreenTextDevice"` /
-`"文字屏"`）输入 `activation` + `text` + `color`；输出 `entity` /
-`activation` / `text` / `color`。文本输入门 UI 名是 `text`，真机 Key 是
-`string`——写 `s.connect(chip, "text", screen, "text")` 即可，SDK 自动解析。
+`"文字屏"`）**默认开启**。输入 `activation` + `text` + `color`；输出
+`entity` / `activation` / `text` / `color`。文本输入门 UI 名是 `text`，
+真机 Key 是 `string`——写 `s.connect(chip, "text", screen, "text")` 即可，
+SDK 自动解析。
 
-**LED 矩阵显示屏**（objectId=`596836672` / `LEDMatrixDisplay`）默认约 32×32。
-输入 `activation` + `led-matrix-data`(ArrayVector) + 可选 width/height/borders。
+**LED 矩阵显示屏**（objectId=`596836672` / `LEDMatrixDisplay`）**默认开启**，
+约 32×32。输入 `activation` + `led-matrix-data`(ArrayVector) + 可选
+width/height/borders。
 不要把芯片 width/height 接到屏上（初值 0 会被夹成 1×1）。Vector4 必须用
 命名键 `{x=r,y=g,z=b,w=a}`。与库存 `LEDMatrix`(424) 不是同一物体。
 

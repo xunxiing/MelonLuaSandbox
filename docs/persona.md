@@ -240,9 +240,9 @@ with MelsaveSession("out.melsave") as s:
   - 输出：`entity` / `activation` / `trigger` / `entity array`
   - 输入：`activation` / `shift x` / `shift y` / `hide` / `width` / `height`
   - 芯片侧声明 `{"name":"targets","type":"array_entity"}`，连 `entity array` → `targets`；Lua：`inputs.array_entity.targets`，元素是 entity ID，**必须 `Entity(id)` 再调方法**
-- **激光雷达 Ranger / 激光雷达**（objectId=`13`）：输入 `activation`/`max dist`/`hide`；输出 `entity`/`activation`/`dist`/`trigger`/`hit point`/`hit normal`/`hit entity`/`physics-material`。默认 `RangerMode=All`
-- **文字屏 ScreenTextDevice / 文字屏**（objectId=`261`）：输入 `activation` + `text` + `color`；输出 `entity`/`activation`/`text`/`color`。连线用显示名即可：`s.connect(chip, "text", screen, "text")`（SDK 写入 Key=`string`）
-- **LED 矩阵显示屏**（objectId=`596836672` / `LEDMatrixDisplay`）：默认约 32×32。输入 `activation` + `led-matrix-data`(ArrayVector) + 可选 width/height/borders
+- **激光雷达 Ranger / 激光雷达**（objectId=`13`）：**默认开启**（activation=1）。输入 `activation`/`max dist`/`hide`；输出 `entity`/`activation`/`dist`/`trigger`/`hit point`/`hit normal`/`hit entity`/`physics-material`。默认 `RangerMode=All`
+- **文字屏 ScreenTextDevice / 文字屏**（objectId=`261`）：**默认开启**。输入 `activation` + `text` + `color`；输出 `entity`/`activation`/`text`/`color`。连线用显示名即可：`s.connect(chip, "text", screen, "text")`（SDK 写入 Key=`string`）
+- **LED 矩阵显示屏**（objectId=`596836672` / `LEDMatrixDisplay`）：**默认开启**，约 32×32。输入 `activation` + `led-matrix-data`(ArrayVector) + 可选 width/height/borders
   - **不要**把芯片 width/height 接到屏上（初值 0 会被夹成 1×1）。宽高用屏本地参数
   - 大图/动画：编译期烘焙像素，Lua 只 `outputs.array_vec.pixels = colors`；禁止运行时 hex 解码循环
   - **Vector4 必须命名键** `{x=r,y=g,z=b,w=a}`（0–1）。**严禁**位置数组 `{r,g,b,a}`

@@ -269,6 +269,58 @@ def _load_item_template(object_id: int) -> dict | None:
     return None
 
 
+# Sensors / displays that should power on when placed via SDK (game stock
+# templates often ship activation=0 so they do nothing until wired).
+_DEFAULT_ACTIVATION_ON_IDS = frozenset({
+    13,          # Ranger / 激光雷达
+    261,         # ScreenTextDevice / 文字屏
+    596836672,   # LEDMatrixDisplay
+    892993856,   # Radar / 区域雷达
+})
+
+
+def _set_mechanic_activation(so: dict, value: float = 1.0) -> None:
+    """Set mechanic activationInput + input-gate Value (in-place)."""
+    if "activationInput" in so:
+        so["activationInput"] = float(value)
+    md = so.get("mechanicData")
+    if not isinstance(md, list):
+        return
+    for m in md:
+        if not isinstance(m, dict):
+            continue
+        m["activationInput"] = float(value)
+        raw = m.get("mechanicSerializedInputs")
+        if not raw:
+            continue
+        try:
+            gates = json.loads(raw) if isinstance(raw, str) else list(raw)
+        except (TypeError, json.JSONDecodeError):
+            continue
+        changed = False
+        for g in gates:
+            if not isinstance(g, dict):
+                continue
+            if g.get("Key") != "activation" and (g.get("DataName") or "") != "activation":
+                continue
+            gd = g.get("GateData")
+            if not isinstance(gd, str) or not gd:
+                continue
+            try:
+                data = json.loads(gd)
+            except json.JSONDecodeError:
+                continue
+            data["Value"] = float(value)
+            g["GateData"] = json.dumps(data)
+            changed = True
+        if changed:
+            m["mechanicSerializedInputs"] = (
+                json.dumps(gates, separators=(",", ":"))
+                if isinstance(raw, str)
+                else gates
+            )
+
+
 def _build_item_save_objects(
     object_id: int,
     x: float,
@@ -310,6 +362,8 @@ def _build_item_save_objects(
     so["constraints"] = []
     so["hingeJoints"] = []
     so["distJoints"] = []
+    if object_id in _DEFAULT_ACTIVATION_ON_IDS:
+        _set_mechanic_activation(so, 1.0)
     return so
 
 
