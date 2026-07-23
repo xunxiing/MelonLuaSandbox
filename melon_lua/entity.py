@@ -1,11 +1,21 @@
 """Mock Entity — matches every field the real Entity API touches.
 
 Fields are populated based on the 60+ methods in EntityApiModule.cs (IL2CPP dump)
-and the signatures in Example_ApiReference_en.lua. This is NOT a physics body:
-state is set directly by setters. A future IPhysicsWorld hook can drive motion.
+and the signatures in Example_ApiReference_en.lua.
+
+Python-side field writes for transform/velocity sync into the owning
+WorldContext Box2D body (via ``_world`` set by ``spawn_entity``), so that
+Lua ``Entity(id):getVelocity()`` sees the same values.
 """
 from dataclasses import dataclass, field
 from typing import Any, Optional
+
+# Fields that must push into Box2D when assigned from Python.
+_BODY_SYNC_FIELDS = frozenset({
+    "position_x", "position_y", "angle",
+    "velocity_x", "velocity_y", "angular_velocity",
+    "gravity_scale", "is_frozen", "is_rotation_frozen",
+})
 
 
 @dataclass
@@ -71,6 +81,41 @@ class Entity:
     # Bookkeeping
     alive: bool = True
     custom_data: dict[str, Any] = field(default_factory=dict)
+
+    # Owning world (not a dataclass field — set by WorldContext.spawn_entity)
+    # so field assignment can sync Box2D.
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "_world", None)
+        object.__setattr__(self, "_syncing_from_body", False)
+
+    def __setattr__(self, name: str, value) -> None:
+        object.__setattr__(self, name, value)
+        if name in _BODY_SYNC_FIELDS and not self.__dict__.get("_syncing_from_body"):
+            w = self.__dict__.get("_world")
+            if w is not None:
+                w.sync_body_from_entity(self.entity_id)
+
+    def bind_world(self, world) -> None:
+        """Attach owning WorldContext (called by spawn_entity)."""
+        object.__setattr__(self, "_world", world)
+
+    def set_velocity(self, vx: float, vy: float) -> None:
+        """Python alias matching Lua Entity:setVelocity — writes + syncs body."""
+        self.velocity_x = float(vx)
+        self.velocity_y = float(vy)
+
+    def set_linear_velocity(self, vx: float, vy: float) -> None:
+        """Alias of set_velocity."""
+        self.set_velocity(vx, vy)
+
+    def get_velocity(self) -> tuple[float, float]:
+        """Python-side velocity; prefers Box2D body when present."""
+        w = self.__dict__.get("_world")
+        if w is not None:
+            b = w.get_body(self.entity_id)
+            if b is not None:
+                return float(b.linearVelocity.x), float(b.linearVelocity.y)
+        return float(self.velocity_x), float(self.velocity_y)
 
     @property
     def normal_x(self) -> float:

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "melon-lua"
-version = "5.2.2"
+version = "5.2.3"
 description = "甜瓜游乐场 Lua 芯片执行器模拟 - Melon Playground Lua chip sandbox"
 readme = "README.md"
 license = { text = "MIT" }

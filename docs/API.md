@@ -1,15 +1,5 @@
 # Melon Lua Sandbox — Python SDK 参考
 
-本 SDK 完整复现甜瓜游乐场芯片运行时（基于 APK 逆向的真实 `LuaPreamble.lua` + 11 ApiModule + melon 允许的标准库）。
-
-## 安装
-
-```bash
-cd MelonLuaSandbox
-pip install -e .
-```
-
-依赖：`lupa`（LuaJIT）、`Box2D`（pybox2d）、`pillow`（预览渲染）。
 
 ## 快速开始
 
@@ -17,7 +7,7 @@ pip install -e .
 from melon_lua import (
     MelonScriptRunner, WorldContext,
     get_profile_by_object_id, object_id_for_name, list_spawnables,
-    render_world,
+    list_item_gates, render_world,
 )
 
 # 1. 准备世界（支持 456+ 物体，objectId 或名字）
@@ -49,24 +39,27 @@ world = WorldContext(seed=42)   # 可复现随机
 # 生成（立即创建实体，支持 objectId / gameObjectName / 别名）
 eid = world.spawn_entity("202", x=0, y=1, dynamic=True, scale_x=1.0, scale_y=1.0)
 
-# 直接操作实体（绕过 Lua）
-e = world.get_entity(eid)
-e.set_position(10, 20)
-e.add_force(0, 100)
+# 直接操作实体（绕过 Lua）— 字段写入会同步 Box2D body
+e = world.get_entity(eid) if not hasattr(eid, "entity_id") else eid
+# spawn_entity 实际返回 Entity 对象：
+e = world.spawn_entity("Box", 0, 2, dynamic=True)
+e.set_velocity(3.0, 4.0)          # 或 e.velocity_x=3; e.velocity_y=4
+e.position_x, e.position_y = 10, 20
 
-# 目录查询（基于 495 条数据）
-prof = get_profile_by_object_id(202)
-print(prof["width"], prof["height"], prof["mass"])
+# 门名查询（读模板，不必建场景）
+from melon_lua import list_item_gates
+print(list_item_gates("文字屏"))  # inputs/outputs: key + data_name
 
-# 物理步进（由 runner 自动调用）
-world.step_physics(dt=1/20)
+# 物理步进（run_tick 不会调这个）
+world.tick(1/20)                  # 或 world.step_physics(1/20)
 ```
 
 主要字段/方法：
 - `entities: dict[int, Entity]`
-- `spawn_entity(alias_or_id, x, y, dynamic=True, ...) -> int`
+- `spawn_entity(alias_or_id, x, y, dynamic=True, ...) -> Entity`（不是 int；id 用 `.entity_id`）
 - `remove_entity(eid)`
-- `step_physics(dt)`
+- `tick(dt)` / `step_physics(dt)` / `step(dt)` — 推进 Box2D
+- `set_entity_velocity(eid, vx, vy)`
 - `spawn_catalog`, `spawn_saves`, `spawn_mods`（用于 spawn.getItems 等）
 
 ### MelonScriptRunner
@@ -101,10 +94,12 @@ print(runner.logs)                       # 全部 print/warn/error_log
 
 ```python
 e = world.get_entity(1)
-e.position_x, e.position_y = 5, 10
-e.add_force(100, 0)
-print(e.real_size())           # (w, h) 考虑 scale
-print(e.sprite_path)           # 贴图路径（若有）
+e.position_x, e.position_y = 5, 10   # 写入会同步 Box2D body
+e.set_velocity(3.0, 4.0)             # 或 set_linear_velocity；Lua 用 e:setVelocity
+print(e.get_velocity())              # 优先读 body
+print(e.real_size())                 # (w, h) 考虑 scale
+print(e.sprite_path)                 # 贴图路径（若有）
+# 力/扭矩请走 Lua Entity:addForce 或 world.get_body(id) 直接操作 body
 ```
 
 ### 目录 API（catalog）
@@ -114,7 +109,7 @@ from melon_lua import (
     catalog_stats,
     get_profile_by_object_id,
     get_profile_by_name,
-    list_spawnables,
+    list_spawnables, list_item_gates,
     object_id_for_name,
     resolve_spawn_name,
 )
@@ -123,6 +118,8 @@ print(catalog_stats())                    # {"total": 456, "with_physics": 245, 
 prof = get_profile_by_object_id(202)      # 完整 profile（含 width/height/mass/sprite）
 oid = object_id_for_name("ResizablePlastic")  # 202
 names = list_spawnables()                 # 所有可生成的名字
+gates = list_item_gates("文字屏")         # 或 261 / "激光雷达"
+# gates["inputs"]/["outputs"]: key, data_name, name, data_type, ...
 ```
 
 ## 预览 / 截图（Pillow）

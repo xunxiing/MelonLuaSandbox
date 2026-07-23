@@ -245,6 +245,7 @@ class WorldContext:
             **kw,
         )
         self.entities[e.entity_id] = e
+        e.bind_world(self)
         # Apply real prefab physics if we have it.
         self.apply_physics_profile(e)
         from .visuals import resolve_sprite
@@ -353,12 +354,33 @@ class WorldContext:
                 e = self.entities.get(eid)
                 if not e or not e.alive:
                     continue
-                e.position_x = float(body.position.x)
-                e.position_y = float(body.position.y)
-                e.angle = _degrees(float(body.angle))
-                e.velocity_x = float(body.linearVelocity.x)
-                e.velocity_y = float(body.linearVelocity.y)
-                e.angular_velocity = _degrees(float(body.angularVelocity))
+                # Avoid Entity.__setattr__ re-pushing into body mid-readback
+                object.__setattr__(e, "_syncing_from_body", True)
+                try:
+                    e.position_x = float(body.position.x)
+                    e.position_y = float(body.position.y)
+                    e.angle = _degrees(float(body.angle))
+                    e.velocity_x = float(body.linearVelocity.x)
+                    e.velocity_y = float(body.linearVelocity.y)
+                    e.angular_velocity = _degrees(float(body.angularVelocity))
+                finally:
+                    object.__setattr__(e, "_syncing_from_body", False)
+
+    def step_physics(self, dt: float):
+        """Alias of ``tick(dt)`` — common agent name for advancing Box2D."""
+        return self.tick(dt)
+
+    def step(self, dt: float):
+        """Alias of ``tick(dt)``."""
+        return self.tick(dt)
+
+    def set_entity_velocity(self, entity_id: int, vx: float, vy: float) -> bool:
+        """Set linear velocity on entity + Box2D body. Returns False if missing."""
+        e = self.get_entity(entity_id)
+        if e is None:
+            return False
+        e.set_velocity(vx, vy)
+        return True
 
     # ——— Ropes / constraints ———
 

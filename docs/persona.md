@@ -65,16 +65,16 @@ world = WorldContext(seed=42)   # 可复现随机
 e = world.spawn_entity("202", x=0, y=1, dynamic=True, scale_x=1.0, scale_y=1.0)
 eid = e.entity_id
 
-# 直接操作实体（绕过 Lua）
-e.set_position(10, 20)
-e.add_force(0, 100)
+# 直接操作实体（绕过 Lua）— 字段写入同步 Box2D body
+e.set_velocity(3.0, 4.0)          # 或 e.velocity_x=3; e.velocity_y=4
+e.position_x, e.position_y = 10, 20
 
-# 目录查询（基于 495 条数据）
-prof = get_profile_by_object_id(202)
-print(prof["width"], prof["height"], prof["mass"])
+# 门名查询（读模板，不必建场景）
+from melon_lua import list_item_gates
+print(list_item_gates("文字屏"))   # key / data_name
 
-# 物理步进（由 runner.run_loop 自动调用；手动用 tick，没有 step_physics）
-world.tick(dt=1/20)
+# 物理步进（run_tick 不会调这个；run_loop 会）
+world.tick(dt=1/20)               # 或 world.step_physics(dt)
 ```
 
 主要字段/方法：
@@ -82,7 +82,8 @@ world.tick(dt=1/20)
 - `entities: dict[int, Entity]`
 - `spawn_entity(alias_or_id, x, y, dynamic=True, ...) -> Entity`（取 id 用 `.entity_id`）
 - `remove_entity(eid)`
-- `tick(dt)`（物理步进；**没有** `step_physics`）
+- `tick(dt)` / `step_physics(dt)` / `step(dt)` — 推进 Box2D
+- `set_entity_velocity(eid, vx, vy)`
 - `spawn_catalog`, `spawn_saves`, `spawn_mods`（用于 spawn.getItems 等）
 
 ### MelonScriptRunner
@@ -285,7 +286,9 @@ with MelsaveSession("out.melsave") as s:
 ### 物理 API 陷阱
 
 - `world.spawn_entity(name, x, y)` 返回 **Entity 对象**，不是 int。取 id 用 `.entity_id`
-- `runner.run_tick(inputs)` **只跑 Lua，不步进物理**。用 `runner.run_loop(ticks=N)` 代替手动循环
+- `runner.run_tick(inputs)` **只跑 Lua，不步进物理**。推进物理用 `world.tick(dt)` / `world.step_physics(dt)`，或 `runner.run_loop(ticks=N)`
+- 设速度（Python）：`e.set_velocity(vx, vy)`（或写 `e.velocity_x`/`e.velocity_y`，会同步 Box2D body）。Lua：`e:setVelocity` / `e:getVelocity`
+- 查物件门：`list_item_gates(261)` / `list_item_gates("文字屏")`，禁止整份 dump 模板 JSON 探门
 - Box2D body inertia 极小（~0.01），torque 量级 0.001~0.1，超过 10 会饱和角速度导致震荡
 
 ### 效率要求

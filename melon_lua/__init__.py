@@ -29,14 +29,14 @@ from .melsave_writer import (
     resolve_gate_key,
 )
 from .session import MelsaveSession
-from .melsave_builder import MelsaveBuilder
+from .melsave_builder import MelsaveBuilder, list_item_gates
 from .uicontrol_builder import (
     UIControllerBuilder, UIElement, ElementHandle, element_schema,
     BUTTON, PEDAL, SLIDER, INPUT_FIELD, STEERING_WHEEL,
     POINTER, TOGGLE, SCREEN, CUSTOM_ICON, JOYSTICK,
 )
 
-__version__ = "5.2.2"
+__version__ = "5.2.3"
 
 __all__ = [
     "MelonScriptRunner",
@@ -53,6 +53,7 @@ __all__ = [
     "get_profile_by_object_id",
     "get_profile_by_name",
     "list_spawnables",
+    "list_item_gates",
     "object_id_for_name",
     "resolve_spawn_name",
     "load_melmod_pack",

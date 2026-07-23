@@ -269,6 +269,103 @@ def _load_item_template(object_id: int) -> dict | None:
     return None
 
 
+def _summarize_mech_gate(g: dict) -> dict:
+    """Compact gate entry for list_item_gates."""
+    key = g.get("Key")
+    dn = g.get("DataName")
+    return {
+        "key": key,
+        "data_name": dn,
+        "name": dn if dn not in (None, "") else key,
+        "data_type": g.get("DataType"),
+        "can_edit": g.get("CanBeEdit", g.get("CanBeEdited")),
+        "group_id": g.get("GroupId"),
+        "group": g.get("Group"),
+        "group_name": g.get("GroupName"),
+    }
+
+
+def list_item_gates(object_id_or_name) -> dict:
+    """Return mechanic input/output gates for a spawnable item template.
+
+    Prefer this over dumping a full saveObjects JSON when an agent only needs
+    gate names for ``connect()``.
+
+    Args:
+        object_id_or_name: int objectId, or catalog name / Chinese alias
+            (resolved via ``object_id_for_name``).
+
+    Returns:
+        {
+          "object_id": int,
+          "name": str | None,
+          "inputs": [{"key","data_name","name","data_type",...}, ...],
+          "outputs": [...],
+          "error": str | None,
+        }
+    """
+    from .catalog import object_id_for_name, get_profile_by_object_id
+
+    oid: int | None
+    if isinstance(object_id_or_name, int):
+        oid = object_id_or_name
+    else:
+        s = str(object_id_or_name).strip()
+        if s.isdigit() or (s.startswith("-") and s[1:].isdigit()):
+            oid = int(s)
+        else:
+            oid = object_id_for_name(s)
+
+    if oid is None:
+        return {
+            "object_id": None,
+            "name": str(object_id_or_name),
+            "inputs": [],
+            "outputs": [],
+            "error": f"unknown object: {object_id_or_name!r}",
+        }
+
+    so = _load_item_template(oid)
+    if not so:
+        return {
+            "object_id": oid,
+            "name": None,
+            "inputs": [],
+            "outputs": [],
+            "error": f"no item template for objectId={oid}",
+        }
+
+    profile = get_profile_by_object_id(oid) or {}
+    name = profile.get("name") if isinstance(profile, dict) else None
+
+    md = so.get("mechanicData")
+    inputs: list[dict] = []
+    outputs: list[dict] = []
+    if isinstance(md, list) and md:
+        m0 = md[0] if isinstance(md[0], dict) else {}
+        for side, bucket in (
+            ("mechanicSerializedInputs", inputs),
+            ("mechanicSerializedOutputs", outputs),
+        ):
+            raw = m0.get(side, "")
+            try:
+                gates = json.loads(raw) if isinstance(raw, str) and raw else (raw or [])
+            except (TypeError, json.JSONDecodeError):
+                gates = []
+            if isinstance(gates, list):
+                for g in gates:
+                    if isinstance(g, dict):
+                        bucket.append(_summarize_mech_gate(g))
+
+    return {
+        "object_id": oid,
+        "name": name or so.get("objectId"),
+        "inputs": inputs,
+        "outputs": outputs,
+        "error": None,
+    }
+
+
 # Sensors / displays that should power on when placed via SDK (game stock
 # templates often ship activation=0 so they do nothing until wired).
 _DEFAULT_ACTIVATION_ON_IDS = frozenset({
