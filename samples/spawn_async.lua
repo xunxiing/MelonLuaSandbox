@@ -1,7 +1,8 @@
 local my_req = 0
 
 function OnInit()
-    my_req = spawn.create("202", 0, 8)
+    -- Real-device menu alias (not objectId / class name)
+    my_req = spawn.create("plastic_plate", 0, 8)
     print("create returned requestId", my_req)
 end
 

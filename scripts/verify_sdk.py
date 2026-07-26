@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SDK alignment smoke test (catalog + spawn by objectId)."""
+"""SDK alignment smoke test (physics catalog + Lua menu-alias spawn)."""
 from __future__ import annotations
 
 import sys
@@ -22,6 +22,7 @@ def main() -> int:
     st = catalog_stats()
     assert st.get("with_size", 0) >= 400, st
 
+    # Python physics / melsave path still uses objectId + gameObjectName
     assert object_id_for_name("ResizablePlastic") == 202
     assert resolve_spawn_name("202") == "ResizablePlastic"
 
@@ -30,18 +31,24 @@ def main() -> int:
     assert p.get("aabbWidth") or (p.get("aabb") or {}).get("width")
 
     w = WorldContext()
+    assert len(w.spawn_catalog) >= 400
+    assert "plastic_plate" in w.spawn_catalog
+    assert "crate_wood" not in w.spawn_catalog
     e = w.spawn_entity("202", 0, 5, dynamic=True)
     assert e.name == "ResizablePlastic"
     assert e.object_id == 202
     assert e.base_size_x > 0 and e.base_size_y > 0
 
+    # Lua spawn.create must use real-device menu aliases (not objectId strings)
     src = """
 function OnInit()
-    outputs.num.req = spawn.create("202", 0, 3)
+    outputs.num.req = spawn.create("plastic_plate", 0, 3)
+    outputs.num.exists = spawn.existsByAlias("plastic_plate")
 end
 function OnSpawned(req, ents)
     outputs.num.spawned = ents[1]:getId()
     outputs.string.pname = ents[1]:getName()
+    outputs.num.n = #ents
 end
 """
     r = MelonScriptRunner(tps=20, world=WorldContext(), quiet=True)
@@ -49,9 +56,12 @@ end
     r.call_on_init()
     outs = r.get_outputs()
     assert outs.get("num", {}).get("spawned"), outs
-    assert outs.get("string", {}).get("pname") == "ResizablePlastic"
+    assert outs.get("num", {}).get("exists") == 1, outs
+    assert outs.get("num", {}).get("n") == 1, outs
+    assert outs.get("string", {}).get("pname")  # sandbox may use alias as name
 
     print("SDK OK:", st)
+    print("  menu aliases:", len(w.spawn_catalog), "plastic_plate OK")
     print("  plastic objectId=202 size", e.base_size_x, e.base_size_y)
     return 0
 

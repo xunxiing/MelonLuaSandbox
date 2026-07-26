@@ -230,13 +230,99 @@ def list_objects(path: str | Path) -> list[MelsaveObject]:
     return read_melsave(path).objects
 
 
+def objects_from_raw_data(data: dict[str, Any]) -> list[MelsaveObject]:
+    """Parse ``saveObjectContainers`` into flat ``MelsaveObject`` list.
+
+    Same rules as ``read_melsave``: roots use container index; children use
+    index >= 100000.
+    """
+    containers = data.get("saveObjectContainers") or []
+    objects: list[MelsaveObject] = []
+    child_index = 100000
+    for idx, container in enumerate(containers):
+        if not isinstance(container, dict):
+            continue
+        so = container.get("saveObjects") or {}
+        if so:
+            oid = int(so.get("objectId", 0))
+            name, hint = _resolve_name(oid)
+            px, py, pz = _vec3(so, "position")
+            _, _, rz = _vec3(so, "rotation")
+            sx, sy, _ = _vec3(so, "scale", 1.0)
+            children = container.get("saveObjectChildren") or []
+            objects.append(
+                MelsaveObject(
+                    index=idx,
+                    object_id=oid,
+                    instance_id=int(so.get("instanceId", 0)),
+                    name=name,
+                    localized_hint=hint,
+                    x=px,
+                    y=py,
+                    z=pz,
+                    rotation_z=rz,
+                    scale_x=sx,
+                    scale_y=sy,
+                    parent_id=int(so.get("parentId", -1)),
+                    gravity=bool(so.get("gravity", True)),
+                    freezed=bool(so.get("freezed", False)),
+                    children_count=len(children) if isinstance(children, list) else 0,
+                    raw=so,
+                )
+            )
+        kids = container.get("saveObjectChildren") or []
+        for k in kids:
+            if not isinstance(k, dict):
+                continue
+            koid = int(k.get("objectId", 0))
+            kname = k.get("childName") or "part"
+            kpx, kpy, _ = _vec3(k, "position")
+            _, _, krz = _vec3(k, "rotation")
+            ksx, ksy, _ = _vec3(k, "scale", 1.0)
+            objects.append(
+                MelsaveObject(
+                    index=child_index,
+                    object_id=koid,
+                    instance_id=int(k.get("instanceId", 0)),
+                    name=kname,
+                    localized_hint=kname,
+                    x=kpx,
+                    y=kpy,
+                    z=0.0,
+                    rotation_z=krz,
+                    scale_x=ksx,
+                    scale_y=ksy,
+                    parent_id=int(k.get("parentId", -1)),
+                    gravity=bool(k.get("gravity", True)),
+                    freezed=bool(k.get("freezed", False)),
+                    children_count=0,
+                    raw=k,
+                )
+            )
+            child_index += 1
+    return objects
+
+
 def spawn_document_into_world(doc: MelsaveDocument, world: Any, *, melmod_overrides: dict[int, str] | None = None) -> list[int]:
     """Spawn all objects (roots + children saved in the melsave) into WorldContext.
 
     melmod_overrides: optional map instanceId -> melmod uniqueId or Part_assetId
+
+    Root containers (``MelsaveObject.index`` < 100000) get
+    ``entity.custom_data['container_idx']`` so mechanic sim can map them to
+    ``saveObjectContainers`` / gate wires.
+
+    Prefers ``doc.raw_data`` containers when present (session may mutate the
+    save after construction without refreshing ``doc.objects``).
     """
+    objects = list(doc.objects)
+    raw = getattr(doc, "raw_data", None)
+    if isinstance(raw, dict) and (raw.get("saveObjectContainers") or []):
+        objects = objects_from_raw_data(raw)
+        doc.objects = objects
+        doc.object_count = len(objects)
     ids: list[int] = []
-    for o in doc.objects:
+    for o in objects:
         e = world.spawn_entity(
             str(o.object_id),
             o.x,
@@ -276,5 +362,8 @@ def spawn_document_into_world(doc: MelsaveDocument, world: Any, *, melmod_overri
         if not raw_lid:
             raw_lid = o.index + 1 if o.index < 100000 else o.index
         e.local_id = raw_lid
+        # Root container index (children use child_index >= 100000)
+        if o.index < 100000:
+            e.custom_data["container_idx"] = int(o.index)
         ids.append(e.entity_id)
     return ids

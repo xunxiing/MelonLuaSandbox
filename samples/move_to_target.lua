@@ -12,9 +12,9 @@ local TARGET_TOL = 0.06
 local BRAKE_DIST = 1.0
 
 function OnInit()
-    -- Spawn the mover (Box, objectId ~23). OnSpawned will give us the real id.
-    local req = spawn.create(23, -3.0, 2.5)
-    print("[MOVE] OnInit: requested spawn id=" .. tostring(req) .. " (Box) target tuning via inputs")
+    -- Real-device menu alias (crate). OnSpawned gives the entity id.
+    local req = spawn.create("crate", -3.0, 2.5)
+    print("[MOVE] OnInit: requested spawn id=" .. tostring(req) .. " (crate) target tuning via inputs")
 end
 
 function OnSpawned(requestId, entities)

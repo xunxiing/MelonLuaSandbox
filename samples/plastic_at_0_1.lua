@@ -1,5 +1,6 @@
 function OnInit()
-    spawn.create("202", 0, 1)
+    -- Real-device menu alias (not objectId 202 / ResizablePlastic)
+    spawn.create("plastic_plate", 0, 1)
 end
 
 function OnSpawned(requestId, entities)

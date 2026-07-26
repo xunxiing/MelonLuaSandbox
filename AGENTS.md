@@ -60,15 +60,17 @@ There is **no** CI workflow, ruff, or mypy config in-repo; do not invent a lint 
 
 **Engine mismatch:** Game uses Lua-CSharp 5.2; sandbox uses **LuaJIT 5.1** via lupa. Chip-facing API is aligned; edge cases (`string.format`, RNG) may differ.
 
-**Spawn:** `spawn.create` returns `requestId` immediately; entities are created in the same call path; `OnSpawned` is flushed end-of-tick via `__dispatch_spawn` + `__current_env`.
+**Spawn:** `spawn.create` returns `requestId` immediately; entities are created in the same call path; `OnSpawned` is flushed end-of-tick via `__dispatch_spawn` + `__current_env`. **Real device only accepts spawn-menu aliases** (e.g. `plastic_plate`, `crate` — see `data/spawn_menu_aliases.json`); objectId / class name / `crate_wood` are sandbox-only false positives.
 
-## Docs map
+## Docs map (agent feed)
 
-- `docs/API.md` — Python SDK
-- `docs/LUA_GUIDE.md` — chip authoring
-- `docs/stdlib.md` — allowed/banned globals
-- `docs/MELSAVE_FORMAT.md`, `docs/MELSAVE_AI_ARCHITECTURE.md` — saves / AI workspace
-- `docs/VPCHIP_TO_LUA.md` — VP graph → Lua compiler plan
+**Only these two for chip + SDK agents:**
+
+- `docs/persona.md` — hard rules, delivery workflow, Lua traps / method cheat sheet
+- `docs/API.md` — Python SDK full signatures (Session / connect / UI / debug)
+
+Redirects (do not feed as primary): `docs/LUA_GUIDE.md`, `docs/guide.md`.  
+Optional: `docs/api reference.txt` (official Melon Lua full ref; spawn aliases may be outdated — persona wins), `docs/others/stdlib.md`, MELSAVE_*, VPCHIP_*.
 
 ## Git / hygiene
 

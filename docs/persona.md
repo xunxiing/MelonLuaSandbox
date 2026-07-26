@@ -1,700 +1,288 @@
+# Melon Lua 芯片 Agent Persona
+
+**喂给 AI 的文档只有两份：**
+
+| 文档 | 职责 |
+|------|------|
+| **本文 `persona.md`** | 硬规则、交付流程、真机陷阱、最短示例 |
+| **`docs/API.md`** | Python SDK **完整签名**（Session / connect / UI / debug / catalog） |
+
+禁止再喂 `guide.md` / 存档格式 / VP 文档。Lua 方法签名以本文「速记」为准；Python 以 `API.md` 为准。
+官方全文对照：`docs/api reference.txt`（有过时 alias，spawn 以本文为准）。
+
+---
+
 ## 最高优先级规则（违反即失败）
 
-1. Entity 的 Lua 方法已固定，直接使用，禁止搜索/验证/探测
-2. 这些方法100%存在，不需要验证。直接在芯片代码里用 e:getAngle() 即可
-3. 禁止用 astrbot_grep_tool / astrbot_file_read_tool / astrbot_execute_shell
-   搜索 melon_lua 的代码——它不在沙盒里，搜了也是 No matches found
-4. **区域雷达 Radar（892993856）必须 Select All**：`saveMetaDatas.Radar_selected_entities`
-   的 `stringValue` 不能是 `"[]"`。SDK `add_item(892993856)` **已默认写入完整名单**；
-   禁止清空或覆盖成空数组。空名单 = 真机 entity array 永远为空（沙盒注入 targets 测
-   通过 ≠ 真机可用）。激光雷达 Ranger(13) 是另一套 `RangerMode=All`，不要混用
+1. **Entity 方法已固定**：直接写 `e:getAngle()` 等，禁止搜索/探测 melon_lua 源码。
+2. **禁止** `astrbot_grep` / `file_read` / `execute_shell` 去翻 melon_lua——沙盒里没有包源码。
+3. **区域雷达 Radar（892993856）必须 Select All**：`Radar_selected_entities.stringValue` 不能是 `"[]"`。`add_item(892993856)` 已默认写全量名单；禁止清空。空名单 = 真机 `entity array` 永远空。激光雷达 Ranger(13) 用 `RangerMode=All`，不是同一字段。
+4. **Lua `spawn.create` 真机只认菜单 Alias**：`spawn.create("plastic_plate", x, y)` 合法；`spawn.create(202)` / `"ResizablePlastic"` / `"crate_wood"` 在真机静默失败（有 requestId、`OnSpawned` 空表）。用 `spawn.getItems()` 的 `"Name|alias"` **右侧**，或包内 `melon_lua/data/spawn_menu_aliases.txt`。
+5. **两套键不要混**：
+   - Lua 真机 spawn → 菜单 alias（`plastic_plate`、`crate`…）
+   - Python `add_item` / `spawn_entity` → objectId / 物理 catalog 名（202 仍可用）
+6. **必须交付可导入的 `.melsave`**（用户要求时），不要只交 Lua 片段。
+7. **完整 Python 签名查 `API.md`**，不要猜方法名。
 
-# Melon Lua Sandbox — Python SDK 参考。
+---
 
-## 快速开始
-
-```python
-from melon_lua import (
-    MelonScriptRunner, WorldContext,
-    get_profile_by_object_id, object_id_for_name, list_spawnables,
-    render_world,
-)
-
-# 1. 准备世界（支持 456+ 物体，objectId 或名字）
-world = WorldContext()
-world.spawn_entity("202", 0, 1)                    # ResizablePlastic (塑料板)
-world.spawn_entity("Box", 2, 5, dynamic=True)      # 按 gameObjectName
-world.spawn_entity(23, -3, 4, scale_x=1.5)         # 直接用 objectId
-
-# 2. 编译并运行 Lua 芯片
-source = '''
-function OnInit()
-    print("chip init")
-end
-
-function OnTick()
-    local e = Entity(1)
-    local x, y = e:getPosition()
-    outputs.num.x = x
-    outputs.num.y = y
-end
-'''
-
-runner = MelonScriptRunner(tps=20, world=world, quiet=False)
-runner.compile(source, chunk_name="@my_chip.lua")
-runner.call_on_init()
-result = runner.run_tick()
-print(result["outputs"])
-
-# 3. 批量模拟（推荐）
-runner.run_loop(ticks=1000)
-print(runner.logs[-10:])   # 最近日志
-```
-
-## 核心类
-
-### WorldContext
-
-物理世界 + 生成目录 + 实体管理。
+## 标准交付路径（必走）
 
 ```python
-world = WorldContext(seed=42)   # 可复现随机
+from melon_lua import MelsaveSession, UIControllerBuilder, list_item_gates
 
-# 生成（立即创建实体，支持 objectId / gameObjectName / 别名）
-# 返回 Entity 对象，不是 int！
-e = world.spawn_entity("202", x=0, y=1, dynamic=True, scale_x=1.0, scale_y=1.0)
-eid = e.entity_id
+# 1) 文档模式：搭场景 + 连线 + 导出
+s = MelsaveSession()
+item = s.add_item(202, x=0, y=0)                    # objectId
+chip = s.add_lua_chip(src, x=1, y=0,
+    inputs=[{"name": "target", "type": "entity"},
+            {"name": "throttle", "type": "number", "value": 0.5}],
+    outputs=[{"name": "status", "type": "string"},
+             {"name": "speed", "type": "number"}])
+s.connect(item, "entity", chip, "target")           # 4 参：容器门连线
+# 门名可用 Key 或 DataName，SDK 自动解析为真机 Key（如文字屏 text→string）
+s.save("out.melsave")
 
-# 直接操作实体（绕过 Lua）— 字段写入同步 Box2D body
-e.set_velocity(3.0, 4.0)          # 或 e.velocity_x=3; e.velocity_y=4
-e.position_x, e.position_y = 10, 20
-
-# 门名查询（读模板，不必建场景）
-from melon_lua import list_item_gates
-print(list_item_gates("文字屏"))   # key / data_name
-
-# 物理步进（run_tick 不会调这个；run_loop 会）
-world.tick(dt=1/20)               # 或 world.step_physics(dt)
-```
-
-主要字段/方法：
-
-- `entities: dict[int, Entity]`
-- `spawn_entity(alias_or_id, x, y, dynamic=True, ...) -> Entity`（取 id 用 `.entity_id`）
-- `remove_entity(eid)`
-- `tick(dt)` / `step_physics(dt)` / `step(dt)` — 推进 Box2D
-- `set_entity_velocity(eid, vx, vy)`
-- `spawn_catalog`, `spawn_saves`, `spawn_mods`（用于 spawn.getItems 等）
-
-### MelonScriptRunner
-
-芯片执行引擎。
-
-```python
-runner = MelonScriptRunner(tps=20, world=world, quiet=True, log_file="run.log")
-
-ok = runner.compile(source, chunk_name="@chip.lua")
-if not ok:
-    print("compile error:", runner.last_error)
-    return
-
-runner.call_on_init()                    # 调用 OnInit（会 flush spawn）
-result = runner.run_tick(inputs=...)     # 单步 + 可注入 inputs
-runner.run_loop(ticks=500)               # 连续跑 N tick
-
-print(runner.get_outputs())              # 当前 outputs 快照
-print(runner.logs)                       # 全部 print/warn/error_log
-```
-
-关键方法：
-
-- `compile(source, chunk_name)`
-- `call_on_init()`
-- `run_tick(inputs=None) -> {"error": ..., "outputs": ...}`
-- `run_loop(ticks, inputs=None, inputs_timeline=None)`
-- `get_outputs() -> dict`
-- `last_error`
-
-### Entity（Python 侧）
-
-```python
-e = world.get_entity(1)
-e.position_x, e.position_y = 5, 10
-e.add_force(100, 0)
-print(e.real_size())           # (w, h) 考虑 scale
-print(e.sprite_path)           # 贴图路径（若有）
-```
-
-### 目录 API（catalog）
-
-```python
-from melon_lua import (
-    catalog_stats,
-    get_profile_by_object_id,
-    get_profile_by_name,
-    list_spawnables,
-    object_id_for_name,
-    resolve_spawn_name,
-)
-
-print(catalog_stats())                    # {"total": 456, "with_physics": 245, ...}
-prof = get_profile_by_object_id(202)      # 完整 profile（含 width/height/mass/sprite）
-oid = object_id_for_name("ResizablePlastic")  # 202
-names = list_spawnables()                 # 所有可生成的名字
-```
-
-## 预览 / 截图（Pillow）
-
-```python
-from melon_lua import render_world
-from pathlib import Path
-
-render_world(
-    world,
-    "preview.png",
-    width=800, height=600,
-    ppm=128,                    # pixels per meter
-    center_x=0, center_y=1,
-    show_labels=True,
-    scale_text=1.0,
-)
-```
-
-支持：网格、实体矩形（带 sprite 颜色提示）、ID/oid/名字标签、十字准星。
-
-## 输入输出与生命周期
-
-与真实甜瓜一致：
-
-- `inputs.*` / `outputs.*`（num/string/vec/entity/color/array_num/array_string/array_vec/array_entity）
-- `OnInit` / `OnTick` / `OnSpawned(requestId, entities)` / `OnActivated` / `OnDeactivated` / `OnDestroy`
-- **Vector4**：array_vec / vec / color 必须用命名键 `{x=,y=,z=,w=}`，位置数组会被读成零向量
-- 推荐 `run_loop(ticks=...)` 而不是手动循环
-
-## UI 控制器构建（UIControllerBuilder）
-
-`UIControllerBuilder` 构建甜瓜 UI 控制器（objectId=2046689600）。元素工厂：
-`button/pedal/slider/indicator/joystick/toggle/rotation_wheel/input_field/pointer/screen/custom_icon`。
-
-```python
-from melon_lua import UIControllerBuilder, element_schema
-
-element_schema()           # 列所有类型 + 输出门
-element_schema("button")   # 查一个类型的完整 schema（输入门/输出门/默认值）
-```
-
-## Python SDK（MelsaveSession）
-
-一个 `.melsave` = 一个 `MelsaveSession`。构造即加载文档；`with` 或 `.load()`
-启动运行时（Box2D + Lua VM）。`MelsaveBuilder` 是其纯文档模式包装。
-
-```python
-from melon_lua import MelsaveSession, UIControllerBuilder
-
-# 文档模式（最常用）：构建 → 连线 → 导出
-s = MelsaveSession()                                    # 或 MelsaveSession("input.melsave")
-item = s.add_item(202, x=0, y=0)                        # 物品，返回容器索引
-chip = s.add_lua_chip(src, x=1, y=0,                    # Lua 芯片
-                      inputs=[{"name":"target","type":"entity"},
-                              {"name":"throttle","type":"number","value":0.5}],
-                      outputs=[{"name":"out","type":"number"}])
-ui_ctrl = UIControllerBuilder()
-slider = ui_ctrl.add_slider(value=0, mn=-1, mx=1)        # 返回元素句柄
-ui = s.add_ui_controller(ui_ctrl, x=2, y=0)
-s.connect(item, "entity", chip, "target")                # 连线（output→input）
-s.connect(slider, chip, "throttle")                      # 句柄自动填门名 + output_group
-s.save("out.melsave")                                    # 导出（save_as 是别名）
-
-# 运行时模式：编译/跑芯片验证逻辑
+# 2) 运行时验证（需要 with / load）
 with MelsaveSession("out.melsave") as s:
-    r = s.run_chip(src, ticks=100)                       # 只要最终 outputs
-    # tr = s.debug_run(src, ticks=100)                   # 每 tick: outputs/logs/variables
-    # r = {"error": str|None, "outputs": {<bucket>: {<gate>: <val>}}}
-    #   bucket ∈ num/int/string/vec/entity/color/array_*
-    #   读数值输出：r["outputs"]["num"]["out"]
-    print(r["error"], r["outputs"]["num"])
-    s.create_rope(from_id=1, to_id=2, kind="Simple")    # 物理绳索
-    print(s.snapshot())                                  # {tick, entities, ropes, ...}
+    r = s.debug_run(src, ticks=40)                  # 每 tick 轨迹
+    # 或 r = s.run_chip(src, ticks=40)              # 只要最终 outputs
+    assert r.get("error") is None
+    s.save("out.melsave")
 ```
 
-**inputs/outputs gate dict 字段**：
-- `"name"`：门名（字符串，可含空格）
-- `"type"`：`entity` | `number`/`num` | `int` | `string`/`str` | `vector`/`vec` | `array_entity` | `array_num` | `array_string` | `array_vec`
-- `"value"`（可选）：初始值。number→float、string→str、entity/int 无（连线提供）
-- Lua 侧按类型分桶访问：`inputs.num.speed` / `inputs.entity.target` / `inputs.array_entity.targets` / `outputs.array_vec.pixels` / `outputs.string.status`
-
-**核心方法速查**（完整签名见 `docs/API.md`）
-
-| 分类 | 方法 | 模式 |
-|------|------|------|
-| 容器 | `add_item(oid, x, y, *, color, dynamic, freezed, template) -> idx`<br>`add_lua_chip(src, x, y, *, inputs, outputs, variables, tps, title) -> idx`<br>`add_ui_controller(ctrl, x, y) -> idx`<br>`add_container(save_objects_dict) -> idx` | 文档+运行时 |
-| 连线 | `connect(src, out_gate, tgt, in_gate, ...)` — 门名可为 Key 或 DataName，自动解析为真机 Key<br>`disconnect(src, *, output_gate, target_idx, input_gate, wire_id)` / `list_connections(...)` | 文档+运行时 |
-| 观察 | `containers() / get_container(idx) / container_count` | 文档+运行时 |
-| 导出 | `save(out, *, write_icon=True) -> Path` | 文档+运行时 |
-| 芯片 | `run_chip(source, *, ticks, inputs, container_idx) -> {"error","outputs"}`（只要最终结果） | 运行时 |
-| 调试 | `debug_run(source, *, ticks, inputs) -> {error, outputs, frames, logs}`（每 tick 轨迹）<br>`compile_only` → `tick` / `run_ticks` → `inspect` 单步 | 运行时 |
-| 实体 | `spawn/remove/entities/get_entity` | 运行时 |
-| 绳索 | `create_rope/remove_rope/set_rope_param/ropes` | 运行时 |
-| 状态 | `inspect()`（outputs+variables+entities+logs）/ `snapshot` / `diff` | 运行时 |
-| 底层 | `.world` / `.runner` / `.document` | 运行时 / 任意 |
-
-**`add_item` 常用参数**：`color=(r,g,b,a)` 0-1 RGBA 元组；`dynamic=True` 受重力；`freezed=True` 冻结。
-
-**内置 mod 物件 / 传感器 / 显示**：
-- **区域雷达 Radar**（objectId=`892993856`）：**默认开启 + 默认 Select All**（检测名单）。
-  - **硬规则**：`Radar_selected_entities.stringValue` 必须是 objectId 字符串 JSON 数组
-    （真机 UI 的 Select All）。`"[]"` / 空名单 = 范围内什么都侦测不到，`entity array` 空。
-    `add_item(892993856)` 已自动填完整名单；**禁止**改回空数组。
-  - **侦测范围默认 sizeX/sizeY=1.0 极小**——创建后必须调大（输入门 `width`/`height` 或
-    `mechanicData[0].floatParameters[4]`/`[5]`）。门数据在 `mechanicData[0]`，不在 saveObjects 顶层。
-  - 输出：`entity` / `activation` / `trigger` / `entity array`
-  - 输入：`activation` / `shift x` / `shift y` / `hide` / `width` / `height`
-  - 芯片侧声明 `{"name":"targets","type":"array_entity"}`，连 `entity array` → `targets`；
-    Lua：`inputs.array_entity.targets`，元素是 entity ID，**必须 `Entity(id)` 再调方法**
-  - 沙盒 `run_tick(inputs={"array_entity":...})` 注入成功 **不能**代替真机雷达过滤名单
-- **激光雷达 Ranger / 激光雷达**（objectId=`13`）：**默认开启**（activation=1）。输入 `activation`/`max dist`/`hide`；输出 `entity`/`activation`/`dist`/`trigger`/`hit point`/`hit normal`/`hit entity`/`physics-material`。默认 `RangerMode=All`（`addData`，与区域雷达 Select All **不是同一字段**）
-- **文字屏 ScreenTextDevice / 文字屏**（objectId=`261`）：**默认开启**。输入 `activation` + `text` + `color`；输出 `entity`/`activation`/`text`/`color`。连线用显示名即可：`s.connect(chip, "text", screen, "text")`（SDK 写入 Key=`string`）
-- **LED 矩阵显示屏**（objectId=`596836672` / `LEDMatrixDisplay`）：**默认开启**，约 32×32。输入 `activation` + `led-matrix-data`(ArrayVector) + 可选 width/height/borders
-  - **不要**把芯片 width/height 接到屏上（初值 0 会被夹成 1×1）。宽高用屏本地参数
-  - 大图/动画：编译期烘焙像素，Lua 只 `outputs.array_vec.pixels = colors`；禁止运行时 hex 解码循环
-  - **Vector4 必须命名键** `{x=r,y=g,z=b,w=a}`（0–1）。**严禁**位置数组 `{r,g,b,a}`
-  - 与库存 `LEDMatrix`(424) 不是同一物体
-
-**UIControllerBuilder**（`add_*` 返回 `ElementHandle`）：
-- `.add_slider(value=0, mn=0, mx=1)` / `.add_button(text="")` / `.add_joystick(multiplier=1.0)` / `.add_toggle(active=False)`
-- 其余：`add_pedal/add_indicator/add_rotation_wheel/add_input_field/add_pointer/add_screen/add_custom_icon`
-- **ElementHandle**：`.group_id` / `.primary_output`（Slider→`"Value"`，Button→`"Button is down"`）/ `.gate(name)` → `(gate_name, group_id)`
-- 句柄：`connect(handle, target_idx, input_gate)` 自动填门名 + `output_group`
-- 多输出：`s.connect(ui_idx, "Joystick Angle", chip, "angle", output_group=joy.group_id)`
-- `.element_group_id(索引或名称)`：返回元素 GUID；`element_schema()` / `element_schema("slider")` 查 schema
-
-**门连线规则**（mechanic gate connections）：
-- `constraintId=13`（物理绳索是 10），存 source 端 `constraints`
-- `startObjectId`/`endObjectId` 是容器索引（0-based），非 objectId
-- 门名保留空格（`"input 2"` 不转下划线）
-- **Key vs DataName**：真机 wire 用 **Key**；`connect()` 接受 Key 或 DataName 并自动解析。文字屏文本门 Key=`string` / DataName=`text`；UI 按钮 Key=`Button is down` / DataName=`Is down`
-- **UI 同名门**（多个 Slider 都叫 `"Value"`）必须用 ElementHandle 或 `output_group=...` 指定元素
-
-## MelonLuaSandbox 插件使用规范
-
-使用 run_melon_python / run_melon_lua 时必须遵守：
-
-### 符号来源
-
-`WorldContext`/`MelsaveSession`/`Entity` 等 SDK 类已 `from melon_lua import` 进作用域，直接用。
-
-### 物理 API 陷阱
-
-- `world.spawn_entity(name, x, y)` 返回 **Entity 对象**，不是 int。取 id 用 `.entity_id`
-- `runner.run_tick(inputs)` **只跑 Lua，不步进物理**。推进物理用 `world.tick(dt)` / `world.step_physics(dt)`，或 `runner.run_loop(ticks=N)`
-- 设速度（Python）：`e.set_velocity(vx, vy)`（或写 `e.velocity_x`/`e.velocity_y`，会同步 Box2D body）。Lua：`e:setVelocity` / `e:getVelocity`
-- 查物件门：`list_item_gates(261)` / `list_item_gates("文字屏")`，禁止整份 dump 模板 JSON 探门
-- Box2D body inertia 极小（~0.01），torque 量级 0.001~0.1，超过 10 会饱和角速度导致震荡
-
-### 效率要求
-
-- 禁止用 inspect.getsource 探索 API —— docstring 已列出全部符号和用法
-- 禁止用 astrbot_execute_shell/astrbot_file_read_tool 操作 melon_lua —— 沙盒环境里没有这个包
-- 单次 run_melon_python 尽量完成完整逻辑链，不要每次只改一个变量重跑
-- 连续调用同一工具超过 3 次时，停下来重新评估策略，不要盲目重试
-
-### 区域雷达 Radar 交付检查（违反即失败）
-
-导出含 `add_item(892993856)` 的 melsave 前必须确认：
-
-1. **Select All**：`saveMetaDatas` 中 `Radar_selected_entities.stringValue` **不是** `"[]"`
-   （SDK 默认已写全量 objectId 列表；不要覆盖成空）
-2. **范围**：`width`/`height`（`floatParameters[4]`/`[5]`）已调大（默认 1 几乎扫不到）
-3. **接线**：`entity array` → 芯片 `array_entity` 输入；元素是 ID，用 `Entity(id)`
-4. **不要**把沙盒手动注入的 `array_entity.targets` 当成真机雷达已工作
-
-### 读已有 .melsave（禁止猜字段名）
-
-zip 内 `Data` JSON 结构：
+**UI 控制器（ElementHandle，3 参 connect）：**
 
 ```python
-import json, zipfile
-with zipfile.ZipFile(path) as z:
-    data = json.loads(z.read("Data"))
-for i, c in enumerate(data["saveObjectContainers"]):
-    so = c["saveObjects"]          # 单个 dict，不是 list！
-    oid = so.get("objectId")
-    metas = so.get("saveMetaDatas") or []
-    src = next((m.get("stringValue") for m in metas if m.get("key") == "lua_chip_source"), None)
+ui = UIControllerBuilder()
+slider = ui.add_slider(value=0, mn=0, mx=1)         # 返回 ElementHandle，不是 self
+btn = ui.add_button(text="RESET")
+ui_idx = s.add_ui_controller(ui, x=2, y=0)
+s.connect(slider, chip, "throttle")                 # 自动门名 + output_group
+s.connect(btn, chip, "reset")
+# 多输出：s.connect(ui_idx, "Joystick Angle", chip, "angle", output_group=joy.group_id)
 ```
 
-**错误字段（会读到 None / AttributeError）**：`SaveObject`、`Properties`、把 `saveObjects` 当 list 遍历。
-优先用 `MelsaveSession(path)` + `s.get_container(i)` / `s.containers()`，不要手搓错误 schema。
+**查门名（禁止 dump 整份模板 JSON）：**
 
-路径属性是 `session.melsave_path`（SDK 5.1+），不是 `.path`。
-
-# Melon Lua 芯片开发完整指南（含标准库）
-
-本文档整合原 `guide.md` 并补充完整标准库说明、生命周期、API 速查等。
-
-## 标准库（甜瓜芯片允许范围）
-
-详见 `docs/stdlib.md`。
-
-**快速记忆**：
-
-- 可用：math / string / table / coroutine / bit32 / 有限 os（time/clock） + 所有基础全局
-- 禁用：io / package / debug / load* / collectgarbage 等
-
-## 特殊 API 模块（游戏功能）
-
-### 1. 输入输出系统（类型化）
-
-```lua
-local speed = inputs.num.speed or 1
-local target = inputs.entity.target
-outputs.num.tick = tick
-outputs.string.status = "ok"
-outputs.vec.dir = {x=1, y=0, z=0, w=0}
-outputs.color.tint = {r=1, g=0, b=0, a=1}
+```python
+list_item_gates(261)           # 或 list_item_gates("文字屏")
+# → inputs/outputs: key + data_name
 ```
 
-### 2. 变量系统
+Session / 门类型 / debug_run 帧结构 / 绳索 等 → **`API.md`**。
+
+---
+
+## 插件 / 沙盒使用规范
+
+- SDK 类已 `from melon_lua import` 进作用域时直接用，不要再 import 不存在的 `export_melsave`。
+- `world.spawn_entity(...)` 返回 **Entity 对象**，id 用 `.entity_id`。
+- `runner.run_tick` / 裸 `session.tick` **只跑 Lua**；推进物理用 `world.tick(dt)` / `step_physics`，或 `run_loop` / `debug_run` / `run_ticks(..., advance_world=True)`。
+- Python 设速度：`e.set_velocity(vx, vy)`（会同步 Box2D）；Lua：`e:setVelocity` / `e:getVelocity`。
+- 单次工具调用尽量完成完整链；禁止连跑 ≥3 次只改一个变量的探测。
+- 读已有 melsave：优先 `MelsaveSession(path)` + `containers()`；zip 内 `saveObjects` 是 **dict 不是 list**。路径属性 `session.melsave_path`。
+
+---
+
+## 内置传感器 / 显示（创建即用）
+
+| 物件 | objectId | 要点 |
+|------|----------|------|
+| 区域雷达 Radar | 892993856 | **Select All 非空**；默认范围 1×1 极小，必须调大 width/height；输出 `entity array` → 芯片 `array_entity`；元素是 **ID**，必须 `Entity(id)` |
+| 激光雷达 Ranger | 13 | 默认开；`RangerMode=All`；输出 dist / hit entity 等 |
+| 文字屏 | 261 | `connect(chip,"text",screen,"text")` → SDK 写 Key=`string` |
+| LED 矩阵 | 596836672 | `array_vec` 像素；**Vector4 必须命名键** `{x=,y=,z=,w=}`；禁止位置数组 |
+
+雷达交付检查：Select All ≠ `"[]"` + 范围够大 + `entity array` 接线。
+
+---
+
+## Lua 硬规则（写芯片）
+
+### 生命周期
+
+- 顶层代码：首次编译执行一次（放 `local state = {}`）。
+- `OnInit` → 首次 Execute 后、首个 `OnTick` 前。
+- **`OnTick` 必须有**。
+- `OnSpawned(requestId, entities)`：`entities` 为 Entity 数组，失败可为 **nil**；坏 alias 常见 **空表**。
+- 碰撞/触发回调在 **OnTick 之前**。
+- `world.load` / `world.reset` 会 **销毁 Lua VM**。
+
+### inputs / outputs
+
+- 桶始终存在：`num` / `int` / `string` / `vec` / `color` / `entity` / `array_*`。
+- **每个 tick 都要写 outputs**，否则回落 0 / `""`。
+- `inputs.entity.x == 0` → 未连线。
+- vec/color/array_vec：**命名键** `{x=,y=,z=,w=}` / `{r=,g=,b=,a=}`。
+- `array_entity` 元素是数字 ID → `Entity(id)` 再调方法。
+
+### 判空
 
 ```lua
-variables.Set("total_ticks", value)   -- 返回 1.0 成功，类型一旦锁定不能改
-local v = variables.Get("total_ticks")
-```
-
-### 3. 共享数据（跨芯片）
-
-```lua
-shared.heartbeat = tick
-shared.Save()
-shared.Load()
-```
-
-### 4. 信号系统（事件总线）
-
-```lua
-signal.on("damage", function(d)
-    print(d.amount)
-end)
-signal.emit("damage", {amount = 10})
-signal.defer("next_tick_event", data)
-```
-
-### 5. 输入处理
-
-```lua
--- Pointer (鼠标)
-if input.pointerDown() == 1 then
-    local wx, wy = input.pointerPos()           -- 世界坐标
-    local sx, sy = input.pointerScreenPos()      -- 屏幕坐标
-    local dx, dy = input.pointerDelta()          -- 帧间位移
+local id = inputs.entity.target
+if id == 0 then
+    outputs.string.status = "no target"
+    return
 end
-if input.isOverUI() == 1 then ... end
-local hit = input.pointerRaycast()               -- raycast 命中实体
-local hits = input.pointerRaycastAll()           -- 所有命中
-
--- Touch (多点触控，索引 0 起)
-local n = input.touchCount()
-if input.touchDown(0) == 1 then
-    local wx, wy = input.touchPos(0)
-    if input.touchTap(0) == 1 then ... end
-    if input.touchSwipe(0) == 1 then ... end
+local e = Entity(id)
+if e._nil or e:isValid() ~= 1 then   -- 官方主推 e._nil；isValid 亦可
+    outputs.string.status = "invalid"
+    return
 end
-
--- Pinch (双指缩放)
-local pd = input.pinchDistance()
-local pa = input.pinchAngle()
-local pcx, pcy = input.pinchCenter()
-
--- Keyboard
-if input.key("space") == 1 then ... end
-if input.keyDown("a") == 1 then ... end          -- 仅按下那一帧
 ```
 
-### 6. 环境信息
+### spawn（真机）
 
 ```lua
-env.deltaTime()               -- 上一帧 dt（秒）
-env.fixedDeltaTime()
-env.time()                    -- 自芯片启动累计时间
-env.sessionTime()             -- 会话时间
-env.entityCount()             -- 当前实体数
-env.frameCount()              -- 总帧数
-env.timeScale()               -- 时间缩放
-env.setTimeScale(0.5)         -- 慢动作
-env.systemTime()              -- 系统时间戳
-env.systemDate()              -- 系统日期字符串
-env.toDate(env.systemTime())  -- 时间戳 → 日期串
-env.toTimeFormat(env.sessionTime())
-env.parseDate("2024-01-01")
-env.isWorld()                 -- 是否在 World 模式
-env.isWorldEditor()           -- 是否在编辑器
+-- 正确
+spawn.create("plastic_plate", 0, 1)
+spawn.createWithAngle("crate", 0, 0, 45)
+
+-- 错误（真机静默失败）
+-- spawn.create(202)  spawn.create("ResizablePlastic")  spawn.create("crate_wood")
 ```
 
-### 7. 相机
+| 用途 | alias |
+|------|--------|
+| 塑料板 | `plastic_plate` |
+| 砖 | `resizable_brick` |
+| 箱 | `crate` |
+| 桶 | `barrel` |
+| 甜瓜生物 | `living_melon` |
+
+全量 ~432：`melon_lua/data/spawn_menu_aliases.json`。  
+目录 API：`getItems` / `getSaves` / `getMods` / `getResourceSaves` 及 `*String` / `*Count`。  
+`existsByAlias` / `getNameByAlias` 创建前可查。
+
+### 禁止的幻觉模块（REMOVED）
+
+不要写：`screen.*` / `time.*` / `go.*` / `physics.*` / `sprite.*` / `event.*`。时间用 `env.*`。
+
+### 标准库
+
+可用：math / string / table / coroutine / bit32 / 有限 os（time/clock）+ pairs/ipairs/pcall/type/tostring/tonumber/select/unpack 等。  
+禁用：io / package / debug / load* / collectgarbage。详见 `docs/others/stdlib.md`（或包内 stdlib 文档）。
+
+---
+
+## Lua 模块速记（完整表见官方 api reference；此处纠正常错点）
+
+### Entity（实例方法均 `e:method`）
+
+- Transform：`get/setPosition` `get/setAngle` `get/setScale` `getNormal` `localToWorld` `worldToLocal` `localAngleToWorld` `worldAngleToLocal`
+- Physics：`get/setVelocity` `get/setAngularVelocity` `addForce` `addTorque` `addForceAtPosition` `getVelocityAtPoint` `getMass` `getCenterOfMass` `get/setGravityScale` `freeze` `freezeRotation` `setCollisionEnabled`
+- State：`isValid` `getId` `getName` `getLocalizedName` `get/setColor` `isVisible` `setVisible` `delete`
+- Fire/HP：`get/setTemperature` `isOnFire` `isFrozen` `ignite` `extinguish` `getHealth` `isBreakable` `getVoltage`
+- Interaction：`isDraggable` `setDraggable` `canBeActivated` **`activate(1|0)`**（必须传 flag）`getActivationInput`
+- Hierarchy：返回 **entityId**，不是 Entity：`getRoot()` `getParent()` `getChildren()` → 用 `Entity(id)` 包装
+- Bounds：`getSize` `getBaseSize` `getBounds` `getFullBounds` `getColliderBounds`（各返回多值）
+- Misc：`lookAt(targetId, degPerSec)` `getElevation` `getPhysicMaterial`
+- 订阅：`subscribeCollisionEnter(cb) → subId`，**`unsubscribeCollisionEnter(subId)`**（不是 cb）；Wire 同理；`unsubscribeAll()`
+- **静态查询（小写 entity 表）**：
+  - `entity.all()` → **数量 number**
+  - `entity.find("Name")` → **id 或 nil** → 再 `Entity(id)`
+
+### input
+
+- Pointer：`pointerDown/Up/Pos/ScreenPos/Delta` `pointerRaycast` `pointerRaycastAll` `isOverUI` `pointerDownFiltered` `pointerUpFiltered`
+- Touch：**索引从 1 开始** `touchDown(1)`（不是 0）
+- Pinch：`pinchDistance` `pinchAngle` `pinchCenter`
+- Key：`key` `keyDown`（`space` `w` `left` …）
+
+### env / camera / world
+
+- env：`time` `deltaTime` `fixedDeltaTime` `timeScale` `setTimeScale(0..2)` `frameCount` `sessionTime` `entityCount` `isWorld` `isWorldEditor`
+  - `systemTime()` → UTC 秒；`systemDate()` → **UTC 天数**；`toDate(days)` → `"dd.MM.yyyy"`；`parseDate("31.12.2024")` → days
+- camera：`get/setPosition` `get/setZoom` `follow` `unfollow` `isFollowing`（follow 时 setPosition 无效）
+- world：`save` `load` `reset`（后两者毁 VM）`clearCorpses/Decals/Gibs/Living` `radioSignal(channel数字)` `isSessionActive` `startSession` `endSession`
+
+### spawn / chip / mechanic / uicontrol
+
+- spawn：见上 + `clone` `cloneTemp` `createSave` `createMod` `destroy`
+- chip.* / mechanic.*：`has` `getType` `getInputs/Outputs` `get/setValue`（wired 时 set 返回 0）`hasWire` `get/setActivation`；chip 另有 `getName` `getTPS`
+  - chip = VP/Lua 芯片；mechanic = 普通机构；UI 面板用 **uicontrol**
+- uicontrol.*（运行时面板，非 Python 构建）：`hasUIControl` `getElements` `findElement` `getElementsByType` `getInputGates` `getOutputGates` `get/setValue` `hasWire` `getAnchors` `get/setAnchoredPosition`
+
+### 其它
 
 ```lua
-camera.follow(targetId)
-camera.setPosition(0, 5)
-camera.setZoom(8)
+variables.Set("k", v)   variables.Get("k")     -- 类型锁定
+shared.x = 1            shared.Save() shared.Load()
+local sid = signal.on("ev", fn)
+signal.emit("ev", data) signal.defer("ev", data)
+signal.off("ev", sid)
+register_module("utils", { clamp = function(...) end })
+local u = require("utils")
+print(...)  warn(...)  error_log(...)
 ```
 
-### 8. 生成系统（spawn）—— 重要
+---
+
+## 最短可运行芯片示例
 
 ```lua
--- 立即返回 requestId，实体稍后通过 OnSpawned 回调
-local req = spawn.create(202, 0, 1)                 -- objectId 或 "ResizablePlastic"
-spawn.createWithAngle("Box", 0, 0, 45)
-spawn.clone(entityId, x, y)
-spawn.cloneTemp(entityId, x, y)   -- 临时实体
-spawn.createSave("my_save", x, y)
-spawn.createMod("my_mod", x, y)
-spawn.destroy(entityId)
+local last = 0
 
-function OnSpawned(requestId, entities)
-    -- entities 是 Entity 对象数组
-    if entities and entities[1] then
-        print("Spawned id=" .. entities[1]:getId())
-    end
-end
-
--- 查询目录（调试用）
-print(spawn.getItemCount())
-print(spawn.getSaveCount())
-print(spawn.getModCount())
-print(spawn.getNameByAlias("human"))
-print(spawn.existsByAlias("human") and "yes" or "no")
-```
-
-**注意**：沙盒中 `spawn.create` 会**立即创建实体**（便于物理模拟），仍正确返回 requestId 并在 tick 末触发 OnSpawned。
-
-### 9. 世界控制
-
-```lua
-world.save()
-world.load()
-world.reset()
-world.clearCorpses()       -- 清除尸体
-world.clearDecals()        -- 清除弹孔/痕迹
-world.clearGibs()          -- 清除碎块
-world.clearLiving()        -- 清除活体
-world.radioSignal("ch")    -- 无线电信号
-world.isSessionActive()
-world.startSession()
-world.endSession()
-```
-
-### 10. 芯片自省（chip.*）
-
-读写当前/其他芯片的输入输出门值与状态。
-
-```lua
-chip.has(eid)                 -> 1/0
-chip.getType(eid)             -> "LuaChip" / "VPChip" / ...
-chip.getInputs(eid)           -> {"gateName|Type", ...}
-chip.getOutputs(eid)
-chip.getValue(eid, "out1")    -> 当前值
-chip.setValue(eid, "in1", v)  -> 1 成功 / 0（门已连线则拒绝）
-chip.hasWire(eid, "in1")      -> 1/0
-chip.getActivation(eid)
-chip.setActivation(eid, 1.0)
-chip.getName(eid)             -> 芯片名字串
-chip.getTPS(eid)              -> 每秒 tick 数（默认 20）
-```
-
-### 11. 机制自省（mechanic.*）
-
-普通机制（非芯片）的门值/连线查询，如按钮、传感器等可接线实体。
-
-```lua
-mechanic.has(eid)                 -> 1/0
-mechanic.getType(eid)
-mechanic.getInputs(eid)           -> {"gateName|Type", ...}
-mechanic.getOutputs(eid)
-mechanic.getValue(eid, "out")
-mechanic.setValue(eid, "in", v)   -> 1 成功 / 0（已连线拒绝）
-mechanic.hasWire(eid, "in")       -> 1/0
-mechanic.getActivation(eid)
-mechanic.setActivation(eid, 1.0)
-```
-
-## 模块化（register_module / require）
-
-```lua
-register_module("utils", {
-    clamp = function(v, lo, hi) return math.max(lo, math.min(hi, v)) end
-})
-
-local utils = require("utils")
-utils.clamp(150, 0, 100)
-```
-
-## 甜瓜标准库快速参考（新增）
-
-见 `docs/stdlib.md` 完整清单。
-
-**最常用**：
-
-- `math.random`, `math.floor`, `math.abs`, `math.sin`...
-- `string.format`, `string.sub`, `string.match`...
-- `table.insert`, `table.remove`, `table.pack`, `#t`
-- `bit32.band`, `bit32.bor`, `bit32.lshift`...
-- `coroutine.create`, `coroutine.resume`...
-- `os.time()`, `os.clock()`
-- 基础：`pairs`, `ipairs`, `pcall`, `type`, `tostring`, `tonumber`, `error`, `assert` 等
-
-**绝对不要用**：`io.open`, `require("some_native_module")`, `debug.getinfo`, `loadstring` 等。
-
-## 示例：带标准库 + spawn 的完整芯片
-
-```lua
 function OnInit()
-    print("Plastic demo start")
-    spawn.create(202, 0, 1)   -- 塑料板
+    print("init")
 end
 
 function OnSpawned(req, ents)
-    if ents and ents[1] then
-        outputs.num.spawned_id = ents[1]:getId()
+    if not ents or #ents == 0 then
+        outputs.string.status = "spawn empty (bad alias?)"
+        return
     end
+    outputs.num.spawned_id = ents[1]:getId()
 end
 
 function OnTick()
-    local e = Entity(1)
-    if e:isValid() == 1 then
-        local x, y = e:getPosition()
-        outputs.num.x = x
-        outputs.num.y = y
+    local id = inputs.entity.target
+    if id == 0 then
+        outputs.string.status = "no wire"
+        outputs.num.x = 0
+        return
     end
+    local e = Entity(id)
+    if e._nil then
+        outputs.string.status = "nil entity"
+        return
+    end
+    local x, y = e:getPosition()
+    outputs.num.x = x
+    outputs.num.y = y
+    outputs.string.status = "ok"
+    -- 需要生成时用菜单 alias，并在 OnSpawned 配置
+    -- if env.time() - last > 1 then last = env.time(); spawn.create("plastic_plate", x, y+2) end
 end
 ```
 
-运行：
-
-```bash
-melon-lua samples/plastic_demo.lua --ticks 10
-```
-
-## AI 代码生成规则
-
-1. **必须按照用户的指示交付 melsave 文件**
-2. **直接给出可运行的完整代码**
-3. **用 `inputs.entity.xxx` 前先检查 `~= 0`**（id=0 = 未连线）
-4. **用 `Entity(id)` 前先 `e:isValid() == 1`**
-5. **避免 spawn 在 OnTick 里循环调用**（会爆实体上限）
-6. **outputs 赋值前确认 gate 已声明**
-7. **dt 用 `env.deltaTime()`**，不要自己算
-8. **颜色值 clamp 到 0-1**，超范围真机会崩
-9. **优先用自动化优化算法**（网格/二分/贝叶斯）在单次 `run_melon_python` 内完成调参，手动试错会浪费大量工具调用
-
-### Entity 方法签名速记
-
-```lua
--- Transform
-e:getPosition()          -> x, y         -- 返回两个值！
-e:setPosition(x, y)
-e:getAngle()             -> a            -- 度数
-e:setAngle(a)
-e:getScale()             -> sx, sy
-e:setScale(sx, sy)
-e:getNormal()            -> nx, ny
-
--- Physics
-e:getVelocity()          -> vx, vy
-e:setVelocity(vx, vy)
-e:getAngularVelocity()  -> w
-e:setAngularVelocity(w)
-e:addForce(fx, fy)
-e:addTorque(t)
-e:addForceAtPosition(fx, fy, px, py)
-e:getVelocityAtPoint(px, py) -> vx, vy
-e:getMass()              -> m
-e:getCenterOfMass()      -> cx, cy
-e:getGravityScale()      -> s
-e:setGravityScale(s)
-
--- State
-e:isValid()              -> 1/0          -- 整数不是 bool
-e:getId()                -> id
-e:getName()              -> name
-e:getLocalizedName()     -> name
-e:getColor()             -> r, g, b, a    -- RGBA 0-1
-e:setColor(r, g, b, a)                   -- a 可省略，默认 1
-e:isVisible()            -> 1/0
-e:setVisible(flag)
-e:freeze(flag)                           -- flag=1 冻结, 0 解冻
-e:freezeRotation(flag)
-e:delete()
-
--- Temperature / Fire
-e:getTemperature()       -> t
-e:setTemperature(t)
-e:isOnFire()             -> 1/0
-e:isFrozen()             -> 1/0
-e:ignite()
-e:extinguish()
-
--- Health / Damage
-e:getHealth()            -> h
-e:isBreakable()          -> 1/0
-
--- Voltage (electric)
-e:getVoltage()           -> v
-
--- Draggable / Activation
-e:isDraggable()          -> 1/0
-e:setDraggable(flag)
-e:canBeActivated()       -> 1/0
-e:activate()
-e:getActivationInput()   -> 1/0
-
--- Hierarchy (grouped/parented entities)
-e:getRoot()              -> rootEntity
-e:getParent()            -> parentEntity
-e:getChildren()          -> {child, ...}
-
--- Size / Bounds (all return multiple values)
-e:getSize()              -> w, h
-e:getBaseSize()          -> w, h
-e:getBounds()            -> minX, minY, maxX, maxY
-e:getFullBounds()        -> minX, minY, maxX, maxY
-e:getColliderBounds()    -> minX, minY, maxX, maxY
-
--- Misc
-e:lookAt(targetId, degPerSec)   -- 旋转看向另一实体（默认 360°/s）
-e:getElevation(tx, ty)       -> ang   -- 朝目标点的仰角（度）
-e:getPhysicMaterial()        -> "Default" / "Ice" / ...
-e:setCollisionEnabled(flag)
-
--- Static query (on Entity class, not instance)
-Entity.all()             -> {e, ...}     -- 所有实体
-Entity.find("Human")     -> e / nil      -- 按名字首匹配
-
--- Collision / Trigger callbacks
-e:subscribeCollisionEnter(cb)
-e:subscribeCollisionExit(cb)
-e:subscribeCollisionStay(cb)
-e:subscribeTriggerEnter(cb)
-e:subscribeTriggerExit(cb)
-e:subscribeTriggerStay(cb)
-e:subscribeWireConnected(cb)
-e:subscribeWireDisconnected(cb)
-e:unsubscribeCollisionEnter(cb)
--- ...对应 unsubscribe* 版本
-e:unsubscribeAll()
-
--- Coord conversion
-e:localToWorld(lx, ly)   -> wx, wy
-e:worldToLocal(wx, wy)   -> lx, ly
-e:localAngleToWorld(la)  -> wa
-e:worldAngleToLocal(wa)  -> la
-```
+---
 
 ## 常见陷阱
 
-- entity id = 0 → 输入未连线，不是bug
-- force/torque = 0 → 检查上游 gate 是否连接
-- inputs.entity.xxx 返回 nil → gate 名拼写/类型错误
-- 芯片在真机不工作 → 检查门名/连线/activation；用户门（如 array_vec）可以加。系统门常见为 entity/activation（tick/status 非必须）
-- 物体不动 → gravity=false 或 freezed=true
-- **LED 黑屏（status 正常但像素全黑）→ array_vec 的 Vector4 元素写成了位置数组 `{r,g,b,a}`。必须用命名键 `{x=r,y=g,z=b,w=a}`**，否则游戏的 Lua-CSharp 按 `.x/.y/.z/.w` 取不到值，全部读成零向量。
+| 现象 | 原因 |
+|------|------|
+| spawn 有 requestId 无实体 | 用了 objectId/类名/`crate_wood`，不是菜单 alias |
+| entity id = 0 | 输入未连线 |
+| LED 黑屏 | array_vec 用了 `{r,g,b,a}` 位置数组，必须 `{x=,y=,z=,w=}` |
+| 雷达永远空 | Select All 空 或 范围仍是 1×1 |
+| 文字屏连不上 | 应用 `connect(...,"text")`（SDK→Key string），不要手写错 Key |
+| UI 多滑块串线 | 同名 `"Value"` 必须 ElementHandle / `output_group` |
+| touch 全无 | 索引写成了 0，应为 1 |
+| `getChildren()[1]:getName()` 崩 | 返回的是 id，先 `Entity(...)` |
+| 输出闪 0 | 某分支没写 outputs |
+| 物体不动 | freezed / 无重力 / 只 run_tick 没步进物理 |
 
+---
+
+## AI 自检清单（导出前）
+
+- [ ] `.melsave` 已 `save`
+- [ ] Lua spawn 全是菜单 alias
+- [ ] 雷达：Select All + 范围 + array_entity 接线 + `Entity(id)`
+- [ ] 门名：`list_item_gates` 查过或用 SDK 自动解析
+- [ ] UI：ElementHandle 连线
+- [ ] `debug_run` / `run_chip` 无 error（能跑沙盒时）
+- [ ] outputs 每路径都有赋值
+- [ ] 未使用 REMOVED 模块 / 错误 Entity 静态 API

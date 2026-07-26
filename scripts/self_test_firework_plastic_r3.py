@@ -5,7 +5,7 @@ Self-test for the BIG plastic-block firework with radius exactly 3.
 Chip: samples/firework_plastic_big_r3.lua
 - Starts a plastic "rocket" at (2, 2)
 - Launches it upward
-- After fuse: explodes into an 18-block ring of "202" (ResizablePlastic) at radius 3
+- After fuse: explodes into an 18-block ring of "plastic_plate" at radius 3
 - Sparks fly outward with velocity
 
 This script:

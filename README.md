@@ -9,7 +9,8 @@
 - ✅ 真实前置脚本 `LuaPreamble.lua`（Entity OOP、`shared`/`signal`/`require` 系统）
 - ✅ 甜瓜允许的标准库（`stdlib_melon` + `verify_melon_stdlib.py`）
 - ✅ 11 个 ApiModule：`entity`、`spawn`、`env`、`camera`、`input`、`inputFilter`、`chip`、`mechanic`、`world`、`variables`、`uicontrol`、`print`
-- ✅ SDK 目录：`object_physics_by_id.json`（495 条尺寸；`spawn.create("202")` / `spawn_entity(object_id=…)`）
+- ✅ SDK 目录：`object_physics_by_id.json`（495 条尺寸，Python `spawn_entity`/`add_item`）+ 真机菜单 alias 表（`spawn.create("plastic_plate")`）
+- ✅ Agent 文档对：`docs/persona.md` + `docs/API.md`
 - ✅ 类型化输入输出：`inputs.num.x`、`outputs.string.status`、`outputs.vec.dir`、`outputs.color.tint` 等
 - ✅ 完整生命周期：`OnInit`、`OnTick`、`OnActivated`、`OnDeactivated`、`OnSpawned`、`OnDestroy`
 - ✅ Box2D 真实 2D 物理：重力、碰撞、`addForce`、`setVelocity`、`freeze`、`gravityScale`

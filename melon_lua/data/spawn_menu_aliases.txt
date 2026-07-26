@@ -1,0 +1,432 @@
+Melon|living_melon
+Pumpkin|living_pumpkin
+Corn|living_corn
+Apple|living_apple
+Cactus|living_cactus
+Tomato|living_tomato
+Dragon Fruit|living_dragon_fruit
+Robot|living_robot
+Coral|living_coral
+Knife|knife
+Sword|sword
+Spear|spear
+Machete|machete
+Blue Sword|blue_sword
+Icicle|icicle
+Energy saber|energy_saber
+Hammer|hammer
+Flail|bludgeon
+Bat|bat
+Club|club
+Tennis Racket|tennis_racket
+Electric baton|electic_baton
+Ax|slashing_axe_1
+Ax|slashing_axe_2
+Labrys|slashing_axe_3
+Pickax|pickaxe
+Circular Saw|circular_saw
+Blue Ax|blue_axe
+chainsaw|chainsaw
+Welding torch|burner
+Staff|staff
+Fire Staff|fire_staff
+Dark Staff|dark_staff
+Spiked Staff|spiked_staff
+Glowing Staff|fluorescent_staff
+Glue Staff|glue_staff
+Ballooning Staff|balloon_staff
+Slick Staff|slick_staff
+Ghostly Staff|ghostly_staff
+Mutation Staff|mutation_staff
+Old broom|old_broom
+Stop sign|stop_sign
+Pistol|pistol
+Auto Pistol|auto_pistol
+Revolver|revolver
+Sawed-Off|sawed_off
+Auto Shotgun|auto_shotgun
+Auto Rifle|auto_rifle
+Machine Gun|machine_gun
+Sniper Rifle|sniper_rifle
+Submachine|submachine
+Minigun|minigun
+Water Gun|water_gun
+Blue Pistol|blue_pistol
+Blue Revolver|blue_revolver
+Crossbow|crossbow
+Flamethrower|flamethrower
+Fire Extinguisher|extinguisher
+Grenade Launcher|grenade_launcher
+Cup Thrower|cup_thrower
+Rocket Launcher|rocket_launcher
+Paintball Gun|paintball_gun
+Nail gun|nail_gun
+Leaf blower|leaf_blower
+Blade launcher|saw_gun
+Homing Launcher|homing_launcher
+Letter Gun|letter_blaster
+Blaster|energy_blaster
+Railgun|railgun
+Protogun|protogun
+Impulse Gun|impulse_gun
+Tool Gun|tool_gun
+Laser Gun|laser_gun
+Stungun|stun_gun
+Freeze gun|freeze_gun
+Standard|ammo_standard
+Explosive|ammo_explosive
+Incendiary|ammo_incendiary
+Armor-Piercing|ammo_armor_piercing
+Expanding|ammo_expanding
+Acidic|ammo_acidic
+Bouncing|ammo_bouncing
+Underwater|ammo_underwater
+Invisible|ammo_invisible
+ammo mixer|ammo_mixer
+Fougasse|fougasse
+Sticky Bomb|sticky_bomb
+Flash Grenade|flash_grenade
+C4|c4
+Land Mine|landmine
+Push Grenade|push_grenade
+Molotov Cocktail|molotov
+Firework|firework
+Nuclear Bomb|nuclear_bomb
+Munroe Bomb|munroe_bomb
+Barrel 1|barrel_1
+Barrel 2|barrel_2
+Fragmentation Grenade|fragmentation_grenade
+Improvised charge|improvised_charge
+Animal Trap|animal_trap
+Turret|turret
+Modular turret|modular_turret
+Healing Turret|healing_turret
+Rocket Turret|rocket_turret
+Turret with knives|knife_turret
+Blade trap|blade_trap
+Freeze Grenade|freezing_grenade
+Smoke grenade|smoke_grenade
+Gas Grenade|gas_grenade
+Explosive charge|explosive_charge
+Virus Barrel|virus_barrel
+Bouncy Bomb Box|bouncy_bomb_box
+Mutation Grenade|mutation_grenade
+Nasty Bomb|nasty_grenade
+Spike grenade|spike_grenade
+Honey Grenade|honey_grenade
+Regen|syringe_regen
+Healing|syringe_healing
+Acid|syringe_acid
+Immortality|syringe_immortality
+Underwater Breathing|syringe_underwater
+Fireproof|syringe_fireproof
+Virus|syringe_virus
+Electricity Protection|syringe_electricity_protection
+Hard Skin|syringe_hard_skin
+Embalming|syringe_embalming
+Joint diluent|syringe_joint_diluent
+Regrowth|syringe_regrowth
+Frost protection|syringe_froze_protection
+Regen|flask_regen
+Healing|flask_healing
+Acid|flask_acid
+Immortality|flask_immortality
+Underwater Breathing|flask_underwater
+Fireproof|flask_fireproof
+Virus|flask_virus
+Electricity Protection|flask_electricity_protection
+Hard Skin|flask_hard_skin
+Embalming|flask_embalming
+Joint diluent|flask_joint_diluent
+Regrowth|flask_regrowth
+Frost protection|frost_protection
+Light Vest|vest_light
+Military Helmet|military_helmet
+Medical Helmet|medical_helmet
+Medium Vest|vest_medium
+Heavy Vest|vest_heavy
+Helmet|helmet
+Pads|pads
+Medieval Armor|armor_medieval
+Medieval Helmet|clothes_helmet_medieval_1
+Medieval Helmet|clothes_helmet_medieval_2
+Medieval Helmet|clothes_helmet_medieval_3
+Hard Hat|hard_hat
+Construction Vest|construction_vest
+Medical Cap|medical_cap
+Bandana|bandana
+Sunglasses|sunglasses
+Hat|hat
+Business Suit|business_suit
+Pants|trousers
+Shoes|shoes
+Cap|cap
+T-Shirt|t_shirt
+Jeans|jeans
+Boots|boots
+Dress|dress
+Camo Suit|camo_suit
+Camo Pants|camo_trousers
+Beard|beard
+Shorts|shorts
+Pumpkin|clothes_pumpkin
+Rabbit Hat|rabbit_hat
+Witch Hat|witch_hat
+Fairy Wings|fairy_wings
+Rabbit Costume|rabbit_costume
+Shirt|shirt
+Kefia|kefia
+Half Kefia|kefia_half
+Wings|wings
+Nimbus|nimbus
+Headphones|headphones
+Old shawl|old_shawl
+Old sweater|old_sweater
+Old skirt|old_skirt
+Old slippers|old_slippers
+Police cap|police_cap
+Police shirt|police_shirt
+Police trousers|police_trousers
+Clown wig|clown_wig
+Clown nose|clown_nose
+Clown shirt|clown_shirt
+Clown trousers|clown_trousers
+Clown shoes|clown_shoes
+Wizard beard|wizard_beard
+Wizard robe|wizard_robe
+Wizard shoes|wizard_shoes
+Parachute|parachute
+Space Helmet|space_helmet
+Spacesuit|space_suit
+Gas mask|gas_mask
+Chemical Helmet|chemical_helmet
+Chemical Suit|chemical_suit
+Welder's mask|welder_mask
+Welder's gloves|welder_gloves
+Welder's Suit|welder_suit
+Party hat|party_hat
+Party Horn|party_horn
+Parasite Cap|parasite_cap
+Wetsuit|wetsuit
+Diving suit|diving_suit
+Diving armor|diving_armor
+Fireproof Suit|fireproof_suit
+Fireproof Helmet|fireproof_helmet
+Christmas Hat|christmas_hat
+Santa Costume|santa_costume
+Elf Hat|elf_hat
+Elf Costume|elf_costume
+Sweater|sweater
+Red Coat|red_coat
+Fur Coat|fur_coat
+Winter Jacket|winter_jacket
+Winter Coat|winter_coat
+Winter Socks|winter_socks
+Warm Pants|warm_pants
+Pompom Hat|pompom_hat
+Pilot’s Hat|pilot_hat
+Winter Boots|winter_boots
+Wig|wig
+Dark wig|dark_wig
+Emo wig|emo_wig
+Iroquois|iroquois
+Cloak|cloak
+Patterned Cloak|patterned_cloak
+Tattered Cloak|tattered_cloak
+Glowing Cloak|glowing_cloak
+Vampire Cloak|vampire_cloak
+Chip|chip
+All Nodes|all
+Velocity|speed
+Following|pursuit
+UI control|uicontrol
+Array|array
+Lua chip|lua_chip
+Gyroscope|gyroscope
+Motorized Wheel|motorized_wheel
+Impulse engine|impulse_engine
+Rocket Engine|thruster
+Directional accelerator|directional_engine
+Piston|piston
+Button|button
+Propeller|propeller
+Wing|wing
+Lever|lever
+Toggle Button|button_toggle
+Contraption Spawner|contraption_spawner
+Vacuum Cleaner|vacuum_cleaner
+Grabber|grabber
+Servo|servo
+Door|door
+Weighting|weighting
+Magnet|magnet
+Effect generator|effect_generator
+Bubble level|bubble_level
+Slider|slider
+conveyor|conveyor
+Plug|plug
+Socket|socket
+Valve|valve
+Fuel engine|fuel_engine
+Car seat|carseat
+Camera screen|screen
+Camera|camera
+Range Finder|ranger
+Trigger|trigger
+Radio|radio
+Timer|timer
+Context activator|context_activator
+Text screen|text_screen
+Synthesizer|synthesizer
+Damage sensor|damage_sensor
+Rope controller|rope_controller
+Liquid Scanner|liquid_scanner
+Liquid Probe|liquid_probe
+Radar|radar
+Entities marker|entities_marker
+LED matrix|led_matrix
+Depth and pressure sensor|depth_and_pressure_sensor
+Ballast|ballast
+Streetlight|street_light
+Flashlight|flash_light
+Edison Lamp|edison_lamp
+Candle|candle
+Candlestick|candlestick
+String Lights|festoon
+Watermelon|watermelon
+Duck|duck
+Melon|light_melon
+Glowing Label|glow_label
+Fluorescent lamp 1|fluorescent_lamp_1
+Fluorescent lamp 2|fluorescent_lamp2
+Generator|generator
+Adapter|adapter
+Relay|relay
+Voltmeter|voltmeter
+Battery|battery
+Transformer|transformer
+Tesla Coil|tesla_coil
+Drums|drums
+Flutes|flutes
+Xylophone|xylophone
+Guitar|guitar
+Piano|piano
+Car seat|сar seat
+Inflatable boat|inflatable_boat
+Limb Connector|limb_connector
+Bandage|bandage
+Splint|splint
+Heartbeat Monitor|heartbeat_monitor
+Defibrillator|defibrilator
+Fluid Tank|fluid_tank
+Oil Can|oil_can
+Syringe Machine|syringe_machine
+Watering Can|watering_can
+Juice Bottle|juice_bottle
+Tomato Juice|tomato_juice
+Dragon Juice|dragon_juice
+Corn Juice|corn_juice
+Pumpkin Juice|pumpkin_juice
+Cactus Juice|cactus_juice
+Apple Juice|apple_juice
+Melon Juice|melon_juice
+Coral Juice|coral_juice
+Glass Jar|glass_jar
+Liquid collector|liquid_collector
+Liquid Duplicator|liquid_duplicator
+Pump|liquid_pump
+Crate|crate
+Barrel|barrel
+Cake|cake
+Tea Box|tea_box
+Metal Rod|metal_rod
+Wooden Stick|wooden_stick
+Wheel|wheel
+Weight|weight
+Life Preserver|lifebuoy
+Chair|chair
+Armchair|armchair
+Table|table
+Gift|present
+Snowman|snow_man
+Melon Cooler|melon_cooler
+Snowblock|snowblock
+Iceblock|iceblock
+Tomato can|tomato_can
+Waste Barrel|waste_barrel
+Helium cylinder|helium_cylinder
+Rusty compartment|room
+Modern compartment|room_blue
+Hermetic door|hermetic_door
+Hermetic door|hermetic_door_blue
+Passageway|passageway
+Passageway|passageway_blue
+Dome|glass_dome
+Strong Dome|glass_dome_blue
+Docking hatch|docking_hatch
+Old triangular compartment|tringle_room
+Modern triangular compartment|tringle_room_blue
+Old rounded compartment|round_room
+Modern rounded compartment|round_room_blue
+Green Camo Plate|camo_plate_green
+Gray Camo Plate|camo_plate_grey
+Yellow Camo Plate|camo_plate_yellow
+Sand Camo Plate|camo_plate_sand
+Metal Plate|metal_plate
+Wooden Plate|wooden_plate
+Concrete Plate|concrete_plate
+Plastic Plate|plastic_plate
+Brick|resizable_brick
+Gothic Brick|gothic_brick
+Cup|cup
+Teapot|teapot
+Plate|plate
+Bowl|bowl
+Bottle|bottle
+Brick Wall|brick_wall
+Brick|build_brick
+Short Beam|balk_short
+Beam|balk
+Wooden Plank|wooden_lath
+Glass Panel|glass_panel
+Triplex Glass|triplex_glass
+Cobblestone|cobblestone
+Front Log|log_front
+Side Log|log_side
+Basketball|basketball_ball
+Basketball Hoop|basketball_hoop
+Soccer Ball|football_ball
+Soccer Goal|football_goal
+Tennis Ball|tennis_ball
+Nanoassembler|nanoassembler
+Rack|rack_decor
+Sectional test tube|sectional_test_tube
+Wide test tube|wide_test_tube
+Thin test tube|thin_test_tube
+Conical flask|conical_flask
+Measuring flask|measuring_flask
+Reaction flask|reaction_flask
+Vat of acid|vat_of_acid
+Spruce|spruce
+Big Spruce|big_spruce
+Cactus|nature_cactus
+Melon|nature_melon
+Pumpkin|nature_pumpkin
+Corn|nature_corn
+Apple|nature_apple
+Apple Tree|apple_tree
+Tree|tree
+Bush|bush
+Palm|palm
+Dragon Fruit|nature_dragon_fruit
+Coral blue|coral_blue
+Coral Pink|coral_pink
+Watermelon Flag|flag_1
+Apple Flag|flag_2
+Red Flag|flag_3
+Corn Flag|flag_4
+Pumpkin Flag|flag_5
+Yellow Flag|flag_6
+Pitaya Flag|flag_7
+Cactus Flag|flag_8
+White Flag|flag_9

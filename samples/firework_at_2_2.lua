@@ -54,7 +54,7 @@ end
 
 function OnInit()
     -- Explicit (2, 2)
-    local req = spawn.create("Firework", 2.0, 2.0)
+    local req = spawn.create("firework", 2.0, 2.0)
     outputs.string.status = "spawning"
     outputs.num.x = 2
     outputs.num.y = 2

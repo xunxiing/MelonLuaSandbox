@@ -1,0 +1,887 @@
+
+  LUA API REFERENCE — full reference of every available method.
+
+    This script is a reference, NOT meant to be executed as a whole.
+    Every method is shown with its signature and a short comment.
+
+    Inputs (for the examples):
+        inputs.entity.target
+        inputs.entity.other
+        inputs.num.action
+        inputs.num.force
+        inputs.vec.direction
+        inputs.color.tint
+        inputs.string.label
+        inputs.int.count
+]]
+
+-- ============================================================
+-- LIFECYCLE (script lifecycle)
+-- ============================================================
+
+-- Code outside functions runs ONCE on first compile (initialization)
+local myState = {}
+local counter = 0
+
+function OnInit()
+    -- Called once after the first Execute, before the first OnTick
+end
+
+function OnTick()
+    -- Called every tick (REQUIRED function)
+    counter = counter + 1
+end
+
+function OnSpawned(requestId, entities)
+    -- Called when a deferred spawn completes
+    -- requestId: number returned by spawn.create/clone/etc
+    -- entities: array of Entity objects (ALWAYS an array), nil on error
+    if entities then
+        for i = 1, #entities do
+            print("spawned: " .. entities[i]:getName())
+        end
+    end
+end
+
+function OnActivated()
+    -- Called when the chip is activated
+end
+
+function OnDeactivated()
+    -- Called when the chip is deactivated
+end
+
+function OnDestroy()
+    -- Called when the chip is destroyed
+end
+
+-- ============================================================
+-- ENTITY API — Transform (11 methods)
+-- ============================================================
+
+function DemoTransform()
+    local e = Entity(inputs.entity.target)
+    if e._nil then return end
+
+    local px, py = e:getPosition()            -- → x, y (world)
+    e:setPosition(px + 1, py)                 -- set position (world)
+
+    local angle = e:getAngle()                -- → degrees
+    e:setAngle(90)                            -- set angle (degrees)
+
+    local sx, sy = e:getScale()               -- → scaleX, scaleY
+    e:setScale(2, 2)                          -- set scale
+
+    local nx, ny = e:getNormal()              -- → object's up vector
+
+    local wx, wy = e:localToWorld(1, 0)       -- local → world coordinates
+    local lx, ly = e:worldToLocal(wx, wy)     -- world → local coordinates
+
+    local wa = e:localAngleToWorld(45)         -- local angle → world
+    local la = e:worldAngleToLocal(wa)         -- world angle → local
+end
+
+-- ============================================================
+-- ENTITY API — Physics (15 methods)
+-- ============================================================
+
+function DemoPhysics()
+    local e = Entity(inputs.entity.target)
+    if e._nil then return end
+
+    local vx, vy = e:getVelocity()            -- → linear velocity
+    e:setVelocity(5, 0)                       -- set linear velocity
+
+    local omega = e:getAngularVelocity()       -- → angular velocity (°/s)
+    e:setAngularVelocity(100)                 -- set angular velocity
+
+    e:addForce(0, 500)                        -- apply force (world)
+    e:addTorque(50)                           -- apply torque
+    e:addForceAtPosition(100, 0, 0, 5)        -- force at point (fx, fy, px, py)
+
+    local vpx, vpy = e:getVelocityAtPoint(1, 0) -- → velocity at point (world)
+
+    local mass = e:getMass()                   -- → mass
+    local cmx, cmy = e:getCenterOfMass()       -- → center of mass (world)
+
+    local gs = e:getGravityScale()             -- → gravity scale
+    e:setGravityScale(0)                      -- disable gravity
+    e:setGravityScale(1)                      -- restore default
+
+    e:freeze(1)                               -- freeze (static body)
+    e:freeze(0)                               -- unfreeze (dynamic body)
+
+    e:freezeRotation(1)                       -- block rotation
+    e:freezeRotation(0)                       -- allow rotation
+
+    e:setCollisionEnabled(0)                  -- disable collisions (NoCollide layer)
+    e:setCollisionEnabled(1)                  -- enable collisions (restore layer)
+end
+
+-- ============================================================
+-- ENTITY API — Health / Temperature (8 methods)
+-- ============================================================
+
+function DemoHealthTemp()
+    local e = Entity(inputs.entity.target)
+    -- local melon = Entity(require("myModule").entityId)  -- require example
+    if e._nil then return end
+
+    local temp = e:getTemperature()            -- → temperature
+    e:setTemperature(500)                     -- set temperature
+
+    local fire = e:isOnFire()                  -- → 1/0
+    local frozen = e:isFrozen()                -- → 1/0
+
+    e:ignite()                                -- set on fire
+    e:extinguish()                            -- extinguish
+
+    local hp = e:getHealth()                   -- → health
+    local breakable = e:isBreakable()          -- → 1/0 (can be broken?)
+end
+
+-- ============================================================
+-- ENTITY API — Visuals (6 methods)
+-- ============================================================
+
+function DemoVisuals()
+    local e = Entity(inputs.entity.target)
+    if e._nil then return end
+
+    local r, g, b, a = e:getColor()            -- → r, g, b, a (0..1)
+    e:setColor(1, 0, 0, 1)                   -- set color (r, g, b, a)
+    e:setColor(0, 1, 0)                       -- alpha defaults to 1
+
+    local name = e:getName()                   -- → ObjectName (internal name)
+    local localName = e:getLocalizedName()     -- → localized name
+
+    -- Visibility (InvisibleComponent)
+    local vis = e:isVisible()                  -- → 1/0 (0 = hidden)
+    e:setVisible(0)                           -- hide the object
+    e:setVisible(1)                           -- show the object
+end
+
+-- ============================================================
+-- ENTITY API — Electricity (1 method)
+-- ============================================================
+
+function DemoElectricity()
+    local e = Entity(inputs.entity.target)
+    if e._nil then return end
+
+    local voltage = e:getVoltage()             -- → voltage
+end
+
+-- ============================================================
+-- ENTITY API — Interaction (5 methods)
+-- ============================================================
+
+function DemoInteraction()
+    local e = Entity(inputs.entity.target)
+    if e._nil then return end
+
+    local drag = e:isDraggable()               -- → 1/0
+    e:setDraggable(0)                         -- disable dragging
+    e:setDraggable(1)                         -- enable dragging
+
+    e:activate(1)                             -- activate the mechanic
+    e:activate(0)                             -- deactivate
+
+    local actInput = e:getActivationInput()    -- → current activation value
+
+    e:delete()                                -- destroy the object
+end
+
+-- ============================================================
+-- ENTITY API — Identity (4 methods)
+-- ============================================================
+
+function DemoIdentity()
+    local e = Entity(inputs.entity.target)
+    if e._nil then return end
+
+    local id = e:getId()                       -- → instanceID
+    local valid = e:isValid()                  -- → 1/0 (is the object alive)
+
+    -- Static methods (no entity needed)
+    local totalEntities = entity.all()         -- → number of objects on the scene
+    local foundId = entity.find("Human")       -- → id of the first match or nil
+end
+
+-- ============================================================
+-- ENTITY API — Hierarchy (3 methods)
+-- ============================================================
+
+function DemoHierarchy()
+    local e = Entity(inputs.entity.target)
+    if e._nil then return end
+
+    -- Root entity (topmost Properties in the hierarchy)
+    local rootId = e:getRoot()                 -- → entityId (own id if already root)
+    local root = Entity(rootId)
+    print("Root: " .. root:getName())
+
+    -- Parent entity (closest parent with Properties)
+    local parentId = e:getParent()             -- → entityId or nil
+    if parentId then
+        local parent = Entity(parentId)
+        print("Parent: " .. parent:getName())
+    end
+
+    -- Direct children (1 level only)
+    local children = e:getChildren()           -- → array of entityId (may be empty)
+    for i = 1, #children do
+        local child = Entity(children[i])
+        print("Child [" .. i .. "]: " .. child:getName())
+    end
+end
+
+-- ============================================================
+-- ENTITY API — Bounds (5 methods)
+-- ============================================================
+
+function DemoBounds()
+    local e = Entity(inputs.entity.target)
+    if e._nil then return end
+
+    local w, h = e:getSize()                   -- → real size = baseSize × scale
+    local bw, bh = e:getBaseSize()             -- → size when scale=1
+
+    local cx, cy, bx, by = e:getBounds()       -- → world AABB (first renderer)
+    local fx, fy, fw, fh = e:getFullBounds()   -- → world AABB (all renderers)
+    local ccx, ccy, cw, ch = e:getColliderBounds() -- → world AABB (collider)
+end
+
+-- ============================================================
+-- ENTITY API — Extended (4 methods)
+-- ============================================================
+
+function DemoExtended()
+    local e = Entity(inputs.entity.target)
+    local other = Entity(inputs.entity.other)
+    if e._nil then return end
+
+    if not other._nil then
+        e:lookAt(other:getId(), 180)           -- turn towards target (targetId, °/s)
+        local tx, ty = other:getPosition()
+        local elev = e:getElevation(tx, ty)    -- → angle to point (degrees)
+    end
+
+    local canAct = e:canBeActivated()          -- → 1/0 (has a Mechanic?)
+    local mat = e:getPhysicMaterial()          -- → physics material name (string)
+end
+
+-- ============================================================
+-- ENTITY API — Collision / Trigger / Wire subscriptions (17 methods)
+-- ============================================================
+
+function DemoCollisions()
+    local e = Entity(inputs.entity.target)
+    if e._nil then return end
+
+    -- === Collision subscriptions ===
+    -- Callback fires BEFORE OnTick (in pre-execute hook)
+
+    local sub1 = e:subscribeCollisionEnter(function(other, self, nx, ny)
+        -- other: Entity that collided with us
+        -- self: Entity that owns the subscription
+        -- nx, ny: collision normal
+    end)
+
+    local sub2 = e:subscribeCollisionExit(function(other, self)
+        -- End of collision (no normal)
+    end)
+
+    local sub3 = e:subscribeCollisionStay(function(other, self)
+        -- Every tick while objects touch
+    end)
+
+    -- === Trigger subscriptions ===
+    -- Triggers have NO normal (no nx, ny)
+
+    local sub4 = e:subscribeTriggerEnter(function(other, self)
+        -- Enter trigger zone
+    end)
+
+    local sub5 = e:subscribeTriggerExit(function(other, self)
+        -- Exit trigger zone
+    end)
+
+    local sub6 = e:subscribeTriggerStay(function(other, self)
+        -- Every tick while inside trigger zone
+    end)
+
+    -- === Unsubscribe (specific subscription by subId) ===
+    e:unsubscribeCollisionEnter(sub1)
+    e:unsubscribeCollisionExit(sub2)
+    e:unsubscribeCollisionStay(sub3)
+    e:unsubscribeTriggerEnter(sub4)
+    e:unsubscribeTriggerExit(sub5)
+    e:unsubscribeTriggerStay(sub6)
+
+    -- === Unsubscribe every subscription of this entity ===
+    e:unsubscribeAll()
+
+    -- === Wire (in/out) subscriptions on chips ===
+    -- Fires when somebody connects/disconnects a wire to a gate of this chip.
+    local sw1 = e:subscribeWireConnected(function(selfId, inputKey, outputEntityId, outputKey)
+        -- selfId: id of the chip receiving the wire
+        -- inputKey: gate name on this chip that got connected
+        -- outputEntityId: id of the chip on the other end
+        -- outputKey: gate name on the other chip
+    end)
+
+    local sw2 = e:subscribeWireDisconnected(function(selfId, inputKey)
+        -- selfId: id of the chip
+        -- inputKey: gate name that got disconnected
+    end)
+
+    e:unsubscribeWireConnected(sw1)
+    e:unsubscribeWireDisconnected(sw2)
+end
+
+-- ============================================================
+-- env — environment (15 methods)
+-- ============================================================
+
+function DemoEnv()
+    local t = env.time()                       -- → seconds (Time.time)
+    local dt = env.deltaTime()                 -- → Time.deltaTime
+    local fdt = env.fixedDeltaTime()           -- → Time.fixedDeltaTime
+    local ts = env.timeScale()                 -- → current timeScale
+    env.setTimeScale(0.5)                     -- set timeScale (0..2)
+
+    local fc = env.frameCount()                -- → frame number
+    local st = env.sessionTime()               -- → seconds since session start
+    local ec = env.entityCount()               -- → number of objects on scene
+
+    local isW = env.isWorld()                  -- → 1/0 (is it a world)
+    local isWE = env.isWorldEditor()           -- → 1/0 (world editor)
+
+    -- System time
+    local utc = env.systemTime()               -- → UTC seconds since epoch
+    local days = env.systemDate()              -- → UTC days since epoch
+    local dateStr = env.toDate(days)           -- → "dd.MM.yyyy"
+    local timeStr = env.toTimeFormat(utc)      -- → "HH:MM:SS"
+    local parsed = env.parseDate("31.12.2024") -- → days since epoch (or 0)
+end
+
+-- ============================================================
+-- camera — camera (7 methods)
+-- ============================================================
+
+function DemoCamera()
+    local cx, cy = camera.getPosition()        -- → x, y
+    camera.setPosition(0, 5)                  -- set position (ignored while following)
+
+    local zoom = camera.getZoom()              -- → zoom
+    camera.setZoom(5.0)                       -- set zoom
+
+    camera.follow(42)                         -- camera follows entityId
+    camera.unfollow()                         -- stop following
+    local following = camera.isFollowing()     -- → 1/0
+end
+
+-- ============================================================
+-- input — input (pointer / multi-touch / gestures / keyboard, 31 methods)
+-- ============================================================
+-- Mouse and touch are unified through LeanTouch — same API works on both
+-- desktop (mouse) and mobile (touch). Mouse counts as one finger.
+
+function DemoInput()
+    -- ==== Pointer (single, "primary" finger / mouse) ====
+    local down = input.pointerDown()           -- → 1/0 (pressed)
+    local up = input.pointerUp()               -- → 1/0 (released this frame)
+    local wx, wy = input.pointerPos()          -- → world coordinates
+    local sx, sy = input.pointerScreenPos()    -- → screen pixels
+    local dx, dy = input.pointerDelta()        -- → movement delta this frame
+
+    -- Raycast — first object under pointer
+    local hitId = input.pointerRaycast()       -- → entityId (0 = nothing hit)
+
+    -- Raycast — all objects under pointer
+    local allHits = input.pointerRaycastAll()  -- → array of entityId (unique)
+    for i = 1, #allHits do
+        local e = Entity(allHits[i])
+        print("hit: " .. e:getName())
+    end
+
+    -- UI filter
+    local overUI = input.isOverUI()            -- → 1/0 (pointer over UI?)
+    local downFiltered = input.pointerDownFiltered()  -- → 1/0 (pressed, not started over UI)
+    local upFiltered = input.pointerUpFiltered()      -- → 1/0 (released, not started over UI)
+
+    -- ==== Multi-touch (per-finger, 1-based index) ====
+    -- Index is into LeanTouch.Fingers — order ≈ touch order, stable within a frame.
+    -- Use input.touchId(i) for stable hardware ID across frames.
+    local count = input.touchCount()           -- → number of active fingers
+
+    if count >= 1 then
+        local set     = input.touchSet(1)              -- → 1/0 (currently touching)
+        local tdown   = input.touchDown(1)             -- → 1/0 (pressed THIS frame)
+        local tup     = input.touchUp(1)               -- → 1/0 (released THIS frame)
+        local age     = input.touchAge(1)              -- → seconds since touch start
+        local id      = input.touchId(1)               -- → stable hardware id
+
+        local tx, ty   = input.touchPos(1)             -- → world coordinates
+        local sx2, sy2 = input.touchScreenPos(1)       -- → current screen pixels
+        local stx, sty = input.touchStartScreenPos(1)  -- → screen position at touch start
+        local tdx, tdy = input.touchDelta(1)           -- → delta this frame
+        local sdx, sdy = input.touchSwipeDelta(1)      -- → total delta since touch start
+
+        local tap     = input.touchTap(1)              -- → 1 only on tap event frame
+        local tapN    = input.touchTapCount(1)         -- → N consecutive taps (double-tap = 2)
+        local swipe   = input.touchSwipe(1)            -- → 1 only on swipe event frame
+
+        local overUi    = input.touchIsOverUI(1)       -- → 1/0 (currently over UI)
+        local startedUi = input.touchStartedOverUI(1)  -- → 1/0 (started over UI — sticky)
+    end
+
+    -- ==== Gesture helpers (two fingers) ====
+    -- Default to fingers 1 and 2; pass explicit 1-based indices for combos.
+    if count >= 2 then
+        local dist  = input.pinchDistance()    -- → screen px between fingers (0 if <2)
+        local angle = input.pinchAngle()       -- → angle a→b in degrees (rotation gesture)
+        local cx, cy = input.pinchCenter()     -- → screen midpoint between fingers
+
+        -- Or with explicit indices: input.pinchDistance(2, 3)
+    end
+
+    -- Common pinch-zoom pattern:
+    --   local lastDist = nil
+    --   function OnTick()
+    --     if input.touchCount() == 2 then
+    --       local d = input.pinchDistance()
+    --       if lastDist then zoom(d - lastDist) end  -- delta>0 → spreading
+    --       lastDist = d
+    --     else lastDist = nil end
+    --   end
+
+    -- ==== Keyboard ====
+    local held = input.key("space")            -- → 1/0 (key held down)
+    local pressed = input.keyDown("w")         -- → 1/0 (key pressed this frame)
+    -- Supported key names:
+    -- "a"-"z", "0"-"9", "space", "left", "right", "up", "down",
+    -- "left shift", "right shift", "left ctrl", "return", "escape",
+    -- "tab", "backspace"
+end
+
+-- ============================================================
+-- spawn — object creation (21 methods)
+-- ============================================================
+
+function DemoSpawn()
+    -- === Standard object catalog ===
+    local items = spawn.getItems()             -- → array of "name|alias" strings
+    local itemStr = spawn.getItemsString("\n") -- → string joined by separator (default ", ")
+    local count = spawn.getItemCount()         -- → count
+
+    -- === User saves catalog ===
+    local saves = spawn.getSaves()             -- → array of "name|id" strings
+    local savesStr = spawn.getSavesString("\n")-- → string joined by separator
+    local saveCount = spawn.getSaveCount()     -- → count
+
+    -- === Built-in resource saves catalog ===
+    local rSaves = spawn.getResourceSaves()          -- → array of "name|id" strings
+    local rSavesStr = spawn.getResourceSavesString() -- → string joined by separator
+    local rSaveCount = spawn.getResourceSaveCount()  -- → count
+
+    -- === Mods catalog ===
+    local mods = spawn.getMods()               -- → array of "name|id" strings
+    local modsStr = spawn.getModsString("\n")  -- → string joined by separator
+    local modCount = spawn.getModCount()       -- → count
+
+    -- === Creating objects (deferred → OnSpawned) ===
+    -- OnSpawned(requestId, entities) — entities is ALWAYS an Entity array
+    local req1 = spawn.create("crate_wood", 0, 5)       -- alias, x, y → requestId
+    local req2 = spawn.createWithAngle("crate_wood", 0, 5, 90) -- alias, x, y, angle → requestId
+
+    -- === Cloning ===
+    local req3 = spawn.clone(1, 5, 5)         -- entityId, x, y → requestId (persistent)
+    local req4 = spawn.cloneTemp(1, 5, 5)     -- entityId, x, y → requestId (temporary, not saved)
+
+    -- === Spawning saves and mods (OnSpawned receives all entities from the save) ===
+    local req5 = spawn.createSave("my_save", 0, 5)  -- name, x, y → requestId
+    local req6 = spawn.createMod("Cool Mod", 3, 5)  -- name, x, y → requestId
+
+    -- === Destroy (immediate) ===
+    spawn.destroy(1)                          -- entityId
+
+    -- === Lookup by alias ===
+    local name = spawn.getNameByAlias("crate_wood")   -- → localized name by alias
+    local exists = spawn.existsByAlias("crate_wood")  -- → 1/0 (does alias exist)
+end
+
+-- ============================================================
+-- chip — VPChip / LuaChip introspection (11 methods)
+-- ============================================================
+-- Works for VPChip and LuaChip mechanics. UIControl / standard mechanics
+-- are handled by their own modules (uicontrol / mechanic).
+
+function DemoChip()
+    local id = inputs.entity.target
+
+    -- Discovery
+    local has = chip.has(id)                    -- → 1/0 (is it a chip at all?)
+    local kind = chip.getType(id)               -- → "VPChip" / "LuaChip" / nil
+
+    -- I/O lists — array of "key|GateDataType" strings (Number, String, Vector, Entity, etc)
+    local ins = chip.getInputs(id)              -- → array of "key|type"
+    local outs = chip.getOutputs(id)            -- → array of "key|type"
+
+    -- Read / Write a gate by name (looks up outputs first, then inputs)
+    local val = chip.getValue(id, "score")      -- → value (number/string/vec/...) or nil
+    local ok = chip.setValue(id, "score", 42)   -- → 1/0 (0 if the gate is wired)
+
+    -- Wire check (true if input gate has a connection)
+    local wired = chip.hasWire(id, "score")     -- → 1/0
+
+    -- Activation gate
+    local act = chip.getActivation(id)          -- → current ActivationInput value
+    chip.setActivation(id, 1)                  -- → 1/0 (set ActivationInput)
+
+    -- Meta
+    local name = chip.getName(id)               -- → visual name / __name input
+    local tps = chip.getTPS(id)                 -- → ticks per second
+end
+
+-- ============================================================
+-- mechanic — standard mechanics introspection (9 methods)
+-- ============================================================
+-- For non-chip mechanics (engines, buttons, doors, etc).
+-- Excludes VPChip / LuaChip / UIControlMechanic.
+
+function DemoMechanic()
+    local id = inputs.entity.target
+
+    local has = mechanic.has(id)                -- → 1/0
+    local kind = mechanic.getType(id)           -- → mechanic class name or nil
+
+    local ins = mechanic.getInputs(id)          -- → array of "key|type"
+    local outs = mechanic.getOutputs(id)        -- → array of "key|type"
+
+    local val = mechanic.getValue(id, "Force")  -- → value or nil
+    local ok = mechanic.setValue(id, "Force", 100) -- → 1/0 (0 if gate is wired)
+
+    local wired = mechanic.hasWire(id, "Force") -- → 1/0
+    local act = mechanic.getActivation(id)      -- → ActivationInput
+    mechanic.setActivation(id, 1)              -- → 1/0
+end
+
+-- ============================================================
+-- uicontrol — runtime UIControl panels (12 methods)
+-- ============================================================
+-- Each UIControl element (button / label / joystick / ...) has:
+--   - Id   — stable runtime identifier (use to read/write its gates)
+--   - Name — author-set display name (use findElement)
+--   - Type — "Button" / "Label" / "Slider" / "Joystick" / ...
+-- Gate names are element-type-specific: "Button is down", "Label Text", "Value", ...
+
+function DemoUIControl()
+    local panel = inputs.entity.target
+
+    -- Discovery
+    local hasPanel = uicontrol.hasUIControl(panel)        -- → 1/0
+    local elements = uicontrol.getElements(panel)         -- → array of "name|type|id"
+    local btnId    = uicontrol.findElement(panel, "play_btn")        -- → elementId by name
+    local buttons  = uicontrol.getElementsByType(panel, "Button")    -- → array of elementId
+
+    -- Per-element gate inspection (each element has its own input/output gates)
+    local inGates  = uicontrol.getInputGates(panel, btnId)   -- → array of "name|type"
+    local outGates = uicontrol.getOutputGates(panel, btnId)  -- → array of "name|type"
+
+    -- Read / write a gate of the element
+    local pressed = uicontrol.getValue(panel, btnId, "Button is down") -- → 1/0
+    uicontrol.setValue(panel, btnId, "Label Text", "Hello")           -- write text
+    local wired = uicontrol.hasWire(panel, btnId, "Button is down")    -- → 1/0
+
+    -- RectTransform (for runtime UI repositioning)
+    local minX, minY, maxX, maxY = uicontrol.getAnchors(panel, btnId)  -- → anchors 0..1
+    local ax, ay = uicontrol.getAnchoredPosition(panel, btnId)         -- → anchored x, y
+    uicontrol.setAnchoredPosition(panel, btnId, 50, -20)               -- move element
+end
+
+-- ============================================================
+-- world — world control (11 methods)
+-- ============================================================
+
+function DemoWorld()
+    -- Session
+    local active = world.isSessionActive()     -- → 1/0
+    world.startSession()                      -- start session
+    world.endSession()                        -- end session
+
+    -- Save/load
+    -- ⚠️ load/reset reload the scene — Lua VM is destroyed
+    world.save()                              -- save current state
+    world.load()                              -- load latest save
+    world.reset()                             -- reset to initial state
+
+    -- Clean up
+    world.clearCorpses()                      -- remove corpses
+    world.clearDecals()                       -- remove decals (blood, footprints)
+    world.clearGibs()                         -- remove gibs
+    world.clearLiving()                       -- remove living things
+
+    -- Radio
+    local signal = world.radioSignal(1)        -- → channel signal (number)
+end
+
+-- ============================================================
+-- REMOVED MODULES (existed in Prototype, gone in production):
+-- screen.size(), screen.center()
+-- time.now(), time.delta(), time.realtime(), time.frame()
+-- go.*, physics.*, sprite., event.
+-- Use env.* for time: env.time(), env.deltaTime(), env.frameCount()
+-- ============================================================
+
+-- ============================================================
+-- variables — state storage
+-- ============================================================
+
+function DemoVariables()
+    -- === Script-level locals (main way to keep state between ticks) ===
+    -- local counter = 0   (outside functions)
+    -- They live in the chunk closure, they are NOT saved to disk.
+    -- Reset on recompile or scene reload.
+
+    -- === Chip-level (stored in VariablesGateDataComponent of THIS chip) ===
+    -- Type is locked once the variable exists (Number stays Number, etc).
+    variables.Set("my_var", 42)                -- → 1.0 (ok) or 0.0, "error"
+    local val = variables.Get("my_var")        -- → value or nil
+    -- Persistence between sessions: enable "save between session" toggle on
+    -- the variable in the chip editor (only visible in WorldEditor).
+
+    -- === Cross-chip data → use shared.* / signal.* / require/register_module ===
+    -- (see DemoShared / DemoSignal / DemoModules below)
+end
+
+-- ============================================================
+-- inputs / outputs — typed I/O
+-- ============================================================
+
+function DemoIO()
+    -- Every sub-table ALWAYS exists (nil-safe)
+
+    -- === Primitives ===
+    local n = inputs.num.speed or 0            -- number (float)
+    local i = inputs.int.count or 0            -- integer
+    local s = inputs.string.label or ""        -- string
+
+    -- === Vector → table {x, y, z, w} ===
+    local v = inputs.vec.direction
+    local vx = v and v.x or 0
+    local vy = v and v.y or 0
+
+    -- === Color → table {r, g, b, a} ===
+    local c = inputs.color.tint
+    local cr = c and c.r or 1
+
+    -- === Entity → number (instanceID), wrap in Entity() ===
+    local e = Entity(inputs.entity.target)
+
+    -- === Arrays (sequential Lua table) ===
+    -- Read: inputs.array_num.data → {1.5, 2.0, 3.7} (1-indexed)
+    local nums = inputs.array_num.data or {}
+    for idx = 1, #nums do
+        local val = nums[idx]                  -- number
+    end
+
+    local strs = inputs.array_string.names or {} -- {"a", "b", "c"}
+    local vecs = inputs.array_vec.points or {}   -- {{x=1,y=2,z=0,w=0}, ...}
+    local ents = inputs.array_entity.targets or {} -- {id1, id2, id3}
+
+    -- === Writing outputs (EVERY tick, otherwise defaults to 0/"") ===
+    outputs.num.result = 42
+    outputs.string.status = "ok"
+    outputs.vec.direction = { x = 1, y = 0, z = 0, w = 0 }
+    outputs.color.highlight = { r = 1, g = 0, b = 0, a = 1 }
+    outputs.entity.found = 123                 -- instanceID
+
+    -- === Writing arrays ===
+    outputs.array_num.filtered = { 1, 2, 3 }
+    outputs.array_string.labels = { "a", "b" }
+    outputs.array_vec.path = {
+        { x = 0, y = 0, z = 0, w = 0 },
+        { x = 1, y = 2, z = 0, w = 0 }
+    }
+    outputs.array_entity.targets = { 101, 102 } -- instanceIDs
+end
+
+-- ============================================================
+-- shared — cross-chip data (any Lua types)
+-- ============================================================
+
+function DemoShared()
+    -- Any chip can read and write
+    shared.my_key = "hello"                    -- write
+    local val = shared.my_key                  -- read
+    shared.score = (shared.score or 0) + 1     -- increment
+    shared.player = { hp = 100, items = {} } -- nested tables
+    shared.inventory = {items = {}, seeds = {}, capacity = 10} --
+    table.insert(shared.player.items, "sword")
+
+    -- Persistence (in worlds)
+    -- shared.Save()                            -- serialize into GlobalVariables
+    -- shared.Load()                            -- load from GlobalVariables
+end
+
+-- ============================================================
+-- signal — event bus between chips
+-- ============================================================
+
+function DemoSignal()
+    -- Subscribe (in OnInit or body)
+    local subId = signal.on("damage", function(data)
+        print("damage: " .. data.amount)       -- data — any Lua type
+    end)
+
+    -- Emit (instant — every subscriber is called right away)
+    signal.emit("damage", { amount = 10, source = "fire" })
+
+    -- Deferred emit (fires at the start of next tick via __flush_signals)
+    signal.defer("game_over", { winner = "player1" })
+
+    -- Unsubscribe
+    signal.off("damage", subId)
+end
+
+-- ============================================================
+-- register_module / require — user modules across chips
+-- ============================================================
+
+function DemoModules()
+    -- One chip registers a module (in OnInit or body)
+    register_module("math_utils", {
+        clamp = function(v, lo, hi)
+            return math.max(lo, math.min(hi, v))
+        end,
+        lerp = function(a, b, t)
+            return a + (b - a) * t
+        end,
+        distance = function(x1, y1, x2, y2)
+            return math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
+        end,
+    })
+
+    -- Another chip imports it (at any time after registration)
+    local utils = require("math_utils")
+    local clamped = utils.clamp(150, 0, 100)   -- → 100
+    local mid = utils.lerp(0, 10, 0.5)          -- → 5
+    local dist = utils.distance(0, 0, 3, 4)     -- → 5
+
+    -- A module can hold any Lua values: functions, tables, numbers
+    -- Stored in _G.__modules — available to every chip
+end
+
+-- ============================================================
+-- debug — print / warn / error_log (3 globals)
+-- ============================================================
+-- All three write to the Lua console AND Unity's CustomDebug log,
+-- but with different severity levels (visible in console filters).
+
+function DemoDebug()
+    -- Info (white) — diagnostic / regular trace
+    print("hello")                             -- → console + Debug.Log
+    print("x =", 42, "y =", 3.14)             -- multiple args joined by tab
+    print(type(Entity(1)))                     -- → "table"
+
+    -- Warning (yellow) — recoverable issue, attention needed
+    warn("config not loaded, using defaults")
+    warn("low health:", inputs.num.hp)
+
+    -- Error (red) — actual bug / unrecoverable problem
+    error_log("missing required input: target_entity")
+    error_log("invalid value:", inputs.num.action, "(expected 0..3)")
+
+    -- Compile / runtime errors are also auto-logged by the engine:
+    -- [compile] ERROR: ...
+    -- [runtime] ERROR in OnTick: ...
+end
+
+
+-- ============================================================
+-- Allowed Lua standard library
+-- ============================================================
+
+-- math:    math.abs, math.floor, math.ceil, math.sqrt, math.sin, math.cos,
+--          math.atan2, math.pi, math.max, math.min, math.random, math.huge ...
+-- string:  string.len, string.sub, string.find, string.format, string.rep,
+--          string.upper, string.lower, string.byte, string.char, string.gmatch ...
+-- table:   table.insert, table.remove, table.sort, table.concat, table.unpack ...
+-- coroutine: coroutine.create, coroutine.resume, coroutine.yield, coroutine.status ...
+-- Basic:   pairs, ipairs, type, tostring, tonumber, select, unpack, pcall
+
+-- ============================================================
+-- FULL EXAMPLE: Automatic turret (commented out)
+-- ============================================================
+
+--[[
+-- inputs.entity.target — turret
+-- inputs.entity.other — target
+-- inputs.string.bullet_alias — bullet object alias
+
+local lastFire = 0
+
+function OnInit()
+    print("turret initialized")
+end
+
+function OnTick()
+    local turret = Entity(inputs.entity.target)
+    local target = Entity(inputs.entity.other)
+    if turret._nil or target._nil then
+        outputs.string.status = "waiting"
+        return
+    end
+
+    -- Aim the turret at the target
+    turret:lookAt(target:getId(), 180)
+
+    -- Fire every 0.5 seconds
+    local now = env.time()
+    if now - lastFire > 0.5 then
+        lastFire = now
+        local bulletAlias = tostring(inputs.string.bullet_alias or "")
+        if bulletAlias ~= "" then
+            local px, py = turret:getPosition()
+            local nx, ny = turret:getNormal()
+            spawn.create(bulletAlias, px + nx * 2, py + ny * 2)
+        end
+    end
+
+    -- Distance to target
+    local tx, ty = target:getPosition()
+    local px, py = turret:getPosition()
+    local dist = math.sqrt((tx - px)^2 + (ty - py)^2)
+
+    outputs.num.distance = dist
+    outputs.string.status = "active"
+end
+
+function OnSpawned(req, entities)
+    if entities and #entities > 0 then
+        local bullet = entities[1]
+        local turret = Entity(inputs.entity.target)
+        if not turret._nil then
+            local nx, ny = turret:getNormal()
+            bullet:setVelocity(nx * 30, ny * 30)
+            bullet:setGravityScale(0)
+            bullet:freezeRotation(1)
+            bullet:setColor(1, 0.5, 0, 1)
+        end
+    end
+end
+
+function OnActivated()
+    print("turret activated")
+end
+
+function OnDeactivated()
+    print("turret dnaeactivated")
+end
+
+function OnDestroy()
+    print("turret destroyed")
+end
+]]

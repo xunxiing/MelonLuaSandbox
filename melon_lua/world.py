@@ -27,8 +27,36 @@ import math as _math
 # Full catalog: 495 spawnables with objectId + size (APK colliders + fallbacks)
 _PHYSICS_BY_ID_PATH = Path(__file__).parent / "data" / "object_physics_by_id.json"
 _PHYSICS_DB_PATH = Path(__file__).parent / "data" / "object_physics.json"
+# Real-device spawn menu: alias → DisplayName (from device getItems dump)
+_SPAWN_MENU_ALIASES_PATH = Path(__file__).parent / "data" / "spawn_menu_aliases.json"
 _PHYSICS_DB_CACHE: Optional[dict[str, dict]] = None
 _PHYSICS_BY_OID_CACHE: Optional[dict[str, dict]] = None
+_SPAWN_MENU_CACHE: Optional[dict[str, str]] = None
+
+
+def _load_spawn_menu_aliases() -> dict[str, str]:
+    """Load real-device menu aliases (alias → display name)."""
+    global _SPAWN_MENU_CACHE
+    if _SPAWN_MENU_CACHE is not None:
+        return dict(_SPAWN_MENU_CACHE)
+    fallback = {
+        "crate": "Crate",
+        "barrel": "Barrel",
+        "plastic_plate": "Plastic Plate",
+        "resizable_brick": "Brick",
+        "wooden_lath": "Wooden Plank",
+        "living_melon": "Melon",
+    }
+    if not _SPAWN_MENU_ALIASES_PATH.exists():
+        _SPAWN_MENU_CACHE = fallback
+        return dict(_SPAWN_MENU_CACHE)
+    try:
+        data = json.loads(_SPAWN_MENU_ALIASES_PATH.read_text(encoding="utf-8"))
+        cat = data.get("alias_to_name") or {}
+        _SPAWN_MENU_CACHE = cat if cat else fallback
+    except Exception:
+        _SPAWN_MENU_CACHE = fallback
+    return dict(_SPAWN_MENU_CACHE)
 
 
 def _load_physics_by_object_id() -> dict[str, dict]:
@@ -139,6 +167,10 @@ class WorldContext:
     # Mechanic gate wire data layer (signal wires between chip/entity gates)
     gate_wires: GateWireRegistry = field(default_factory=GateWireRegistry)
 
+    # Runtime gate output values: container_idx → {gate_name: value}
+    # Filled by mechanics sim (Radar etc.) each tick; used for wire → chip inputs.
+    gate_output_values: dict[int, dict[str, Any]] = field(default_factory=dict)
+
     # Chip variables (variables.Set/Get) — type-locked per key
     chip_variables: dict[str, Any] = field(default_factory=dict)
     chip_variable_types: dict[str, str] = field(default_factory=dict)
@@ -149,15 +181,8 @@ class WorldContext:
     # Signal event bus state is kept in Lua preamble (_sig_listeners etc.)
     # but C# side needs nothing — signal.* is pure Lua in the preamble.
 
-    # Spawn catalog (pre-seeded with a few built-in aliases)
-    spawn_catalog: dict[str, str] = field(default_factory=lambda: {
-        "crate_wood": "Wooden Crate",
-        "crate_metal": "Metal Crate",
-        "human": "Human",
-        "barrel": "Barrel",
-        "ball": "Ball",
-        "plank_wood": "Wooden Plank",
-    })
+    # Spawn catalog: real-device menu aliases (alias → DisplayName)
+    spawn_catalog: dict[str, str] = field(default_factory=_load_spawn_menu_aliases)
     spawn_saves: dict[str, str] = field(default_factory=dict)
     spawn_resource_saves: dict[str, str] = field(default_factory=dict)
     spawn_mods: dict[str, str] = field(default_factory=dict)

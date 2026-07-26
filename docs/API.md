@@ -1,5 +1,7 @@
 # Melon Lua Sandbox — Python SDK 参考
 
+**Agent 文档对：`docs/persona.md`（规则 / 流程 / Lua 硬约束）+ 本文（Python SDK 完整签名）。**  
+不要单独只喂其中一份。Lua 生命周期与游戏 API 陷阱见 persona；Session / connect / UI / debug 签名以本文为准。
 
 ## 快速开始
 
@@ -10,11 +12,12 @@ from melon_lua import (
     list_item_gates, render_world,
 )
 
-# 1. 准备世界（支持 456+ 物体，objectId 或名字）
+# 1. 准备世界（Python：objectId / 物理 catalog；≠ 真机 Lua spawn 菜单 alias）
 world = WorldContext()
-world.spawn_entity("202", 0, 1)                    # ResizablePlastic (塑料板)
-world.spawn_entity("Box", 2, 5, dynamic=True)      # 按 gameObjectName
-world.spawn_entity(23, -3, 4, scale_x=1.5)         # 直接用 objectId
+world.spawn_entity("202", 0, 1)                    # 塑料板 objectId（沙盒/存档）
+world.spawn_entity("Box", 2, 5, dynamic=True)
+world.spawn_entity(23, -3, 4, scale_x=1.5)
+# world.spawn_catalog：真机菜单 alias→DisplayName（约 432 条，见 data/spawn_menu_aliases.json）
 
 runner = MelonScriptRunner(tps=20, world=world, quiet=False)
 runner.compile(source, chunk_name="@my_chip.lua")
@@ -55,12 +58,13 @@ world.tick(1/20)                  # 或 world.step_physics(1/20)
 ```
 
 主要字段/方法：
+
 - `entities: dict[int, Entity]`
 - `spawn_entity(alias_or_id, x, y, dynamic=True, ...) -> Entity`（不是 int；id 用 `.entity_id`）
 - `remove_entity(eid)`
 - `tick(dt)` / `step_physics(dt)` / `step(dt)` — 推进 Box2D
 - `set_entity_velocity(eid, vx, vy)`
-- `spawn_catalog`, `spawn_saves`, `spawn_mods`（用于 spawn.getItems 等）
+- `spawn_catalog`, `spawn_saves`, `spawn_mods`（`spawn.getItems` 等；catalog 为真机菜单 alias→名，见 `data/spawn_menu_aliases.json`）
 
 ### MelonScriptRunner
 
@@ -83,6 +87,7 @@ print(runner.logs)                       # 全部 print/warn/error_log
 ```
 
 关键方法：
+
 - `compile(source, chunk_name)`
 - `call_on_init()`
 - `run_tick(inputs=None) -> {"error": ..., "outputs": ...}`
@@ -153,28 +158,10 @@ melon-lua --api-list
 ## 输入输出与生命周期
 
 与真实甜瓜一致：
-- `inputs.*` / `outputs.*`（num/string/vec/entity/color/array_num/array_string/array_vec/array_entity）
-- `OnInit` / `OnTick` / `OnSpawned(requestId, entities)` / `OnActivated` / `OnDeactivated` / `OnDestroy`
+
 - **Vector4 格式**：array_vec / vec / color 类型的 Lua 值必须用**命名键** `{x=, y=, z=, w=}`。位置数组 `{r,g,b,a}` 会被游戏读成零向量（黑屏/无效果）。
 
-## 线程安全与性能
-
-- 所有 tick 都是确定性的（Box2D + 固定种子）
-- 无真实时间 sleep，适合批量模拟
-- 推荐 `run_loop(ticks=...)` 而不是手动循环
-
-## 限制
-
-- 渲染为 2D 简易预览（无真实 sprite 裁剪/动画）
-- 部分 ApiModule（mechanic/uicontrol/inputFilter）返回 mock 值
-- spawn 目录当前使用别名 + 495 条尺寸表（非完整运行时菜单）
-
 ## 从零构建存档（MelsaveBuilder）
-
-`MelsaveBuilder` 是 `MelsaveSession` 的轻量包装，用于从零程序化构建 .melsave：
-生成物品 + Lua 芯片 + 连线 + 导出。字段结构对齐真机存档。新代码可直接用
-`MelsaveSession`（默认文档模式）；`MelsaveBuilder` 仅作「纯构造、不跑运行时」
-的语义标记。
 
 ### 最小示例
 
@@ -241,17 +228,18 @@ b.save("output.melsave")
 
 ### Gate 类型映射
 
-| 别名 | GateDataType | LuaValue.Type | 说明 |
-|------|-------------|---------------|------|
-| `entity` | 1 | 6 | 实体引用 |
-| `number`/`num` | 2 | 1 | 浮点数 |
-| `int`/`integer` | 2 | 2 | 整数 |
-| `string`/`str` | 4 | 3 | 字符串 |
-| `vector`/`vec` | 8 | 4 | 向量 |
-| `array_entity` | 1024 | 7 | 实体数组（雷达 `entity array` 等） |
-| `array_num`/`array_number` | 128 | 7 | 数值数组 |
-| `array_string`/`array_str` | 256 | 7 | 字符串数组 |
-| `array_vec`/`array_vector` | 512 | 7 | 向量数组 |
+
+| 别名                       | GateDataType | LuaValue.Type | 说明                              |
+| -------------------------- | ------------ | ------------- | --------------------------------- |
+| `entity`                   | 1            | 6             | 实体引用                          |
+| `number`/`num`             | 2            | 1             | 浮点数                            |
+| `int`/`integer`            | 2            | 2             | 整数                              |
+| `string`/`str`             | 4            | 3             | 字符串                            |
+| `vector`/`vec`             | 8            | 4             | 向量                              |
+| `array_entity`             | 1024         | 7             | 实体数组（雷达`entity array` 等） |
+| `array_num`/`array_number` | 128          | 7             | 数值数组                          |
+| `array_string`/`array_str` | 256          | 7             | 字符串数组                        |
+| `array_vec`/`array_vector` | 512          | 7             | 向量数组                          |
 
 ### 芯片系统门
 
@@ -269,9 +257,10 @@ b.save("output.melsave")
 **区域雷达 Radar**（objectId=`892993856`，catalog `"Radar"` / `"radar"`）
 **默认开启**，且 **默认 Select All**（检测名单）。
 
-| 方向 | 门 |
-|------|----|
-| 输出 | `entity` / `activation` / `trigger` / `entity array` |
+
+| 方向 | 门                                                                 |
+| ---- | ------------------------------------------------------------------ |
+| 输出 | `entity` / `activation` / `trigger` / `entity array`               |
 | 输入 | `activation` / `shift x` / `shift y` / `hide` / `width` / `height` |
 
 **Select All（必做）**：真机过滤名单在 `saveMetaDatas` 键
@@ -286,7 +275,12 @@ b.save("output.melsave")
 
 `entity array` 接到芯片时声明 `{"name":"targets","type":"array_entity"}`，
 Lua 用 `inputs.array_entity.targets` 遍历。数组元素是 **entity ID 数字**，
-调用方法前必须 `Entity(id)` 包装：
+调用方法前必须 `Entity(id)` 包装。
+
+**沙盒仿真**（`MelsaveSession`，v5.2.4+）：每 tick 在 `world.tick` 后扫描 Radar
+范围内实体（中心点落在 width×height 框内 + `Radar_selected_entities` 过滤），
+经 `connect(radar, "entity array", chip, "targets")` 自动写入芯片 inputs。
+仍可用 `inputs=` 覆盖/补充。Ranger 激光尚未仿真。
 
 ```lua
 local arr = inputs.array_entity.targets
@@ -324,14 +318,15 @@ width/height/borders。
 语义对齐：`add_lua_chip()` 都把源码写入 `lua_chip_source` 元数据。
 `MelsaveSession` 额外支持运行时 `run_chip()` / 绳索 / 物理。
 
-| 特性 | MelsaveBuilder | MelsaveSession |
-|------|----------------|----------------|
-| 场景 | 从零构建存档（blueprint） | 加载/修改/从零构建 + 可选运行时 |
-| 物理模拟 | 无 | 可选（`.load()` 或 `with` 启动） |
-| 物品 / 芯片 | `add_item()` / `add_lua_chip()` | 同左 + `run_chip()` / `tick()` |
-| 连线 | `connect()` | `connect()` / `disconnect()` |
-| 绳索 | 无 | `create_rope()` / `remove_rope()` |
-| 导出 | `save()` | `save()`（`save_as` 是别名） |
+
+| 特性        | MelsaveBuilder                  | MelsaveSession                    |
+| ----------- | ------------------------------- | --------------------------------- |
+| 场景        | 从零构建存档（blueprint）       | 加载/修改/从零构建 + 可选运行时   |
+| 物理模拟    | 无                              | 可选（`.load()` 或 `with` 启动）  |
+| 物品 / 芯片 | `add_item()` / `add_lua_chip()` | 同左 +`run_chip()` / `tick()`     |
+| 连线        | `connect()`                     | `connect()` / `disconnect()`      |
+| 绳索        | 无                              | `create_rope()` / `remove_rope()` |
+| 导出        | `save()`                        | `save()`（`save_as` 是别名）      |
 
 ## UI 控制器构建（UIControllerBuilder）
 
@@ -341,19 +336,20 @@ UI 元素（按钮、滑块、摇杆等）的面板。每个元素有输入门�
 
 ### 元素类型
 
-| 工厂方法 | Type | 输出门 | 说明 |
-|---------|------|--------|------|
-| `.button()` | 1 | `Button is down` / `Button is up` | 按钮 |
-| `.pedal()` | 2 | 同上 | 踏板（按钮变体） |
-| `.slider()` | 5 | `Value` | 滑块 |
-| `.indicator()` | 6 | `Value` | 指示器（滑块变体） |
-| `.joystick()` | 22 | `Joystick Activation` / `Joystick Direction` / `Joystick Angle` | 摇杆 |
-| `.toggle()` | 17 | `Value` | 开关 |
-| `.rotation_wheel()` | 12 | `Angle Value` / `Up direction` | 转向轮 |
-| `.input_field()` | 11 | `Is changed` / `Field Value` | 文本输入框 |
-| `.pointer()` | 14 | `Dot viewport/screen/worlds position` | 触控点 |
-| `.screen()` | 18 | — | 屏幕（相机） |
-| `.custom_icon()` | 19 | — | 自定义图标 |
+
+| 工厂方法            | Type | 输出门                                                          | 说明               |
+| ------------------- | ---- | --------------------------------------------------------------- | ------------------ |
+| `.button()`         | 1    | `Button is down` / `Button is up`                               | 按钮               |
+| `.pedal()`          | 2    | 同上                                                            | 踏板（按钮变体）   |
+| `.slider()`         | 5    | `Value`                                                         | 滑块               |
+| `.indicator()`      | 6    | `Value`                                                         | 指示器（滑块变体） |
+| `.joystick()`       | 22   | `Joystick Activation` / `Joystick Direction` / `Joystick Angle` | 摇杆               |
+| `.toggle()`         | 17   | `Value`                                                         | 开关               |
+| `.rotation_wheel()` | 12   | `Angle Value` / `Up direction`                                  | 转向轮             |
+| `.input_field()`    | 11   | `Is changed` / `Field Value`                                    | 文本输入框         |
+| `.pointer()`        | 14   | `Dot viewport/screen/worlds position`                           | 触控点             |
+| `.screen()`         | 18   | —                                                              | 屏幕（相机）       |
+| `.custom_icon()`    | 19   | —                                                              | 自定义图标         |
 
 每个元素还有 4 个布局输出门（`Anchor min/max out`、`Anchored position out`、
 `Size delta out`）。
@@ -395,8 +391,7 @@ element_schema("joy")   # 前缀匹配也可以
 }
 ```
 
-公共布局门（每个元素都有，schema 中省略）：`Element shown`、`Element Title
-shown`、`Button is interactable`、`Color`、`Label Pivot`、`Anchor min/max`、
+公共布局门（每个元素都有，schema 中省略）：`Element shown`、`Element Title shown`、`Button is interactable`、`Color`、`Label Pivot`、`Anchor min/max`、
 `Anchored position`、`Size delta`、`Sorting order`（输入）和对应的 `... out`
 （输出）。
 
@@ -438,12 +433,13 @@ with MelsaveSession("ui_demo.melsave") as s:
 `UIControllerBuilder.add_*()` 返回 `ElementHandle` 而非 `self`。句柄携带
 元素 `group_id`（GUID）和主输出门名，可直接传给 `MelsaveSession.connect`：
 
-| 属性 | 说明 |
-|------|------|
-| `.group_id` | 元素稳定 GUID（mechCon.outputGroup 用） |
+
+| 属性              | 说明                                                                                                           |
+| ----------------- | -------------------------------------------------------------------------------------------------------------- |
+| `.group_id`       | 元素稳定 GUID（mechCon.outputGroup 用）                                                                        |
 | `.primary_output` | 该元素类型的主输出门名（Button→`"Button is down"`，Slider→`"Value"`，Joystick→`"Joystick Direction"`，...） |
-| `.container_idx` | 被 `add_ui_controller` 绑定后的容器索引（绑定前为 None） |
-| `.gate(name="")` | 返回 `(gate_name, group_id)`；name 为空时用主输出门 |
+| `.container_idx`  | 被`add_ui_controller` 绑定后的容器索引（绑定前为 None）                                                        |
+| `.gate(name="")`  | 返回`(gate_name, group_id)`；name 为空时用主输出门                                                             |
 
 ```python
 btn = ctrl.add_button(x=0, y=0)
@@ -643,182 +639,179 @@ MelsaveSession(path=None)   # 构造即读取文档（path=None 用空白世界�
 - `debug_run(source, *, ticks=1, inputs=None, container_idx=None, stop_on_error=True, inputs_provider=None)`
   同上，但返回 **每 tick 轨迹**（适合 AI 排查中间状态）::
 
-      {
-        "error": str | None,
-        "outputs": {...},          # 最终输出
-        "frames": [                # 每 tick 一条
-          {
-            "tick": 0,
-            "outputs": {...},
-            "logs_delta": [("print", "...")],
-            "error": None,
-            "variables": {...},    # variables.Set/Get
-            "entity_count": 3,
-          },
-          ...
-        ],
-        "logs": [...],             # 全量控制台
-      }
+  {
+  "error": str | None,
+  "outputs": {...},          # 最终输出
+  "frames": [                # 每 tick 一条
+  {
+  "tick": 0,
+  "outputs": {...},
+  "logs_delta": [("print", "...")],
+  "error": None,
+  "variables": {...},    # variables.Set/Get
+  "entity_count": 3,
+  },
+  ...
+  ],
+  "logs": [...],             # 全量控制台
+  }
 
-- `compile_only(source) -> bool` — 只编译不跑
-- `tick(inputs=None) -> dict` — 单步 OnTick（需先 compile；**不**推进 world）
-- `run_ticks(n, *, inputs=None, inputs_provider=None, tick_callback=None, advance_world=True, stop_on_error=True)`
-  在已编译芯片上跑 N 步（可带 `tick_callback(i, dt, result)`）。典型单步：
+  - `compile_only(source) -> bool` — 只编译不跑
+  - `tick(inputs=None) -> dict` — 单步 OnTick（需先 compile；**不**推进 world）
+  - `run_ticks(n, *, inputs=None, inputs_provider=None, tick_callback=None, advance_world=True, stop_on_error=True)`
+    在已编译芯片上跑 N 步（可带 `tick_callback(i, dt, result)`）。典型单步：
 
-      s.compile_only(src)
-      s.runner.call_on_init()
-      s.run_ticks(10, tick_callback=lambda i, dt, r: ...)
-      print(s.inspect())
+    s.compile_only(src)
+    s.runner.call_on_init()
+    s.run_ticks(10, tick_callback=lambda i, dt, r: ...)
+    print(s.inspect())
 
-- `inspect(*, log_tail=50) -> dict` — 只读汇总：`outputs` + `variables` + `entities` + `logs` + `error`（不推进模拟）
-- `.outputs` / `.logs` / `.last_error` — 当前输出/日志/错误
+    - `inspect(*, log_tail=50) -> dict` — 只读汇总：`outputs` + `variables` + `entities` + `logs` + `error`（不推进模拟）
+    - `.outputs` / `.logs` / `.last_error` — 当前输出/日志/错误
+      **实体**
+  - `entities() -> list[dict]` — 所有存活实体快照
+  - `get_entity(eid)` — 取实体对象
+  - `spawn(name_or_id, x, y, **kw)` — 新增实体
+  - `remove(eid) -> bool` — 删除实体
 
-**实体**
+  **绳子/关节**（16 种 RopeTool 类型：Simple/Spring/FixedDistance/FixedLine/
+  Friction/Slider/Wheel/Relative/...）
 
-- `entities() -> list[dict]` — 所有存活实体快照
-- `get_entity(eid)` — 取实体对象
-- `spawn(name_or_id, x, y, **kw)` — 新增实体
-- `remove(eid) -> bool` — 删除实体
+  - `create_rope(from_id, to_id, kind, **params) -> int` — 建绳，返回 constraint_id
+  - `remove_rope(constraint_id) -> bool` — 删绳
+  - `set_rope_param(constraint_id, key, value) -> bool` — 改绳参数
+    （breakForce/distance/frequency/damping/enableCollisions/...）
+  - `ropes() -> list[dict]` — 当前所有绳子
 
-**绳子/关节**（16 种 RopeTool 类型：Simple/Spring/FixedDistance/FixedLine/
-Friction/Slider/Wheel/Relative/...）
+  **门连线 / 信号线**（mechanic gate connections — 芯片/实体门之间的信号路由）
 
-- `create_rope(from_id, to_id, kind, **params) -> int` — 建绳，返回 constraint_id
-- `remove_rope(constraint_id) -> bool` — 删绳
-- `set_rope_param(constraint_id, key, value) -> bool` — 改绳参数
-  （breakForce/distance/frequency/damping/enableCollisions/...）
-- `ropes() -> list[dict]` — 当前所有绳子
+  门连线是 mechanic 约束（`constraintId=13`，带 `mechCon` 字段），与物理绳索
+  （`constraintId=10`，`mechCon=null`）共存于 `constraints` 列表。统一 API 用
+  `connect` / `disconnect` / `list_connections`。
 
-**门连线 / 信号线**（mechanic gate connections — 芯片/实体门之间的信号路由）
+  ```python
+  with MelsaveSession("input.melsave") as s:
+      # 连线：c7 的 "input 2" 门 -> c5 的 "force" 门
+      s.connect(7, "input 2", 5, "force",
+                name="left engine force",
+                start_point=(0.1, 0.0), end_point=(0.0, 0.1))
 
-门连线是 mechanic 约束（`constraintId=13`，带 `mechCon` 字段），与物理绳索
-（`constraintId=10`，`mechCon=null`）共存于 `constraints` 列表。统一 API 用
-`connect` / `disconnect` / `list_connections`。
+      # 断线：按过滤组合
+      s.disconnect(7, output_gate="input 2")           # 按输出门名删
+      s.disconnect(7, target_idx=5)                    # 按 source+target 删
 
-```python
-with MelsaveSession("input.melsave") as s:
-    # 连线：c7 的 "input 2" 门 -> c5 的 "force" 门
-    s.connect(7, "input 2", 5, "force",
-              name="left engine force",
-              start_point=(0.1, 0.0), end_point=(0.0, 0.1))
+      # 列出当前连线
+      for w in s.list_connections():
+          print(f"c{w['source_idx']}.{w['output_gate']} -> "
+                f"c{w['target_idx']}.{w['input_gate']}")
 
-    # 断线：按过滤组合
-    s.disconnect(7, output_gate="input 2")           # 按输出门名删
-    s.disconnect(7, target_idx=5)                    # 按 source+target 删
+      # 导出
+      s.save("output.melsave")
+  ```
+  **门连线 SDK 契约**
 
-    # 列出当前连线
-    for w in s.list_connections():
-        print(f"c{w['source_idx']}.{w['output_gate']} -> "
-              f"c{w['target_idx']}.{w['input_gate']}")
 
-    # 导出
-    s.save("output.melsave")
-```
+  | 字段                          | 值            | 说明                                        |
+  | ----------------------------- | ------------- | ------------------------------------------- |
+  | `constraintId`                | `13`          | mechanic 连线固定值（10=物理绳索）          |
+  | `mechCon.outputID`            | 源门**Key**   | 如`"input 2"`、`"Button is down"`           |
+  | `mechCon.inputID`             | 目标门**Key** | 如`"force"`、`"string"`（文字屏 text 门）   |
+  | `startObjectId`/`endObjectId` | 容器索引      | 0-based 数组下标，非 objectId/localId       |
+  | `startPoint`/`endPoint`       | 视觉偏移      | 对象局部坐标系小值（<1.25），不影响信号路由 |
+  | `mainGuid`                    | UUID          | `{"Value": uuid, "IsEmpty": false}`         |
+  | 约束存放位置                  | source 端     | 只在输出端对象的`constraints` 列表存一份    |
+  | 门名空格                      | 保留          | `"input 2"` 不转下划线                      |
 
-**门连线 SDK 契约**
+  **门名适配（Key vs DataName）**
 
-| 字段 | 值 | 说明 |
-|------|----|------|
-| `constraintId` | `13` | mechanic 连线固定值（10=物理绳索） |
-| `mechCon.outputID` | 源门 **Key** | 如 `"input 2"`、`"Button is down"` |
-| `mechCon.inputID` | 目标门 **Key** | 如 `"force"`、`"string"`（文字屏 text 门） |
-| `startObjectId`/`endObjectId` | 容器索引 | 0-based 数组下标，非 objectId/localId |
-| `startPoint`/`endPoint` | 视觉偏移 | 对象局部坐标系小值（<1.25），不影响信号路由 |
-| `mainGuid` | UUID | `{"Value": uuid, "IsEmpty": false}` |
-| 约束存放位置 | source 端 | 只在输出端对象的 `constraints` 列表存一份 |
-| 门名空格 | 保留 | `"input 2"` 不转下划线 |
+  真机 `mechCon.inputID` / `outputID` 存的是 `mechanicSerialized*` 里的 **Key**，
+  不是 UI 显示的 **DataName**。多数门两者相同；例外：
 
-**门名适配（Key vs DataName）**
 
-真机 `mechCon.inputID` / `outputID` 存的是 `mechanicSerialized*` 里的 **Key**，
-不是 UI 显示的 **DataName**。多数门两者相同；例外：
+  | 物体         | 门       | Key              | DataName  |
+  | ------------ | -------- | ---------------- | --------- |
+  | 文字屏 (261) | 文本输入 | `string`         | `text`    |
+  | UI Button    | 按下     | `Button is down` | `Is down` |
+  | UI Button    | 抬起     | `Button is up`   | `Is up`   |
 
-| 物体 | 门 | Key | DataName |
-|------|----|-----|----------|
-| 文字屏 (261) | 文本输入 | `string` | `text` |
-| UI Button | 按下 | `Button is down` | `Is down` |
-| UI Button | 抬起 | `Button is up` | `Is up` |
+  `connect()` / `connect_gates()` 自动解析：Key 精确匹配 → DataName→Key →
+  大小写不敏感 → 原样回退。因此 `s.connect(chip, "text", screen, "text")`
+  写入 `inputID="string"`。底层：`resolve_gate_key(save_objects, "text", side="input")`。
 
-`connect()` / `connect_gates()` 自动解析：Key 精确匹配 → DataName→Key →
-大小写不敏感 → 原样回退。因此 `s.connect(chip, "text", screen, "text")`
-写入 `inputID="string"`。底层：`resolve_gate_key(save_objects, "text", side="input")`。
+  **快照/写回**
 
-**快照/写回**
 
-- `inspect(*, log_tail=50) -> dict` — outputs + variables + entities + logs + error（agent 首选）
-- `snapshot() -> dict` — {tick, elapsed, entities, ropes, variables, entity_count}
-- `diff() -> dict` — 与原始存档的差异（modified/added/removed/constraints）
-- `save(out_path, *, write_icon=True) -> Path` — 写回 .melsave
-  文档模式直接序列化；运行时模式先应用 world diff 再写。
-  `save_as` 是 `save` 的别名。
+  - `inspect(*, log_tail=50) -> dict` — outputs + variables + entities + logs + error（agent 首选）
+  - `snapshot() -> dict` — {tick, elapsed, entities, ropes, variables, entity_count}
+  - `diff() -> dict` — 与原始存档的差异（modified/added/removed/constraints）
+  - `save(out_path, *, write_icon=True) -> Path` — 写回 .melsave
+    文档模式直接序列化；运行时模式先应用 world diff 再写。
+    `save_as` 是 `save` 的别名。
 
-**底层访问**
+  **底层访问**
 
-- `.world` — WorldContext 对象（要求 load）
-- `.runner` — MelonScriptRunner 对象（要求 load）
-- `.document` — 原始 MelsaveDocument
+  - `.world` — WorldContext 对象（要求 load）
+  - `.runner` — MelonScriptRunner 对象（要求 load）
+  - `.document` — 原始 MelsaveDocument
 
-### 低层 API（不通过 Session）
+  ### 低层 API（不通过 Session）
 
-```python
-from melon_lua import (
-    read_melsave, write_world_to_melsave, build_diff_from_world,
-    WorldContext, MelonScriptRunner,
-)
-from melon_lua.melsave import spawn_document_into_world
+  ```python
+  from melon_lua import (
+      read_melsave, write_world_to_melsave, build_diff_from_world,
+      WorldContext, MelonScriptRunner,
+  )
+  from melon_lua.melsave import spawn_document_into_world
 
-doc = read_melsave("input.melsave")
-world = WorldContext()
-spawn_document_into_world(doc, world)
-runner = MelonScriptRunner(world=world)
-runner.compile(source)
-runner.run_loop(ticks=100)
-write_world_to_melsave(world, doc, "output.melsave")
-```
+  doc = read_melsave("input.melsave")
+  world = WorldContext()
+  spawn_document_into_world(doc, world)
+  runner = MelonScriptRunner(world=world)
+  runner.compile(source)
+  runner.run_loop(ticks=100)
+  write_world_to_melsave(world, doc, "output.melsave")
+  ```
+  ### 低层门连线 API（JSON 级，无 live world）
 
-### 低层门连线 API（JSON 级，无 live world）
+  适用于不创建 `MelsaveSession`、直接操作 Data JSON 的脚本（如
+  `scripts/build_new_rocket_save.py`）：
 
-适用于不创建 `MelsaveSession`、直接操作 Data JSON 的脚本（如
-`scripts/build_new_rocket_save.py`）：
+  ```python
+  import json, zipfile
+  from melon_lua import connect_gates, disconnect_gates, list_gate_connections, resolve_gate_key
 
-```python
-import json, zipfile
-from melon_lua import connect_gates, disconnect_gates, list_gate_connections, resolve_gate_key
+  with zipfile.ZipFile("input.melsave", "r") as zf:
+      data = json.loads(zf.read("Data").decode("utf-8"))
 
-with zipfile.ZipFile("input.melsave", "r") as zf:
-    data = json.loads(zf.read("Data").decode("utf-8"))
+  # 连线：c0 的 "Dot worlds position" -> c7 的 "target"
+  connect_gates(data, 0, "Dot worlds position", 7, "target",
+                name="target position")
 
-# 连线：c0 的 "Dot worlds position" -> c7 的 "target"
-connect_gates(data, 0, "Dot worlds position", 7, "target",
-              name="target position")
+  # 断线：按过滤组合
+  disconnect_gates(data, source_idx=7, output_gate="input 2")
 
-# 断线：按过滤组合
-disconnect_gates(data, source_idx=7, output_gate="input 2")
+  # 列出连线
+  for c in list_gate_connections(data):
+      print(f"c{c['source_idx']}.{c['output_gate']} -> "
+            f"c{c['target_idx']}.{c['input_gate']}")
 
-# 列出连线
-for c in list_gate_connections(data):
-    print(f"c{c['source_idx']}.{c['output_gate']} -> "
-          f"c{c['target_idx']}.{c['input_gate']}")
+  # 写回
+  from melon_lua import write_melsave
+  write_melsave("output.melsave", data, meta_json=None, icon_bytes=None)
+  ```
+  ### GateWireRegistry（直接使用）
 
-# 写回
-from melon_lua import write_melsave
-write_melsave("output.melsave", data, meta_json=None, icon_bytes=None)
-```
+  `WorldContext.gate_wires` 字段是 `GateWireRegistry` 实例，也可直接操作：
 
-### GateWireRegistry（直接使用）
+  ```python
+  from melon_lua import WorldContext, GateWireRegistry
 
-`WorldContext.gate_wires` 字段是 `GateWireRegistry` 实例，也可直接操作：
-
-```python
-from melon_lua import WorldContext, GateWireRegistry
-
-world = WorldContext()
-wid = world.gate_wires.connect(7, "input 2", 5, "force", name="engine")
-world.gate_wires.disconnect(wid)
-world.gate_wires.disconnect_matching(source_idx=7, output_gate="input 2")
-wires = world.gate_wires.list_all()  # list[GateWire]
-```
-
-`GateWire` dataclass 字段：`wire_id`/`main_guid`/`source_idx`/`target_idx`/
-`output_gate`/`input_gate`/`start_point`/`end_point`/`name`/`start_material`/
-`end_material`。
+  world = WorldContext()
+  wid = world.gate_wires.connect(7, "input 2", 5, "force", name="engine")
+  world.gate_wires.disconnect(wid)
+  world.gate_wires.disconnect_matching(source_idx=7, output_gate="input 2")
+  wires = world.gate_wires.list_all()  # list[GateWire]
+  ```
+  `GateWire` dataclass 字段：`wire_id`/`main_guid`/`source_idx`/`target_idx`/
+  `output_gate`/`input_gate`/`start_point`/`end_point`/`name`/`start_material`/
+  `end_material`。

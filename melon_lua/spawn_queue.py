@@ -152,12 +152,33 @@ class SpawnQueue:
                 e.angle = float(op.angle)
             return [e.entity_id]
 
-        resolved = resolve_spawn_name(op.alias_or_name) or op.alias_or_name
+        # Prefer real-device menu alias → display name; still allow objectId/class
+        # for sandbox physics demos (device only accepts menu aliases).
+        key = op.alias_or_name
+        menu_name = (w.spawn_catalog or {}).get(str(key))
+        if menu_name:
+            resolved = str(menu_name)
+        else:
+            resolved = resolve_spawn_name(key) or str(key)
+        # Common menu alias → physics objectId (sandbox sizes; device ignores this)
+        _MENU_OID = {
+            "plastic_plate": 202,
+            "resizable_brick": 202,
+            "crate": 23,
+            "barrel": 24,
+            "wheel": 121,
+            "wooden_lath": 202,
+            "wooden_plate": 202,
+            "metal_plate": 202,
+        }
+        oid = op.object_id
+        if oid is None and str(key) in _MENU_OID:
+            oid = _MENU_OID[str(key)]
         e = w.spawn_entity(
             name=resolved,
             x=op.x,
             y=op.y,
-            object_id=op.object_id,
+            object_id=oid,
             dynamic=op.dynamic,
         )
         if op.angle is not None:

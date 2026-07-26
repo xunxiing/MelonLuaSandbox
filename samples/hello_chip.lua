@@ -4,7 +4,7 @@
 function onInit()
     print("芯片初始化!")
     env.set("counter", 0)
-    spawn.create("测试方块", 10, 10)
+    spawn.create("crate", 10, 10)
 end
 
 function onTick()

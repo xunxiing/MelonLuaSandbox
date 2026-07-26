@@ -9,7 +9,9 @@ from ..world import WorldContext
 
 
 def _format_items(lua, items_dict, sep=None):
-    arr = [f"{k}|{v}" for k, v in items_dict.items()]
+    # Device format is "DisplayName|alias" (see official SpawnCatalog example:
+    # alias = entry:match("|([^|]+)$")). Catalog dict is alias → display name.
+    arr = [f"{v}|{k}" for k, v in items_dict.items()]
     if sep is None:
         return lua.table_from(arr)
     return sep.join(arr)

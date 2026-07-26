@@ -1,9 +1,7 @@
 -- Big plastic block firework, radius 3
--- Uses "202" (ResizablePlastic / Plastic plate) for the burst elements.
+-- Uses real-device menu alias "plastic_plate" (not objectId 202 / ResizablePlastic).
 -- Launches a small rocket from (2, 2), then at height explodes into a LARGE ring
--- of plastic blocks arranged in a circle of radius exactly 3, flying outward.
---
--- This demonstrates a "big" explosion effect with radius 3 made purely from plastic blocks.
+-- of plastic plates arranged in a circle of radius exactly 3, flying outward.
 --
 -- Self-test:
 --   python scripts/self_test_firework_plastic_r3.py
@@ -16,9 +14,9 @@ local state = "init"
 local t = 0
 local FUSE = 28          -- launch duration before big burst
 
-local pending = {}       -- {name="202", x, y, vx, vy}
+local pending = {}       -- {name="plastic_plate", x, y, vx, vy}
 
-local PLASTIC = "202"    -- ResizablePlastic / PlasticBlock
+local PLASTIC = "plastic_plate"
 
 function OnInit()
     local req = spawn.create(PLASTIC, 2.0, 2.0)  -- start with a plastic "rocket"

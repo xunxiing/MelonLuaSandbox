@@ -3,8 +3,8 @@
 
 function onInit()
     print("创建实体...")
-    self_id = spawn.create("玩家芯片", 0, 0)
-    target_id = spawn.create("目标方块", 50, 30)
+    self_id = spawn.create("crate", 0, 0)
+    target_id = spawn.create("barrel", 50, 30)
     print("self_id=" .. self_id .. " target_id=" .. target_id)
 end
 

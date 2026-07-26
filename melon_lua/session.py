@@ -190,6 +190,19 @@ class MelsaveSession:
         """Populate ``world.gate_wires`` from the document's raw constraints."""
         assert self._world is not None
         first = True
+        # Prefer raw_data containers (session mutations after open)
+        containers = self._doc.raw_data.get("saveObjectContainers") or []
+        if containers:
+            for c in containers:
+                if not isinstance(c, dict):
+                    continue
+                so = c.get("saveObjects") or {}
+                cs = so.get("constraints") if isinstance(so, dict) else None
+                if not isinstance(cs, list) or not cs:
+                    continue
+                self._world.gate_wires.from_constraint_dicts(cs, append=not first)
+                first = False
+            return
         for obj in self._doc.objects:
             raw = getattr(obj, "raw", None) or {}
             cs = raw.get("constraints")
@@ -197,6 +210,29 @@ class MelsaveSession:
                 continue
             self._world.gate_wires.from_constraint_dicts(cs, append=not first)
             first = False
+
+    def _simulate_mechanics_and_inputs(
+        self,
+        *,
+        chip_container_idx: Optional[int] = None,
+        inputs: Optional[dict] = None,
+    ) -> Optional[dict]:
+        """Run sensor sims + wire resolve; merge with host ``inputs`` override."""
+        assert self._world is not None
+        from .mechanics import (
+            simulate_radars,
+            build_chip_inputs_from_wires,
+            merge_inputs,
+        )
+        doc_raw = self._doc.raw_data
+        simulate_radars(self._world, doc_raw)
+        idx = chip_container_idx
+        if idx is None:
+            idx = self._active_chip_container
+        auto = None
+        if idx is not None:
+            auto = build_chip_inputs_from_wires(self._world, doc_raw, int(idx))
+        return merge_inputs(auto, inputs)
 
     def close(self) -> None:
         """Release the Box2D world and Lua VM. Idempotent."""
@@ -570,10 +606,29 @@ class MelsaveSession:
         r.call_on_init()
         if ticks <= 0:
             return {"error": None, "outputs": r.get_outputs()}
+        chip_idx = idx
         if ticks == 1:
-            return r.run_tick(inputs=inputs)
-        provider = (lambda i: inputs) if inputs is not None else None
-        r.run_loop(ticks=ticks, inputs_provider=provider)
+            merged = self._simulate_mechanics_and_inputs(
+                chip_container_idx=chip_idx, inputs=inputs,
+            )
+            return r.run_tick(inputs=merged)
+
+        def _provider(i: int) -> dict:
+            base = inputs
+            if callable(inputs):
+                base = inputs(i)  # type: ignore[operator]
+            return self._simulate_mechanics_and_inputs(
+                chip_container_idx=chip_idx, inputs=base,
+            ) or {}
+
+        # run_loop advances world; we need sensors each tick — use manual loop
+        dt = 1.0 / float(r.tps)
+        assert self._world is not None
+        for i in range(int(ticks)):
+            self._world.tick(dt)
+            result = r.run_tick(inputs=_provider(i))
+            if result.get("error"):
+                break
         return {"error": r.last_error, "outputs": r.get_outputs()}
 
     def debug_run(
@@ -635,6 +690,7 @@ class MelsaveSession:
         log_cursor = len(r.logs)
         dt = 1.0 / float(r.tps)
 
+        chip_idx = idx
         for i in range(int(ticks)):
             self._world.tick(dt)
             tick_inputs = None
@@ -642,6 +698,9 @@ class MelsaveSession:
                 tick_inputs = inputs_provider(i)
             elif inputs is not None:
                 tick_inputs = inputs
+            tick_inputs = self._simulate_mechanics_and_inputs(
+                chip_container_idx=chip_idx, inputs=tick_inputs,
+            )
             result = r.run_tick(inputs=tick_inputs)
             logs_now = r.logs
             logs_delta = list(logs_now[log_cursor:])
@@ -686,10 +745,17 @@ class MelsaveSession:
         return self._runner.compile(source, chunk_name=chunk_name)
 
     def tick(self, inputs: Optional[dict] = None) -> dict:
-        """Run a single OnTick on the already-compiled chip (no world step)."""
+        """Run a single OnTick on the already-compiled chip (no world step).
+
+        Still runs radar/sensor sim + gate wire resolve so chips receive
+        wired ``array_entity`` inputs without manual inject.
+        """
         self._require_runtime()
         assert self._runner is not None
-        return self._runner.run_tick(inputs=inputs)
+        merged = self._simulate_mechanics_and_inputs(
+            chip_container_idx=self._active_chip_container, inputs=inputs,
+        )
+        return self._runner.run_tick(inputs=merged)
 
     def run_ticks(
         self,
@@ -726,6 +792,7 @@ class MelsaveSession:
         last_error: Optional[str] = None
         dt = 1.0 / float(r.tps)
         n = max(0, int(ticks))
+        chip_idx = self._active_chip_container
         for i in range(n):
             if advance_world:
                 self._world.tick(dt)
@@ -734,6 +801,9 @@ class MelsaveSession:
                 tick_inputs = inputs_provider(i)
             elif inputs is not None:
                 tick_inputs = inputs
+            tick_inputs = self._simulate_mechanics_and_inputs(
+                chip_container_idx=chip_idx, inputs=tick_inputs,
+            )
             result = r.run_tick(inputs=tick_inputs)
             if tick_callback is not None:
                 tick_callback(i, dt, result)
