@@ -932,6 +932,38 @@ class MelsaveSession:
     # Runtime mode: snapshot / diff
     # ==================================================================
 
+    def workspace_debug(self, code: str, ticks: int = 10, tick_callback=None):
+        self._require_runtime()
+        frames = []
+        for i in range(ticks):
+            self._world.tick(1.0 / float(self.tps))
+            state = self._get_light_state()
+            frames.append({
+                "tick": i,
+                "outputs": state["outputs"],
+                "variables": state["variables"],
+                "entity_count": state["entity_count"]
+            })
+            if tick_callback:
+                tick_callback(frames[-1])
+        return frames
+
+    def get_state(self) -> dict:
+        self._require_runtime()
+        return {
+            "tick": self._world.current_tick,
+            "outputs": self._runner.get_outputs() if self._runner else {},
+            "variables": dict(self._world.chip_variables),
+            "entity_count": sum(1 for e in self._world.entities.values() if getattr(e, "alive", True))
+        }
+
+    def _get_light_state(self):
+        return {
+            "outputs": self._runner.get_outputs() if self._runner else {},
+            "variables": dict(self._world.chip_variables),
+            "entity_count": sum(1 for e in self._world.entities.values() if getattr(e, "alive", True))
+        }
+
     def snapshot(self) -> dict:
         """Return a serializable snapshot of the current world state."""
         self._require_runtime()
