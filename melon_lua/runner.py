@@ -181,11 +181,50 @@ class MelonScriptRunner:
             inputs_tbl[cat] = sub_tbl
         self._g["inputs"] = inputs_tbl
 
-        # Always-fresh outputs table
-        outputs_tbl = self._lua.table_from({})
-        for cat in sub_categories:
-            outputs_tbl[cat] = self._lua.table_from({})
-        self._g["outputs"] = outputs_tbl
+        # Always-fresh outputs table with runtime type checks to match C# engine behavior
+        self._lua.execute("""
+            local sub_categories = {
+                "num", "int", "string", "vec", "color", "entity",
+                "array_num", "array_string", "array_vec", "array_entity"
+            }
+            local outputs = {}
+            local function check_type(cat, val)
+                if val == nil then return end
+                local t = type(val)
+                if t == "function" or t == "thread" or t == "userdata" then
+                    error("Type mismatch: cannot assign " .. t .. " to outputs." .. cat, 3)
+                end
+                if cat == "num" or cat == "int" or cat == "entity" then
+                    if t == "table" then
+                        error("Type mismatch: cannot assign table to outputs." .. cat, 3)
+                    end
+                elseif cat == "string" then
+                    if t == "table" then
+                        error("Type mismatch: cannot assign table to outputs." .. cat, 3)
+                    end
+                elseif cat == "vec" or cat == "color" or cat:find("array_") then
+                    if t ~= "table" then
+                        error("Type mismatch: expected table for outputs." .. cat .. ", got " .. t, 3)
+                    end
+                end
+            end
+
+            for _, cat in ipairs(sub_categories) do
+                local tbl = {}
+                local mt = {
+                    __newindex = function(t, k, v)
+                        check_type(cat, v)
+                        rawset(t, k, v)
+                    end
+                }
+                setmetatable(tbl, mt)
+                outputs[cat] = tbl
+            end
+            __outputs_global_temp = outputs
+        """)
+        self._g["outputs"] = self._g["__outputs_global_temp"]
+        self._g["__outputs_global_temp"] = None
+
 
     def get_outputs(self) -> dict[str, dict[str, Any]]:
         """Return outputs as a plain Python dict."""
