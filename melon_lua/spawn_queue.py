@@ -1,14 +1,36 @@
-"""Spawn requests — spawn.create returns requestId; entities created immediately (no artificial delay)."""
+"""Spawn requests — spawn.create returns requestId; entities created immediately (no artificial delay).
+
+Failure contract (fixes silent-failure debugging): a spawn that cannot resolve
+its alias/objectId produces NO entity and OnSpawned fires with a ``reason``
+string: ``OnSpawned(requestId, nil, reason)``. Device-safety warnings (e.g.
+objectId spawns that work in sandbox but not on the real device) are recorded
+in ``SpawnQueue.warnings`` and logged by the runner at flush time.
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any, Literal, Optional
 
-from .catalog import resolve_spawn_name
+from .catalog import (
+    MENU_ALIAS_OID,
+    get_profile_by_name,
+    get_profile_by_object_id,
+    resolve_spawn_name,
+)
 from .entity import Entity
 from .world import WorldContext
 
 SpawnKind = Literal["create", "clone", "clone_temp", "save", "mod"]
+
+
+def _unknown_alias_reason(key: str, w: "WorldContext") -> str:
+    aliases = ", ".join(sorted((w.spawn_catalog or {}).keys())[:12])
+    return (
+        f"spawn.create: unknown spawn alias '{key}' — no entity created. "
+        f"Valid: device menu aliases from spawn.getItems() (e.g. {aliases}...), "
+        f"catalog gameObjectName (list_spawnables()/catalog_search()), "
+        f"or numeric objectId."
+    )
 
 
 @dataclass
@@ -29,7 +51,10 @@ class SpawnOp:
 class SpawnQueue:
     world: WorldContext
     pending_ops: list[SpawnOp] = field(default_factory=list)
-    _ready_callbacks: list[tuple[int, list[int]]] = field(default_factory=list)
+    _ready_callbacks: list[tuple[int, list[int], Optional[str]]] = field(default_factory=list)
+    # request_id → device-safety warning (spawn succeeded in sandbox, but the
+    # real device would reject this alias/kind). Logged at flush time.
+    warnings: dict[int, str] = field(default_factory=dict)
 
     def allocate_request_id(self) -> int:
         self.world.spawn_request_counter += 1
@@ -56,9 +81,9 @@ class SpawnQueue:
             angle=angle,
             object_id=oid,
         )
-        ent_ids = self._execute_one(op)
+        ent_ids, reason = self._execute_one(op)
         self.world.spawn_requests[rid] = ent_ids
-        self._ready_callbacks.append((rid, ent_ids))
+        self._ready_callbacks.append((rid, ent_ids, reason))
         return rid
 
     def enqueue_clone(
@@ -77,9 +102,9 @@ class SpawnQueue:
             y=float(y),
             clone_entity_id=int(entity_id),
         )
-        ent_ids = self._execute_one(op)
+        ent_ids, reason = self._execute_one(op)
         self.world.spawn_requests[rid] = ent_ids
-        self._ready_callbacks.append((rid, ent_ids))
+        self._ready_callbacks.append((rid, ent_ids, reason))
         return rid
 
     def enqueue_save(self, name: str, x: float, y: float) -> int:
@@ -91,9 +116,9 @@ class SpawnQueue:
             y=float(y),
             save_or_mod_name=str(name),
         )
-        ent_ids = self._execute_one(op)
+        ent_ids, reason = self._execute_one(op)
         self.world.spawn_requests[rid] = ent_ids
-        self._ready_callbacks.append((rid, ent_ids))
+        self._ready_callbacks.append((rid, ent_ids, reason))
         return rid
 
     def enqueue_mod(self, name: str, x: float, y: float) -> int:
@@ -105,28 +130,36 @@ class SpawnQueue:
             y=float(y),
             save_or_mod_name=str(name),
         )
-        ent_ids = self._execute_one(op)
+        ent_ids, reason = self._execute_one(op)
         self.world.spawn_requests[rid] = ent_ids
-        self._ready_callbacks.append((rid, ent_ids))
+        self._ready_callbacks.append((rid, ent_ids, reason))
         return rid
 
-    def flush(self) -> list[tuple[int, list[int]]]:
-        """Fire OnSpawned for entities already created this frame."""
+    def flush(self) -> list[tuple[int, list[int], Optional[str]]]:
+        """Fire OnSpawned callbacks: (request_id, entity_ids, fail_reason).
+
+        Empty ids + reason → the spawn failed (reason carries the cause).
+        Non-empty ids + reason=None → success. Device-safety warnings are in
+        ``self.warnings`` (runner logs them).
+        """
         results = list(self._ready_callbacks)
         self._ready_callbacks = []
         for op in self.pending_ops:
-            ent_ids = self._execute_one(op)
+            ent_ids, reason = self._execute_one(op)
             self.world.spawn_requests[op.request_id] = ent_ids
-            results.append((op.request_id, ent_ids))
+            results.append((op.request_id, ent_ids, reason))
         self.pending_ops = []
         return results
 
-    def _execute_one(self, op: SpawnOp) -> list[int]:
+    def _execute_one(self, op: SpawnOp) -> tuple[list[int], Optional[str]]:
         w = self.world
         if op.kind in ("clone", "clone_temp"):
             src = w.get_entity(op.clone_entity_id or 0)
             if not src:
-                return []
+                return [], (
+                    f"spawn.{op.kind}: source entity {op.clone_entity_id} not found "
+                    f"or destroyed — nothing cloned."
+                )
             e = w.spawn_entity(
                 name=src.name,
                 x=op.x,
@@ -136,44 +169,75 @@ class SpawnQueue:
             )
             self._copy_entity_state(src, e, temp=op.kind == "clone_temp")
             w.sync_body_from_entity(e.entity_id)
-            return [e.entity_id]
+            return [e.entity_id], None
 
         if op.kind == "save":
             display = f"[save]{op.save_or_mod_name}"
             e = w.spawn_entity(display, op.x, op.y, dynamic=True)
             if op.angle is not None:
                 e.angle = float(op.angle)
-            return [e.entity_id]
+            return [e.entity_id], None
 
         if op.kind == "mod":
             display = f"[mod]{op.save_or_mod_name}"
             e = w.spawn_entity(display, op.x, op.y, dynamic=True)
             if op.angle is not None:
                 e.angle = float(op.angle)
-            return [e.entity_id]
+            return [e.entity_id], None
 
-        # Prefer real-device menu alias → display name; still allow objectId/class
-        # for sandbox physics demos (device only accepts menu aliases).
+        # ---- create ----
+        # Resolution order (fixes both silent failure and dual naming):
+        # 1. device menu alias (spawn_catalog)          → device-safe
+        # 2. known alias→oid map (_MENU_OID)            → device-safe
+        # 3. numeric objectId in catalog                → sandbox-only, warn
+        # 4. catalog gameObjectName (auto-fallback oid) → sandbox-only, warn
+        # 5. anything else                              → FAIL with reason
         key = op.alias_or_name
         menu_name = (w.spawn_catalog or {}).get(str(key))
+        oid = op.object_id
+        resolved: Optional[str] = None
+        device_safe = False
+
         if menu_name:
             resolved = str(menu_name)
+            device_safe = True  # menu aliases are accepted by the real device
+            if str(key) in MENU_ALIAS_OID and oid is None:
+                oid = MENU_ALIAS_OID[str(key)]
+        elif str(key) in MENU_ALIAS_OID:
+            resolved = str(key)
+            device_safe = True
+            if oid is None:
+                oid = MENU_ALIAS_OID[str(key)]
+        elif key.isdigit():
+            prof = get_profile_by_object_id(int(key))
+            if prof is None:
+                return [], (
+                    f"spawn.create: objectId {key} is not in the object catalog "
+                    f"— no entity created. Check the id with "
+                    f"get_profile_by_object_id({key}) or catalog_search()."
+                )
+            resolved = str(prof.get("name") or key)
+            oid = int(key)
         else:
-            resolved = resolve_spawn_name(key) or str(key)
-        # Common menu alias → physics objectId (sandbox sizes; device ignores this)
-        _MENU_OID = {
-            "plastic_plate": 202,
-            "resizable_brick": 202,
-            "crate": 23,
-            "barrel": 24,
-            "wheel": 121,
-            "wooden_lath": 202,
-            "wooden_plate": 202,
-            "metal_plate": 202,
-        }
-        oid = op.object_id
-        if oid is None and str(key) in _MENU_OID:
-            oid = _MENU_OID[str(key)]
+            prof = get_profile_by_name(str(key)) or get_profile_by_name(
+                str(resolve_spawn_name(key))
+            )
+            if prof is not None and prof.get("name"):
+                resolved = str(prof["name"])
+                if oid is None and prof.get("objectId") is not None:
+                    oid = int(prof["objectId"])
+            # else: fall through to failure below
+
+        if resolved is None:
+            return [], _unknown_alias_reason(key, w)
+
+        if not device_safe:
+            self.warnings[op.request_id] = (
+                f"spawn.create('{key}'): works in the sandbox, but the REAL DEVICE "
+                f"only accepts spawn-menu aliases (spawn.getItems()) — it would "
+                f"silently return an empty OnSpawned. Prefer a menu alias."
+            )
+
         e = w.spawn_entity(
             name=resolved,
             x=op.x,
@@ -189,7 +253,7 @@ class SpawnQueue:
                 body = w.get_body(e.entity_id)
                 if body is not None:
                     body.angle = math.radians(float(op.angle))
-        return [e.entity_id]
+        return [e.entity_id], None
 
     @staticmethod
     def _copy_entity_state(src: Entity, dst: Entity, *, temp: bool) -> None:

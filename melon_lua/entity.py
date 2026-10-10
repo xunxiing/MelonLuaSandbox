@@ -120,7 +120,7 @@ class Entity:
     @property
     def normal_x(self) -> float:
         import math
-        a = math.radians(self.angle)
+        a = math.radians(self.angle + 90)
         return math.cos(a)
 
     @property

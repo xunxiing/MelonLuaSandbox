@@ -3,7 +3,7 @@
 1. **Entity 方法已固定**：直接写 `e:getAngle()` 等，禁止搜索/探测 melon_lua 源码。
 2. **禁止** `astrbot_grep` / `file_read` / `execute_shell` 去翻 melon_lua——沙盒里没有包源码。
 3. **区域雷达 Radar（892993856）必须 Select All**：`Radar_selected_entities.stringValue` 不能是 `"[]"`。`add_item(892993856)` 已默认写全量名单；禁止清空。空名单 = 真机 `entity array` 永远空。激光雷达 Ranger(13) 用 `RangerMode=All`，不是同一字段。
-4. **Lua `spawn.create` 真机只认菜单 Alias**：`spawn.create("plastic_plate", x, y)` 合法；`spawn.create(202)` / `"ResizablePlastic"` / `"crate_wood"` 在真机静默失败（有 requestId、`OnSpawned` 空表）。用 `spawn.getItems()` 的 `"Name|alias"` **右侧**，或包内 `melon_lua/data/spawn_menu_aliases.txt`。
+4. **Lua `spawn.create` 真机只认菜单 Alias**：`spawn.create("plastic_plate", x, y)` 合法；`spawn.create(202)` / `"ResizablePlastic"` / `"crate_wood"` 在真机静默失败（有 requestId、`OnSpawned` 空表）。用 `spawn.getItems()` 的 `"Name|alias"` **右侧**，或包内 `melon_lua/data/spawn_menu_aliases.txt`。沙盒行为（v5.2.6+）：objectId/catalog 名自动回退解析（带 `[spawn request N]` 真机不兼容警告）；完全未知的 alias → `OnSpawned(requestId, nil, reason)` **第三个参数带失败原因**，不再静默。
 5. **两套键不要混**：
    - Lua 真机 spawn → 菜单 alias（`plastic_plate`、`crate`…）
    - Python `add_item` / `spawn_entity` → objectId / 物理 catalog 名（202 仍可用）
@@ -69,7 +69,7 @@ Session / 门类型 / debug_run 帧结构 / 绳索 等 → **`API.md`**。
 
 | 物件 | objectId | 要点 |
 |------|----------|------|
-| 区域雷达 Radar | 892993856 | **Select All 非空**；默认范围 1×1 极小，必须调大 width/height；输出 `entity array` → 芯片 `array_entity`；元素是 **ID**，必须 `Entity(id)` |
+| 区域雷达 Radar | 892993856 | **Select All 非空**；真机默认范围 1×1 极小，必须调大 width/height（沙盒缺省 10×10 更宽松）；输出 `entity array` → 芯片 `array_entity`；元素是 **ID**，必须 `Entity(id)` |
 | 激光雷达 Ranger | 13 | 默认开；`RangerMode=All`；输出 dist / hit entity 等 |
 | 文字屏 | 261 | `connect(chip,"text",screen,"text")` → SDK 写 Key=`string` |
 | LED 矩阵 | 596836672 | `array_vec` 像素；**Vector4 必须命名键** `{x=,y=,z=,w=}`；禁止位置数组 |
@@ -85,7 +85,7 @@ Session / 门类型 / debug_run 帧结构 / 绳索 等 → **`API.md`**。
 - 顶层代码：首次编译执行一次（放 `local state = {}`）。
 - `OnInit` → 首次 Execute 后、首个 `OnTick` 前。
 - **`OnTick` 必须有**。
-- `OnSpawned(requestId, entities)`：`entities` 为 Entity 数组，失败可为 **nil**；坏 alias 常见 **空表**。`requestId` 对应 `spawn.create` 等返回的请求 ID。
+- `OnSpawned(requestId, entities, reason)`：`entities` 为 Entity 数组，失败为 **nil**；坏 alias 真机常见 **空表**（无提示），沙盒会把失败原因放进第三个参数 `reason`（真机无此参数，写 `function OnSpawned(reqId, entities, reason)` 两端兼容）。`requestId` 对应 `spawn.create` 等返回的请求 ID。
 - 碰撞/触发回调在 **OnTick 之前**。
 - `world.load` / `world.reset` 会 **销毁 Lua VM**。
 
@@ -118,6 +118,29 @@ end
 -- 正确
 spawn.create("plastic_plate", 0, 1)
 spawn.createWithAngle("crate", 0, 0, 45)
+```
+
+---
+
+## 跨芯片原生通信与高级优化（真机必知）
+
+### 1. 原生 `shared` 零线缆共享内存表
+* **零物理导线开销**：芯片之间可以直接读写全局 `shared` 对象（支持嵌套 Lua Table），无需通过 Wire 线缆和 Vector4 数组传输。
+* **生命周期与判空陷阱**：
+  * **必须在 `function OnInit()` 中初始化**！如果在脚本顶层（`OnInit` 外部）直接访问 `shared`，C# 引擎加载时会抛出 `attempt to index global 'shared' (a nil value)` 崩溃并导致芯片挂掉。
+  * 在 `OnTick()` 中读写时，必须添加判空守护：`if shared.my_queue then ... end`。
+
+### 2. 核心原生 API（`signal` / `register_module` / `variables`）
+* **`signal` 事件总线**：`signal.emit("event_name", { amount = 10 })` 广播事件，`signal.on("event_name", callback)` 监听响应；支持 `signal.defer("event_name", data)` 延迟到下一 Tick 触发。
+* **`register_module` 共享库**：在 `OnInit` 中执行 `register_module("utils", { clamp = ... })` 注册模块，其他芯片即可直接 `local utils = require("utils")` 加载使用。
+* **`variables` 变量持久化**：`variables.Set("key", val)` 与 `variables.Get("key")`（支持全局 `SetGlobal` / `GetGlobal`）。
+* **`Entity:setColor` 样式设置**：芯片连接屏幕实体的 `entity target` 输入门后，在首帧执行 `Entity(target):setColor(0, 0, 0, 0)` 可将 LED 屏幕的外框背景全透明隐藏。
+
+### 3. 高性能物理与渲染优化规范
+* **Tick 标记算法 ($O(N) \rightarrow O(1)$)**：避免每帧跑 `for i = 1, 1024 do updated[i] = false end` 重置表，改用 `updated_tick[idx] == tick_cnt` 进行当前帧号标记校验，瞬间省去 1024 次循环开销。
+* **差异化增量渲染 (Differential Incremental Write)**：在修改 Vector4 显存属性（`p.x, p.y, p.z, p.w`）前，先校验值是否发生变化（`_p.x ~= _nx`），仅在改变时修改显存。此举可减少 95%+ 的 C# 结构体反射写开销，彻底封死 `INSTRUCTION LIMIT IN __CHUNK_xx.ONTICK` 指令爆表错误。
+* **`instanceId` 唯一性防掉码陷阱**：每一个 `.melsave` 中的 `saveObjectContainers` 必须分配**独一无二的 negative 32-bit `instanceId`** 以及自增 `localId`。相同 `instanceId` 会导致甜瓜 C# 解包器放弃代码注入，静默将子芯片重置为内置默认的 Demo 模板代码。
+* **LED 屏点阵无缝拼屏**：`LEDMatrixDisplay`（596836672）画面的实际无缝缝合中心距为 **`0.6591m`**（如左上 `-0.3449, 0.6724`，右上 `0.3142, 0.6724`），可实现矩阵点阵边缘 100% 精准无缝连结。
 
 -- 错误（真机静默失败）
 -- spawn.create(202)  spawn.create("ResizablePlastic")  spawn.create("crate_wood")
@@ -218,6 +241,7 @@ parentId = e:getParent()                     -- Get parent entity ID or nil
 children = e:getChildren()                   -- Get children entity IDs (array)
 -- Static methods
 entityCount = entity.all()                   -- Total entities in scene
+ids = entity.all_id()                        -- 1-based table of live entity ids
 foundId = entity.find(name)                  -- Find first entity by name (nil if none)
 
 -- Bounds
@@ -457,7 +481,7 @@ error_log(...)                               -- Log error severity (red)
 | LED 黑屏 | array_vec 用了 `{r,g,b,a}` 位置数组，必须 `{x=,y=,z=,w=}` |
 | 雷达永远空 | Select All 空 或 范围仍是 1×1 |
 | 文字屏连不上 | 应用 `connect(...,"text")`（SDK→Key string），不要手写错 Key |
-| UI 多滑块串线 | 同名 `"Value"` 必须 ElementHandle / `output_group` |
+| UI 多滑块串线 | 同名 `"Value"` 必须 ElementHandle / `output_group`；沙盒 connect 现会对同名多元素门发 ambiguity 警告 |
 | touch 全无 | 索引写成了 0，应为 1 |
 | env.time 比较/计算失效 | env.time 是函数，真机及沙盒运行必须写成 `env.time()`，不可当作数值使用 |
 | `getChildren()[1]:getName()` 崩 | 返回的是 id，先 `Entity(...)` |
@@ -476,3 +500,11 @@ error_log(...)                               -- Log error severity (red)
 - [ ] `debug_run` / `run_chip` 无 error（能跑沙盒时）
 - [ ] outputs 每路径都有赋值
 - [ ] 未使用 REMOVED 模块 / 错误 Entity 静态 API
+
+---
+
+## 扩展包与模块指南
+
+* **`docs/canvas_package_guide.md`**：Canvas 屏幕绘图扩展包、多芯片并行渲染与智能增量渲染指南。
+* **`docs/chinese_character_printing_guide.md`**：紫晶石灰 `Chinese_character_printing` 8105 字 11×11 汉字打印 API 接入与使用指南。
+

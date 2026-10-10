@@ -306,6 +306,8 @@ class WorldContext:
         body = self.b2_world.CreateDynamicBody(**body_def) if dynamic \
                else self.b2_world.CreateStaticBody(position=body_def["position"],
                                                     angle=body_def["angle"])
+        # Tag body with its entity id so raycasts can map hits back to entities.
+        body.userData = e.entity_id
         # Box fixture sized to entity's real size. Static bodies get an
         # extra-thick fixture to prevent tunneling of fast dynamic objects.
         if dynamic:

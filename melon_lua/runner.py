@@ -93,15 +93,25 @@ class MelonScriptRunner:
         if not self._compiled:
             return
         results = self.world.spawn_queue.flush()
+        if not results and not self.world.spawn_queue.warnings:
+            return
+        # Device-safety warnings: sandbox spawn succeeded, real device wouldn't.
+        for rid, warn_msg in getattr(self.world.spawn_queue, "warnings", {}).items():
+            self._on_log("warn", f"[spawn request {rid}] {warn_msg}")
+        self.world.spawn_queue.warnings = {}
         if not results:
             return
         self._sync_chip_env()
         dispatch = self._g["__dispatch_spawn"]
         if dispatch is None:
             return
-        for req_id, ent_ids in results:
+        for req_id, ent_ids, reason in results:
             try:
-                dispatch(req_id, self._lua.table_from(list(ent_ids)))
+                dispatch(
+                    req_id,
+                    self._lua.table_from(list(ent_ids)),
+                    reason if (not ent_ids and reason) else None,
+                )
             except LuaError as e:
                 self._last_error = str(e)
 
@@ -332,14 +342,23 @@ class MelonScriptRunner:
 
         return {"error": None, "outputs": self.get_outputs()}
 
-    def queue_spawn_result(self, request_id: int, entity_ids: list[int]):
-        """Host: external spawn completed — fire OnSpawned like the game engine."""
+    def queue_spawn_result(self, request_id: int, entity_ids: list[int],
+                           reason: str | None = None):
+        """Host: external spawn completed — fire OnSpawned like the game engine.
+
+        Pass ``reason`` (with empty entity_ids) to report a host-side spawn
+        failure to the chip: ``OnSpawned(requestId, nil, reason)``.
+        """
         self.world.spawn_requests[request_id] = list(entity_ids)
         self._sync_chip_env()
         dispatch = self._g["__dispatch_spawn"]
         if dispatch is not None:
             try:
-                dispatch(request_id, self._lua.table_from(list(entity_ids)))
+                dispatch(
+                    request_id,
+                    self._lua.table_from(list(entity_ids)),
+                    reason if (not entity_ids and reason) else None,
+                )
             except LuaError as e:
                 self._last_error = str(e)
 

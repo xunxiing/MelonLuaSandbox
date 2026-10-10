@@ -9,6 +9,7 @@ from .world import WorldContext, CameraState, InputState
 from .entity import Entity
 from .constraints import ConstraintRegistry, Constraint, GateWireRegistry, GateWire
 from .catalog import (
+    catalog_search,
     catalog_stats,
     get_profile_by_object_id,
     get_profile_by_name,
@@ -50,6 +51,7 @@ __all__ = [
     "GateWireRegistry",
     "GateWire",
     "catalog_stats",
+    "catalog_search",
     "get_profile_by_object_id",
     "get_profile_by_name",
     "list_spawnables",

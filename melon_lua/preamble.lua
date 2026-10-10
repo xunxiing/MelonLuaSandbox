@@ -148,6 +148,7 @@ do
     entity = {
         get = Entity,
         all = _e.all,
+        all_id = _e.all_id,
         find = _e.find
     }
 
@@ -207,13 +208,16 @@ end
 -- Spawn callback dispatch
 -- __current_env устанавливается C# перед каждым Execute/CallFunction —
 -- указывает на env-таблицу текущего чипа, где определена OnSpawned.
-function __dispatch_spawn(requestId, idsArray)
+-- Третий аргумент reason — опциональная причина сбоя спавна (fix: раньше
+-- неразрешимый alias тихо возвращал пустой OnSpawned без объяснений).
+function __dispatch_spawn(requestId, idsArray, reason)
     local env = __current_env
     local fn = env and env.OnSpawned or OnSpawned
     if type(fn) ~= "function" then return end
 
     if type(idsArray) ~= "table" then
-        __lua_safe_call(fn, "OnSpawned", requestId, nil)
+        -- Пустой результат: если передан reason — это ошибка спавна.
+        __lua_safe_call(fn, "OnSpawned", requestId, nil, reason)
         return
     end
 
@@ -221,7 +225,7 @@ function __dispatch_spawn(requestId, idsArray)
     -- если idsArray попал с false-дырками или странной структурой.
     local count = __lua_seq_len(idsArray)
     if count <= 0 then
-        __lua_safe_call(fn, "OnSpawned", requestId, nil)
+        __lua_safe_call(fn, "OnSpawned", requestId, nil, reason)
         return
     end
 

@@ -91,5 +91,17 @@ temp/
 *.tmp
 hot.json   # leftover from removed --inputs-hot test
 
+# Generated .melsave outputs at repo root (from samples/CLI runs) — keep local only
+/*.melsave
+# Catalog dumps / one-off scratch
+/*.catalog.txt
+temp_preamble_cut.txt
+
+# Local tool state
+.cortexkit/
+
+# uv lockfile (library — users resolve their own deps)
+uv.lock
+
 # Data that is large/generated at runtime (keep source data/ under melon_lua/data)
 # If you ever generate large sprite atlases at root, list them here.

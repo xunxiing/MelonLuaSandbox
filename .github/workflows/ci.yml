@@ -33,6 +33,9 @@ jobs:
       - name: Run SDK verification
         run: python scripts/verify_sdk.py
 
+      - name: Run 9-bug-fix regression suite
+        run: python scripts/verify_bugfix_9items.py
+
       - name: Smoke test (stdlib chip)
         run: melon-lua samples/stdlib_smoke.lua --ticks 1
         continue-on-error: true

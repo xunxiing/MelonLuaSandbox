@@ -50,6 +50,12 @@ from .melsave_writer import (
 )
 from .world import WorldContext
 from .runner import MelonScriptRunner
+from melon_lua.packages.canvas import (
+    CanvasInstance,
+    CanvasCluster,
+    ParallelCanvasGroup,
+    generate_worker_tile_preamble,
+)
 
 # Packaged empty world template — minimal valid save with zero objects.
 _EMPTY_TEMPLATE = Path(__file__).parent / "data" / "empty.melsave"
@@ -176,10 +182,41 @@ class MelsaveSession:
             return self
         self._world = WorldContext()
         spawn_document_into_world(self._doc, self._world)
+        # Detect the first Lua chip container: use its declared tps for the
+        # runner (chip tps vs session tps mismatch made every tick run at
+        # the wrong dt) and mark it active so run_ticks targets it without
+        # an explicit container_idx.
+        chip_tps: Optional[float] = None
+        containers = self._doc.raw_data.get("saveObjectContainers") or []
+        for i, c in enumerate(containers):
+            if not isinstance(c, dict):
+                continue
+            so = c.get("saveObjects") or {}
+            if not isinstance(so, dict) or so.get("objectId") != 507707712:
+                continue
+            if self._active_chip_container is None:
+                self._active_chip_container = i
+            for md in so.get("saveMetaDatas") or []:
+                if isinstance(md, dict) and md.get("key") == "lua_chip_tps":
+                    try:
+                        v = md.get("intValue") or 0
+                        chip_tps = float(v) if v else None
+                    except (TypeError, ValueError):
+                        chip_tps = None
+                    break
+            if chip_tps:
+                break
+        runner_tps = chip_tps if chip_tps and 1.0 <= chip_tps <= 1000.0 else self.tps
         self._runner = MelonScriptRunner(
-            tps=self.tps,
+            tps=runner_tps,
             world=self._world,
             quiet=self._quiet,
+            # Route Python-side runner logs (spawn device-safety warnings,
+            # dispatch errors) into world.console_buffer so they surface in
+            # debug_run()["logs"] / runner.logs instead of stdout-only print.
+            log_callback=lambda level, msg: self._world.console_buffer.append(
+                (str(level), str(msg))
+            ) if self._world is not None else None,
         )
         # Load existing mechanic gate wires from the document's constraints
         self._load_gate_wires_from_doc()
@@ -211,27 +248,105 @@ class MelsaveSession:
             self._world.gate_wires.from_constraint_dicts(cs, append=not first)
             first = False
 
+    def reset_world(self) -> "MelsaveSession":
+        """Reset the runtime world back to the document state.
+
+        Destroys all runtime-spawned entities (e.g. ``spawn.create`` beads from
+        a previous ``debug_run``), clears Box2D bodies/joints, chip variables,
+        shared table, pending spawn requests and tick counters, then re-spawns
+        the document's objects and reloads gate wires. Call between debug runs
+        so a chip that spawns objects each run doesn't accumulate duplicates
+        (old + new entities pollute color/position readings).
+
+        The Lua runner is kept (recompile your chip with ``compile`` /
+        ``debug_run`` after reset). Idempotent; runtime must be active.
+        """
+        self._require_runtime()
+        assert self._world is not None
+        w = self._world
+        from .constraints import ConstraintRegistry, GateWireRegistry
+
+        # Destroy all physics bodies + entities
+        for eid in list(w.entities.keys()):
+            w.remove_entity(eid)
+        w.entities.clear()
+        w._b2_bodies.clear()
+        w._b2_joints.clear()
+        if w.b2_world is not None:
+            # Fresh Box2D world so leftover contacts/joints can't survive.
+            from .world import _HAS_BOX2D  # noqa: F401  (b2_world rebuild below)
+            try:
+                from Box2D import b2World
+                w.b2_world = b2World(gravity=w.gravity)
+            except Exception:
+                w.b2_world = None
+        # Registries + runtime state
+        w.constraints = ConstraintRegistry()
+        w.gate_wires = GateWireRegistry()
+        w.gate_output_values.clear()
+        w.chip_variables.clear()
+        w.chip_variable_types.clear()
+        w.shared_table.clear()
+        w.spawn_requests.clear()
+        w.spawn_request_counter = 0
+        w.current_tick = 0
+        w.elapsed_time = 0.0
+        w.frame_count = 0
+        w.entity_counter = 0
+        # Pending spawn queue ops / callbacks from the previous run
+        q = getattr(w, "spawn_queue", None)
+        if q is not None:
+            try:
+                q.pending_ops.clear()
+                q._ready_callbacks.clear()
+                q.warnings.clear()
+            except AttributeError:
+                pass
+        # Re-create document entities + wires
+        spawn_document_into_world(self._doc, w)
+        self._load_gate_wires_from_doc()
+        return self
+
     def _simulate_mechanics_and_inputs(
         self,
         *,
         chip_container_idx: Optional[int] = None,
         inputs: Optional[dict] = None,
     ) -> Optional[dict]:
-        """Run sensor sims + wire resolve; merge with host ``inputs`` override."""
+        """Run sensor sims + wire resolve; merge with host ``inputs`` override.
+
+        Priority contract: host-injected inputs WIN over scene wires per gate
+        name. Flat non-bucketed dicts (``{"enable": 1}``) are routed into the
+        correct bucket via the chip's input schema first (normalize_inputs),
+        so they can no longer be silently overridden by a wire like
+        ``btn -> enable`` writing 0 each tick.
+        """
         assert self._world is not None
         from .mechanics import (
             simulate_radars,
+            simulate_rangers,
             build_chip_inputs_from_wires,
             merge_inputs,
+            normalize_inputs,
         )
+        from .mechanics.gate_propagate import chip_input_schema_from_container
         doc_raw = self._doc.raw_data
         simulate_radars(self._world, doc_raw)
+        simulate_rangers(self._world, doc_raw)
         idx = chip_container_idx
         if idx is None:
             idx = self._active_chip_container
         auto = None
         if idx is not None:
             auto = build_chip_inputs_from_wires(self._world, doc_raw, int(idx))
+            if inputs:
+                chip_so = None
+                containers = doc_raw.get("saveObjectContainers") or []
+                if 0 <= int(idx) < len(containers):
+                    c = containers[int(idx)]
+                    if isinstance(c, dict):
+                        chip_so = c.get("saveObjects") or {}
+                inputs = normalize_inputs(inputs, chip_input_schema_from_container(chip_so or {}))
         return merge_inputs(auto, inputs)
 
     def close(self) -> None:
@@ -336,6 +451,165 @@ class MelsaveSession:
         )
         return self.add_container(so)
 
+    def create_canvas(
+        self,
+        width: int = 32,
+        height: int = 32,
+        display_type: str = "led_matrix",
+        x: float = 0.0,
+        y: float = 0.0,
+        scale_x: float = 1.0,
+        scale_y: float = 1.0,
+    ) -> Any:
+        """Create a display hardware item (e.g. LEDMatrixDisplay) and return a CanvasInstance."""
+        from .packages import CanvasInstance
+        if display_type == "led_matrix":
+            item_idx = self.add_item(596836672, x=x, y=y, scale_x=scale_x, scale_y=scale_y)
+            # Pre-allocate Vector4 array data in led-matrix-data input gate
+            total_pixels = width * height
+            vec4_item = {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0, "magnitude": 1.0, "sqrMagnitude": 1.0}
+            vec4_json = json.dumps({"Value": [dict(vec4_item) for _ in range(total_pixels)], "Default": None}, separators=(",", ":"))
+
+            so = self.get_container(item_idx)
+            for md in so.get("mechanicData", []):
+                msi_str = md.get("mechanicSerializedInputs", "[]")
+                if isinstance(msi_str, str):
+                    try:
+                        msi = json.loads(msi_str)
+                        for gate in msi:
+                            if gate.get("Key") == "activation":
+                                gate["GateData"] = json.dumps({"Value": 1.0, "Default": 0.0, "Min": -3.40282347E+38, "Max": 3.40282347E+38, "IsCheckbox": False}, separators=(",", ":"))
+                            elif gate.get("Key") == "led-matrix-data":
+                                gate["GateData"] = vec4_json
+                            elif gate.get("Key") == "led-matrix-width":
+                                gate["GateData"] = json.dumps({"Value": float(width), "Default": float(width), "Min": 1.0, "Max": 256.0, "DropdownOptions": None, "DropdownOptionsLocalizationKey": None}, separators=(",", ":"))
+                            elif gate.get("Key") == "led-matrix-height":
+                                gate["GateData"] = json.dumps({"Value": float(height), "Default": float(height), "Min": 1.0, "Max": 256.0, "DropdownOptions": None, "DropdownOptionsLocalizationKey": None}, separators=(",", ":"))
+                            elif gate.get("Key") == "led-matrix-use-borders":
+                                gate["GateData"] = json.dumps({"Value": 0.0, "Default": 1.0, "Min": 0.0, "Max": 1.0, "IsCheckbox": True}, separators=(",", ":"))
+                        md["mechanicSerializedInputs"] = json.dumps(msi, separators=(",", ":"))
+                    except Exception:
+                        pass
+        else:
+            raise ValueError(f"Unsupported display_type: {display_type}")
+
+        return CanvasInstance(
+            canvas_id=item_idx,
+            item_idx=item_idx,
+            width=width,
+            height=height,
+            display_type=display_type,
+        )
+
+    def create_canvas_cluster(
+        self,
+        cols: int = 2,
+        rows: int = 2,
+        tile_width: int = 32,
+        tile_height: int = 32,
+        display_type: str = "led_matrix",
+        start_x: float = 0.0,
+        start_y: float = 0.0,
+        spacing_x: float = 2.0,
+        spacing_y: float = 2.0,
+    ) -> CanvasCluster:
+        """Create a 2D grid cluster of hardware display screens."""
+        cluster = CanvasCluster(
+            cols=cols,
+            rows=rows,
+            tile_width=tile_width,
+            tile_height=tile_height,
+            display_type=display_type,
+        )
+        for r in range(rows):
+            row_list = []
+            for c in range(cols):
+                px = start_x + c * spacing_x
+                py = start_y + r * spacing_y
+                cv = self.create_canvas(
+                    width=tile_width,
+                    height=tile_height,
+                    display_type=display_type,
+                    x=px,
+                    y=py,
+                )
+                row_list.append(cv)
+            cluster.grid.append(row_list)
+        return cluster
+
+    def add_parallel_canvas_chips(
+        self,
+        cluster: CanvasCluster,
+        worker_script_fn: Callable[[int, int, CanvasInstance], str],
+        master_script: Optional[str] = None,
+        inputs: Optional[list[dict]] = None,
+        outputs: Optional[list[dict]] = None,
+        master_x: float = -2.0,
+        master_y: float = 0.0,
+    ) -> ParallelCanvasGroup:
+        """Spawn parallel worker Lua chips (and optional Master chip) auto-wired to a CanvasCluster."""
+        master_idx = None
+        master_outputs = []
+        if master_script:
+            master_outputs = copy.deepcopy(outputs or [])
+            for r in range(cluster.rows):
+                for c in range(cluster.cols):
+                    master_outputs.append({
+                        "name": f"tile_out_{r}_{c}",
+                        "type": "array_vec",
+                        "size": cluster.tile_width * cluster.tile_height,
+                    })
+            master_idx = self.add_lua_chip(
+                master_script,
+                x=master_x,
+                y=master_y,
+                inputs=inputs,
+                outputs=master_outputs,
+                title="Master Canvas Controller",
+            )
+
+        worker_indices: list[list[int]] = []
+        for r in range(cluster.rows):
+            row_indices = []
+            for c in range(cluster.cols):
+                cv = cluster.get_tile(c, r)
+                user_src = worker_script_fn(c, r, cv)
+                tile_preamble = generate_worker_tile_preamble(c, r, cluster, cv)
+
+                combined_src = f"{tile_preamble}\n{user_src}"
+
+                target_so = self.get_container(cv.item_idx)
+                pos = target_so.get("position", {})
+                wx = pos.get("x", 0.0) + 0.5
+                wy = pos.get("y", 0.0)
+
+                w_inputs = copy.deepcopy(inputs or [])
+                if master_script:
+                    w_inputs.append({"name": "tile_in", "type": "array_vec"})
+
+                w_outputs = copy.deepcopy(outputs or [])
+                w_idx = self.add_lua_chip(
+                    combined_src,
+                    x=wx,
+                    y=wy,
+                    canvases=[cv],
+                    inputs=w_inputs,
+                    outputs=w_outputs,
+                    title=f"Worker Tile ({c},{r})",
+                )
+                row_indices.append(w_idx)
+
+                if master_idx is not None:
+                    self.connect(master_idx, f"tile_out_{r}_{c}", w_idx, "tile_in")
+
+            worker_indices.append(row_indices)
+
+        return ParallelCanvasGroup(
+            cluster=cluster,
+            master_chip_idx=master_idx,
+            worker_chip_indices=worker_indices,
+        )
+
     def add_lua_chip(
         self,
         source: str,
@@ -346,9 +620,10 @@ class MelsaveSession:
         inputs: list[dict] | None = None,
         outputs: list[dict] | None = None,
         variables: list[dict] | None = None,
+        canvases: Any = None,
         tps: int = 30,
         priority: int = 0,
-        instruction_cost: int = 1000,
+        instruction_cost: int = 100000,
         title: str = "",
     ) -> int:
         """Add a Lua chip container to the document.
@@ -360,8 +635,13 @@ class MelsaveSession:
             source: Lua source code (must define OnTick at minimum).
             x, y: World position.
             inputs: List of ``{"name": str, "type": str, "value": ...}`` dicts.
+                Type aliases: entity / number("num") / string("str") /
+                vector("vec") / **color** (Vector4 r,g,b,a — drives FlashLight /
+                EdisonLamp color inputs) / int("integer") / array_num /
+                array_string / array_vec / array_entity.
             outputs: Same format as inputs.
             variables: List of ``{"name": str, "value": float}``.
+            canvases: Optional CanvasInstance or list of CanvasInstance objects to auto-bind.
             tps: Ticks per second.
             title: Visual title shown on the chip.
 
@@ -369,6 +649,44 @@ class MelsaveSession:
             Container index.
         """
         from .melsave_builder import _build_chip_save_objects
+        from .packages import CanvasInstance
+
+        canvas_list: list[CanvasInstance] = []
+        if canvases:
+            if isinstance(canvases, CanvasInstance):
+                canvas_list = [canvases]
+            elif isinstance(canvases, (list, tuple)):
+                canvas_list = list(canvases)
+
+            outputs = outputs or []
+            preambles = []
+            for cv in canvas_list:
+                preambles.append(cv.generate_lua_preamble())
+                outputs.append({
+                    "name": cv.gate_key,
+                    "type": "array_vec",
+                    "value": cv.width * cv.height,
+                })
+
+            source = "\n".join(preambles) + "\n" + source
+            # Device invokes `function OnTick()` only. `OnTick = canvas:bind(...)`
+            # stores a closure and never runs, so the panel stays dark.
+            # Keep a real function and flush after it when the user did not.
+            if "function OnTick" not in source:
+                raise ValueError(
+                    "canvas chip must define `function OnTick()`. "
+                    "`OnTick = canvas:bind(...)` does not run on device."
+                )
+            missing = [
+                cv.lua_var for cv in canvas_list
+                if f"{cv.lua_var}:flush()" not in source and ":flush()" not in source
+            ]
+            if missing:
+                raise ValueError(
+                    "call canvas:flush() at the end of function OnTick(); "
+                    "missing: " + ", ".join(missing)
+                )
+
         so = _build_chip_save_objects(
             source, x, y, z=z,
             inputs=inputs, outputs=outputs, variables=variables,
@@ -377,6 +695,12 @@ class MelsaveSession:
         )
         idx = self.add_container(so)
         self._active_chip_container = idx
+
+        # Working device saves (chinese_text_demo) store the wire on the
+        # chip: canvas_out_N is the output, led-matrix-data is the input.
+        for cv in canvas_list:
+            self.connect(idx, cv.gate_key, cv.item_idx, "led-matrix-data")
+
         return idx
 
     def add_ui_controller(self, controller: Any, x: float = 0.0, y: float = 0.0) -> int:
@@ -633,7 +957,7 @@ class MelsaveSession:
 
     def debug_run(
         self,
-        source: str,
+        source: Optional[str] = None,
         *,
         ticks: int = 1,
         inputs: Optional[dict] = None,
@@ -641,41 +965,61 @@ class MelsaveSession:
         container_idx: Optional[int] = None,
         stop_on_error: bool = True,
         inputs_provider: Optional[Callable[[int], dict]] = None,
+        reset_world: bool = False,
     ) -> dict:
         """Compile + OnInit + run ticks, returning a per-tick trace.
 
-        Unlike ``run_chip`` (final outputs only), each frame records::
+        If source is None, reads the source from container_idx (or active chip container).
 
-            {
-              "tick": int,            # 0-based
-              "outputs": dict,        # typed output buckets
-              "logs_delta": list,     # new console lines this tick
-              "error": str | None,
-              "variables": dict,      # chip variables.Set/Get table
-              "entity_count": int,
-            }
+        **reset_world=True** wipes runtime-spawned entities first (fresh world
+        from the document each run). Use it whenever the chip spawns objects
+        (``spawn.create``) — otherwise each run accumulates the previous run's
+        entities and pollutes readings.
 
-        Return shape::
+        **frames / tick correspondence** (phase-exact, no off-by-one):
 
-            {
-              "error": str | None,    # last/first fatal error
-              "outputs": dict,        # final outputs
-              "frames": list[dict],   # one entry per completed tick
-              "logs": list,           # full console after the run
-            }
+        - ``frames[i]["tick"] == i``, i is 0-based.
+        - Per frame: ``world.tick(dt)`` (physics + sensors) runs FIRST, then
+          ``OnTick`` sees the post-step state. Frame 0's outputs therefore
+          reflect one world step + one OnTick — NOT the OnInit state.
+        - ``OnInit`` runs before frame 0 on the loaded world state (document
+          entities, no physics stepped yet).
+        - A signal emitted in OnTick of frame i is readable by wires/inputs
+          of frame i+1 (one-tick wire latency — matches the real device).
 
-        OnInit-only path: pass ``ticks=0`` (``frames`` empty).
+        **Input priority**: host ``inputs`` (flat or bucketed) beat scene
+        wire values per gate name; gates you don't inject keep their wire /
+        default values.
         """
         self._require_runtime()
         assert self._runner is not None and self._world is not None
+        if reset_world:
+            self.reset_world()
+        idx = container_idx if container_idx is not None else self._active_chip_container
+        if source is None:
+            if idx is not None:
+                so = self.get_container(idx)
+                for sm in so.get("saveMetaDatas", []):
+                    if sm.get("key") == "lua_chip_source":
+                        source = sm.get("stringValue", "")
+                        break
+            if not source:
+                raise ValueError("No source provided and no chip source found in active container")
+
         r = self._runner
         if not r.compile(source, chunk_name=chunk_name):
             err = r.last_error or "compile failed"
             return {"error": err, "outputs": {}, "frames": [], "logs": list(r.logs)}
-        idx = container_idx if container_idx is not None else self._active_chip_container
         if idx is not None:
             self._sync_chip_source(idx, source)
 
+        # Resolve wired inputs BEFORE OnInit so entity wiring and gate
+        # defaults are visible during setup (real device binds gates first).
+        init_inputs = self._simulate_mechanics_and_inputs(
+            chip_container_idx=idx if idx is not None else self._active_chip_container,
+        )
+        if init_inputs is not None:
+            r.set_inputs(init_inputs)
         r.call_on_init()
         if ticks <= 0:
             return {
@@ -786,7 +1130,26 @@ class MelsaveSession:
         assert self._runner is not None and self._world is not None
         r = self._runner
         if not r._compiled:  # noqa: SLF001 — intentional compile guard
-            return {"error": r.last_error or "not compiled", "outputs": {}, "frames": []}
+            # Auto-compile the save's active chip so callers can load a
+            # melsave and immediately run_ticks without a debug_run first.
+            idx0 = self._active_chip_container
+            src0: Optional[str] = None
+            if idx0 is not None:
+                so0 = self.get_container(idx0)
+                for sm in so0.get("saveMetaDatas", []):
+                    if sm.get("key") == "lua_chip_source":
+                        src0 = sm.get("stringValue", "") or None
+                        break
+            if not src0:
+                return {"error": r.last_error or "not compiled", "outputs": {}, "frames": []}
+            if not r.compile(src0, chunk_name="@session_chip.lua"):
+                return {"error": r.last_error or "compile failed", "outputs": {}, "frames": []}
+            init_inputs = self._simulate_mechanics_and_inputs(
+                chip_container_idx=idx0,
+            )
+            if init_inputs is not None:
+                r.set_inputs(init_inputs)
+            r.call_on_init()
 
         frames: list[dict] = []
         last_error: Optional[str] = None

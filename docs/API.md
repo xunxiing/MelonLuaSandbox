@@ -111,6 +111,7 @@ print(e.sprite_path)                 # 贴图路径（若有）
 
 ```python
 from melon_lua import (
+    catalog_search,
     catalog_stats,
     get_profile_by_object_id,
     get_profile_by_name,
@@ -123,6 +124,7 @@ print(catalog_stats())                    # {"total": 456, "with_physics": 245, 
 prof = get_profile_by_object_id(202)      # 完整 profile（含 width/height/mass/sprite）
 oid = object_id_for_name("ResizablePlastic")  # 202
 names = list_spawnables()                 # 所有可生成的名字
+report = catalog_search("plate")          # 按名字/objectId 子串搜索 → 可读报告字符串
 gates = list_item_gates("文字屏")         # 或 261 / "激光雷达"
 # gates["inputs"]/["outputs"]: key, data_name, name, data_type, ...
 ```
@@ -636,7 +638,7 @@ MelsaveSession(path=None)   # 构造即读取文档（path=None 用空白世界�
 
 - `run_chip(source, *, ticks=1, inputs=None, container_idx=None) -> {"error", "outputs"}`
   编译 + OnInit + 跑 N tick，**只返回最终** outputs。源码自动同步回活跃芯片容器。
-- `debug_run(source, *, ticks=1, inputs=None, container_idx=None, stop_on_error=True, inputs_provider=None)`
+- `debug_run(source, *, ticks=1, inputs=None, container_idx=None, stop_on_error=True, inputs_provider=None, reset_world=False)`
   同上，但返回 **每 tick 轨迹**（适合 AI 排查中间状态）::
 
   {
@@ -655,6 +657,18 @@ MelsaveSession(path=None)   # 构造即读取文档（path=None 用空白世界�
   ],
   "logs": [...],             # 全量控制台
   }
+
+  - **`reset_world=True`**：先清空运行时世界（销毁上次运行 `spawn.create`
+    出的所有实体、重置 tick/变量），再从文档重建。芯片里会 spawn 的话
+    每次跑都必须带，否则新旧实体混跑污染读数。
+  - **frames/tick 对应关系**（相位精确）：`frames[i]["tick"] == i`（0 起）；
+    每 tick 先 `world.tick(dt)`（物理+传感器）再 `OnTick`，所以 frame 0 的
+    输出 = 走一步物理 + 第一次 OnTick，**不是** OnInit 状态；OnInit 在
+    frame 0 之前跑（面对文档初始状态）。frame i 的 OnTick 输出信号要
+    i+1 帧才被连线读到（1 tick 连线延迟，与真机一致）。
+  - **注入优先级**：host `inputs`（扁平或分桶写法都行）**逐门覆盖**场景
+    连线值；没注入的门保持连线/默认值。`{"enable": 1}` 和
+    `{"num": {"enable": 1}}` 等效。
 
   - `compile_only(source) -> bool` — 只编译不跑
   - `tick(inputs=None) -> dict` — 单步 OnTick（需先 compile；**不**推进 world）

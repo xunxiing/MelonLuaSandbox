@@ -18,6 +18,13 @@ from typing import Any, Optional
 RADAR_OBJECT_ID = 892993856
 _SELECTED_KEY = "Radar_selected_entities"
 
+# Default detection box when the save carries no sizeX/sizeY gates.
+# The REAL device defaults to 1x1 — a classic "radar never detects anything"
+# trap when you forget to enlarge it. The sandbox defaults to a friendlier
+# 10x10 so unconfigured radars still see nearby objects; explicit size gates
+# always win.
+RADAR_DEFAULT_SIZE = 10.0
+
 
 def _gate_value_float(gate: dict, default: float = 0.0) -> float:
     gd = gate.get("GateData")
@@ -96,9 +103,9 @@ def parse_radar_config(so: dict) -> dict[str, Any]:
     if size_y is None and len(fps) > 5:
         size_y = float(fps[5])
     if size_x is None:
-        size_x = 1.0
+        size_x = RADAR_DEFAULT_SIZE
     if size_y is None:
-        size_y = 1.0
+        size_y = RADAR_DEFAULT_SIZE
     shift_x = gates.get("shiftX", gates.get("shift x"))
     shift_y = gates.get("shiftY", gates.get("shift y"))
     if shift_x is None and len(fps) > 1:
@@ -207,9 +214,9 @@ def simulate_radars(world: Any, doc_raw: dict | None = None) -> dict[int, dict[s
         else:
             # runtime-only radar: default select-all from package data if present
             cfg = {
-                "activation": float(getattr(e, "activation_input", 1.0) or 1.0),
-                "width": float(e.custom_data.get("radar_width", 1.0)),
-                "height": float(e.custom_data.get("radar_height", 1.0)),
+                "activation": float(getattr(e, "activation_input", 1.0) or 0.0),
+                "width": float(e.custom_data.get("radar_width", RADAR_DEFAULT_SIZE)),
+                "height": float(e.custom_data.get("radar_height", RADAR_DEFAULT_SIZE)),
                 "shift_x": float(e.custom_data.get("radar_shift_x", 0.0)),
                 "shift_y": float(e.custom_data.get("radar_shift_y", 0.0)),
                 "selected_ids": e.custom_data.get("radar_selected_ids"),

@@ -352,7 +352,7 @@ class GateWireRegistry:
         start_point: tuple[float, float] = (0.0, 0.0),
         end_point: tuple[float, float] = (0.0, 0.0),
         start_material: str = "Paper",
-        end_material: str = "Metal",
+        end_material: str = "Paper",
         output_group: str = "",
         input_group: str = "",
     ) -> int:
@@ -430,6 +430,7 @@ class GateWireRegistry:
         """
         out: list[dict] = []
         for w in self.list_all():
+            cname = w.name if w.name else f"{w.output_gate} {w.input_gate} "
             out.append({
                 "mainGuid": {"Value": w.main_guid, "IsEmpty": False},
                 "constraintId": MECHANIC_CONSTRAINT_ID,
@@ -445,7 +446,7 @@ class GateWireRegistry:
                 "startObjectId": w.source_idx,
                 "endObjectId": w.target_idx,
                 "linkedRopeGuid": None,
-                "constraintName": w.name,
+                "constraintName": cname,
                 "isNameVisible": bool(w.name),
                 "startObjectConnectionMaterial": w.start_material,
                 "endObjectConnectionMaterial": w.end_material,

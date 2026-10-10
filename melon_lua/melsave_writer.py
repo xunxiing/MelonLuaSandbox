@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import copy
 import json
+import warnings
 import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -57,6 +58,10 @@ def write_melsave(
     """
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
+    containers = data_json.get("saveObjectContainers") or []
+    for i, c in enumerate(containers):
+        if isinstance(c, dict) and isinstance(c.get("saveObjects"), dict):
+            c["saveObjects"]["localId"] = i
     data_bytes = json.dumps(data_json, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("Data", data_bytes)
@@ -154,6 +159,40 @@ def resolve_gate_key(so: dict, gate_name: str, *, side: str) -> str:
     return name
 
 
+def _warn_ambiguous_grouped_gates(so: dict, side: str, gate_name: str, group: str) -> None:
+    """Warn when a bare gate name matches several grouped (UI element) gates.
+
+    Multiple UI elements commonly share one gate name (three sliders all
+    named "Value"). Wiring by bare name then attaches to the FIRST match —
+    a silent cross-wire that shows no error on device or sandbox. Pin the
+    wire with ``output_group``/``input_group`` = the element's GroupId, or
+    use ``ElementHandle.gate()``.
+    """
+    if group:
+        return
+    gates = _parse_mechanic_gates(so, side)
+    if not gates:
+        return
+    name = str(gate_name)
+    groups: set[str] = set()
+    for g in gates:
+        key = str(g.get("Key") or "")
+        dn = str(g.get("DataName") or "")
+        if (key == name or dn == name
+                or key.lower() == name.lower() or dn.lower() == name.lower()):
+            gid = g.get("GroupId")
+            if gid:
+                groups.add(str(gid))
+    if len(groups) > 1:
+        warnings.warn(
+            f"connect_gates: ambiguous {side} gate '{name}' — {len(groups)} UI "
+            f"elements share this name, the wire will attach to the first one "
+            f"(silent cross-wire). Pass {side}_group=<element GroupId> (see "
+            f"element_group_id / ElementHandle.gate) to pin the connection.",
+            stacklevel=3,
+        )
+
+
 def connect_gates(
     data_json: dict,
     source_idx: int,
@@ -212,7 +251,10 @@ def connect_gates(
     tgt_so = containers[target_idx].get("saveObjects") or {}
     resolved_out = resolve_gate_key(src_so, output_gate, side="output")
     resolved_in = resolve_gate_key(tgt_so, input_gate, side="input")
+    _warn_ambiguous_grouped_gates(src_so, "output", output_gate, output_group)
+    _warn_ambiguous_grouped_gates(tgt_so, "input", input_gate, input_group)
 
+    cname = name if name else f"{resolved_out} {resolved_in} "
     constraint = {
         "mainGuid": {"Value": str(__import__("uuid").uuid4()), "IsEmpty": False},
         "constraintId": MECHANIC_CONSTRAINT_ID,
@@ -228,10 +270,10 @@ def connect_gates(
         "startObjectId": source_idx,
         "endObjectId": target_idx,
         "linkedRopeGuid": None,
-        "constraintName": name,
+        "constraintName": cname,
         "isNameVisible": bool(name),
         "startObjectConnectionMaterial": "Paper",
-        "endObjectConnectionMaterial": "Metal",
+        "endObjectConnectionMaterial": "Paper",
         "customRope": None,
     }
     cs = src_so.get("constraints")

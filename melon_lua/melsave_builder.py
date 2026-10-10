@@ -65,6 +65,7 @@ _TYPE_MAP: dict[str, tuple[int, int]] = {
     "str": (GATE_STRING, LUAVAL_STRING),
     "vector": (GATE_VECTOR, LUAVAL_VECTOR),
     "vec": (GATE_VECTOR, LUAVAL_VECTOR),
+    "color": (GATE_VECTOR, LUAVAL_COLOR),
     "int": (GATE_INTEGER, LUAVAL_INTEGER),
     "integer": (GATE_INTEGER, LUAVAL_INTEGER),
     "array_num": (GATE_ARRAY_NUMBER, LUAVAL_ARRAY),
@@ -167,8 +168,13 @@ def _integer_gate_data(value: int = 32, min_v: float = 1.0,
     }, separators=(",", ":"))
 
 
-def _array_gate_data() -> str:
-    return json.dumps({"Value": None, "Default": None}, separators=(",", ":"))
+def _vec4_array(size: int) -> list[dict]:
+    vec4 = {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0, "magnitude": 1.0, "sqrMagnitude": 1.0}
+    return [dict(vec4) for _ in range(size)]
+
+
+def _array_gate_data(size: int = 1024) -> str:
+    return json.dumps({"Value": _vec4_array(size), "Default": None}, separators=(",", ":"))
 
 
 def _string_gate_data(value: str = "") -> str:
@@ -216,7 +222,10 @@ def _gate_data_for(type_alias: str, value: Any = None) -> str | None:
         "array_num", "array_number", "array_string", "array_str",
         "array_vec", "array_vector", "array_entity",
     ):
-        return _array_gate_data()
+        size = 1024
+        if isinstance(value, int) and value > 0:
+            size = value
+        return _array_gate_data(size)
     # Entity, Vector, Color → no GateData (connected via wire)
     return None
 
@@ -511,7 +520,7 @@ def _build_item_save_objects(
         )
     so = copy.deepcopy(template_dict)
     so["objectId"] = object_id
-    so["instanceId"] = -abs(hash((object_id, x, y))) % (2**31) * -1
+    so["instanceId"] = -abs(uuid.uuid4().int % (2**31 - 1)) - 1
     so["localId"] = 0
     so["originLocalId"] = 0
     so["parentId"] = -1
@@ -550,7 +559,7 @@ def _build_chip_save_objects(
     variables: list[dict] | None = None,
     tps: int = 30,
     priority: int = 0,
-    instruction_cost: int = 1000,
+    instruction_cost: int = 1000000,
     title: str = "",
     template: dict | None = None,
 ) -> dict:
@@ -560,10 +569,13 @@ def _build_chip_save_objects(
         lua_source: The Lua source code.
         x, y: Chip position.
         inputs: List of {"name": str, "type": str, "value": optional} dicts.
-            Type aliases: entity/number/string/vector/int.
+            Type aliases: entity/number(string "num")/string("str")/vector("vec")
+            /color/int("integer")/array_num/array_string/array_vec/array_entity.
+            "color" gates are Vector4 (r,g,b,a) — e.g. outputs.color feeds the
+            "color" input of FlashLight / EdisonLamp style lights.
         outputs: Same format as inputs.
         variables: List of {"name": str, "value": float} for chip_variables.
-        tps: Ticks per second (1-60).
+        tps: Ticks per second (1-1000; device UI may cap lower).
         priority: Chip execution priority.
         instruction_cost: Max instructions per tick.
         title: Visual title shown on chip.
@@ -578,6 +590,7 @@ def _build_chip_save_objects(
     else:
         template_dict = _minimal_chip_template()
     so = copy.deepcopy(template_dict)
+    so["instanceId"] = -abs(uuid.uuid4().int % (2**31 - 1)) - 1
 
     inputs = inputs or []
     outputs = outputs or []

@@ -79,10 +79,10 @@ def chip_input_schema_from_container(so: dict) -> dict[str, str]:
                     schema[name] = "array_string"
                 elif "num" in nlow or "float" in nlow:
                     schema[name] = "array_num"
-                elif "vec" in nlow or "color" in nlow or "pixel" in nlow:
+                elif "vec" in nlow or "color" in nlow or "pixel" in nlow or "data" in nlow or "array" in nlow:
                     schema[name] = "array_vec"
                 else:
-                    schema[name] = "array_entity"
+                    schema[name] = "array_vec"
     # mechanicSerializedInputs DataType overrides / fills gaps
     md = so.get("mechanicData")
     if isinstance(md, list) and md and isinstance(md[0], dict):
@@ -180,14 +180,139 @@ def build_chip_inputs_from_wires(
             inputs[bucket][in_name] = list(val) if isinstance(val, list) else []
         else:
             inputs[bucket][in_name] = val
+
+    # Bind GateData default values for unwired scalar inputs (num/int/string).
+    # Real device reads gate defaults from mechanicData; sandbox must too,
+    # otherwise chips see nil for unconnected number inputs.
+    _bind_gate_defaults(inputs, schema, chip_so)
     return inputs
+
+
+def _bind_gate_defaults(
+    inputs: dict[str, dict[str, Any]],
+    schema: dict[str, str],
+    chip_so: Optional[dict],
+) -> None:
+    if not isinstance(chip_so, dict):
+        return
+    md = chip_so.get("mechanicData")
+    if not isinstance(md, list) or not md:
+        return
+    raw = md[0].get("mechanicSerializedInputs")
+    gates: Any = []
+    if isinstance(raw, str):
+        if not raw:
+            return
+        try:
+            parsed = json.loads(raw)
+            gates = parsed if isinstance(parsed, list) else []
+        except (json.JSONDecodeError, TypeError):
+            return
+    elif isinstance(raw, list):
+        gates = raw
+    for g in gates:
+        if not isinstance(g, dict):
+            continue
+        name = str(g.get("Key") or g.get("DataName") or "")
+        if not name:
+            continue
+        bucket = schema.get(name) or schema.get(name.lower())
+        if bucket not in ("num", "int", "string"):
+            continue
+        if inputs.get(bucket, {}).get(name) is not None:
+            continue  # wired value wins
+        gd = g.get("GateData")
+        if not isinstance(gd, str) or not gd:
+            continue
+        try:
+            data = json.loads(gd)
+        except (json.JSONDecodeError, TypeError):
+            continue
+        val = data.get("Value") if isinstance(data, dict) else None
+        if val is None:
+            continue
+        if bucket in ("num", "int"):
+            try:
+                inputs[bucket][name] = float(val)
+            except (TypeError, ValueError):
+                continue
+        elif isinstance(val, str):
+            inputs["string"][name] = val
+
+
+def normalize_inputs(
+    inputs: Optional[dict],
+    schema: Optional[dict[str, str]] = None,
+) -> Optional[dict[str, dict[str, Any]]]:
+    """Route flat (non-bucketed) gate names into typed input buckets.
+
+    ``debug_run(inputs={"enable": 1})`` used to lose the value: merge_inputs
+    only merges per-bucket dicts, so a flat key never overrode a wire value
+    (scene wires silently won). Now flat names are routed into buckets:
+
+    1. chip input schema (gate name → bucket) when known;
+    2. else value shape — float/int → ``num``, str → ``string``,
+       list → ``array_num`` (all-numeric) / ``array_string`` (all-str) /
+       ``array_vec``, dict with x/y(/z/w) → ``vec``, dict with r/g/b(/a) →
+       ``color``.
+
+    Already-bucketed dicts pass through unchanged (copies). Returns None
+    for None input.
+    """
+    if inputs is None:
+        return None
+    schema = schema or {}
+    out = empty_inputs()
+    for k in _EMPTY_BUCKETS:
+        if isinstance(inputs.get(k), dict):
+            out[k].update(inputs[k])
+    for k, v in inputs.items():
+        if k in _EMPTY_BUCKETS:
+            continue
+        bucket = schema.get(k) or schema.get(str(k).lower())
+        if bucket is None:
+            if isinstance(v, bool):
+                bucket = "num"
+                v = 1.0 if v else 0.0
+            elif isinstance(v, (int, float)):
+                bucket = "num"
+            elif isinstance(v, str):
+                bucket = "string"
+            elif isinstance(v, dict):
+                keys = {str(kk).lower() for kk in v}
+                if keys & {"r", "g", "b", "a"}:
+                    bucket = "color"
+                elif keys & {"x", "y", "z", "w"}:
+                    bucket = "vec"
+                else:
+                    continue
+            elif isinstance(v, list):
+                if v and all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in v):
+                    bucket = "array_num"
+                elif v and all(isinstance(x, str) for x in v):
+                    bucket = "array_string"
+                elif v and all(isinstance(x, dict) for x in v):
+                    bucket = "array_vec"
+                else:
+                    bucket = "array_num"
+            else:
+                continue
+        if bucket in out:
+            out[bucket][k] = v
+    return out
 
 
 def merge_inputs(
     auto: Optional[dict[str, dict[str, Any]]],
     override: Optional[dict[str, dict[str, Any]]],
 ) -> Optional[dict[str, dict[str, Any]]]:
-    """Merge override on top of auto (override wins per gate name)."""
+    """Merge override on top of auto (override wins per gate name).
+
+    Priority contract (debug injection vs scene wires): **override wins per
+    gate name** — a host-injected ``{"num": {"enable": 1}}`` (or flat
+    ``{"enable": 1}`` after normalize_inputs) beats a ``btn -> enable`` wire
+    that writes 0 every tick. Wires only affect gates the host did not inject.
+    """
     if not auto and not override:
         return None
     if not auto:

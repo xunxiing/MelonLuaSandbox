@@ -17,6 +17,7 @@ from .uicontrol_backend import register_uicontrol_backend
 from .world_backend import register_world_backend
 from .variables_backend import register_variables_backend
 from .print_backend import register_print_backend
+from .http_backend import register_http_backend
 
 __all__ = [
     "register_all",
@@ -31,6 +32,7 @@ __all__ = [
     "register_world_backend",
     "register_variables_backend",
     "register_print_backend",
+    "register_http_backend",
 ]
 
 
@@ -47,3 +49,4 @@ def register_all(lua, g, world, on_log=None, error_log_fn=None, queue_spawn_resu
     register_uicontrol_backend(lua, g, world)
     register_world_backend(lua, g, world)
     register_variables_backend(lua, g, world)
+    register_http_backend(lua, g, world)

@@ -365,5 +365,12 @@ def spawn_document_into_world(doc: MelsaveDocument, world: Any, *, melmod_overri
         # Root container index (children use child_index >= 100000)
         if o.index < 100000:
             e.custom_data["container_idx"] = int(o.index)
+            # Fill the container's built-in "entity" output gate so gate-wire
+            # resolution (gate_propagate) can feed chip entity inputs. Radar
+            # containers overwrite their own bucket each tick; we only seed.
+            gv = getattr(world, "gate_output_values", None)
+            if isinstance(gv, dict):
+                bucket = gv.setdefault(int(o.index), {})
+                bucket.setdefault("entity", e.entity_id)
         ids.append(e.entity_id)
     return ids

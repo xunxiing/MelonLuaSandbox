@@ -298,6 +298,11 @@ def register_entity_backend(lua, g, world: WorldContext):
         # so first arg may be nil. Count live entities.
         return sum(1 for e in world.entities.values() if e.alive)
 
+    def all_id(_id=None):
+        # entity.all_id() → 1-based Lua array of live entity ids.
+        ids = [eid for eid, e in world.entities.items() if e.alive]
+        return lua.table_from(ids)
+
     def find(_id_or_name, name=None):
         # entity.find("Human") → id of first match
         target = name if name is not None else _id_or_name
@@ -425,7 +430,7 @@ def register_entity_backend(lua, g, world: WorldContext):
         "delete": delete,
         # Identity
         "getId": get_id, "isValid": is_valid,
-        "all": all_, "find": find,
+        "all": all_, "all_id": all_id, "find": find,
         # Hierarchy
         "getRoot": get_root, "getParent": get_parent, "getChildren": get_children,
         # Bounds
